@@ -17,14 +17,18 @@
   },
   "homepage": "https://github.com/renasar/renasar-core",
   "dependencies": {
+    "assert-plus": "^0.1.5",
     "colors": "^1.0.3",
     "di": "git+ssh://git@github.com/renasar/di.js.git",
     "glob": "^4.3.2",
     "lodash": "^2.4.1",
+    "lru-cache": "^2.5.0",
     "nconf": "^0.7.1",
     "prettyjson": "^1.0.0",
     "q": "^1.1.2",
     "resolve": "^1.0.0",
-    "stack-trace": "0.0.9"
+    "sails-mongo": "^0.10.5",
+    "stack-trace": "0.0.9",
+    "waterline": "^0.10.15"
   }
 }

@@ -14,11 +14,15 @@ module.exports = function (di, directory) {
             [
                 helper.requireGlob(__dirname + '/lib/protocol/*.js'),
                 helper.requireGlob(__dirname + '/lib/services/*.js'),
+                helper.requireGlob(__dirname + '/lib/models/*.js'),
                 helper.requireWrapper('q', 'Q'),
                 helper.requireWrapper('nconf'),
+                helper.requireWrapper('waterline', 'Waterline'),
+                helper.requireWrapper('sails-mongo', 'MongoAdapter'),
                 helper.simpleWrapper(_, '_'),
-                require('./lib/common/constants.js'),
-                require('./lib/common/logger.js')
+                require('./lib/common/constants'),
+                require('./lib/common/logger'),
+                require('./lib/common/model')
             ]
         )
     };
