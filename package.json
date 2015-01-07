@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/renasar/renasar-core",
   "dependencies": {
+    "amqplib": "^0.3.0",
     "assert-plus": "^0.1.5",
     "colors": "^1.0.3",
     "di": "git+ssh://git@github.com/renasar/di.js.git",
