@@ -1,9 +1,10 @@
 {
   "name": "renasar-core",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Renasar Core Library",
   "main": "index.js",
   "scripts": {
+    "doc": "jsdoc lib -r -d docs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -31,5 +32,13 @@
     "sails-mongo": "^0.10.5",
     "stack-trace": "0.0.9",
     "waterline": "^0.10.15"
+  },
+  "devDependencies": {
+    "chai": "^1.10.0",
+    "istanbul": "^0.3.5",
+    "jsdoc": "^3.3.0-alpha13",
+    "jshint": "^2.5.11",
+    "sinon": "^1.12.2",
+    "sinon-chai": "^2.6.0"
   }
 }
