@@ -87,8 +87,6 @@ global.helper = {
         require('../lib/models/catalog'),
         require('../lib/models/node'),
         require('../lib/models/poller'),
-        require('../lib/models/workflow'),
-        require('../lib/models/workflow-event'),
 
         dihelper.requireGlob(__dirname + '../lib/protocol/*.js')
 
