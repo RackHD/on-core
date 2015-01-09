@@ -70,8 +70,6 @@
         "expect": false,
         "should": false,
         "request": false,
-        "di": false,
-        "dihelper": false,
         "helper": false,
         "chai": false,
         "sinon": false,
