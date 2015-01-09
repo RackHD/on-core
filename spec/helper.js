@@ -35,8 +35,8 @@ global.should = chai.should(); // jshint ignore:line
 /**
  *  set up di for testing
  */
-global.di = require('di');
-global.dihelper = require('../lib/common/di')(di, __dirname);
+var di = require('di');
+var dihelper = require('../lib/common/di')(di, __dirname);
 
 /**
  *  set up global lodash as _ for testing
@@ -72,24 +72,15 @@ global.helper = {
         dihelper.requireWrapper('amqplib', 'amqp'),
 
         // Non Glob Requirables
-        require('../lib/services/assert'),
-        require('../lib/services/configuration'),
-        require('../lib/services/errors'),
-        require('../lib/services/lookup'),
-        require('../lib/services/messenger'),
-        require('../lib/services/waterline'),
-
         require('../lib/common/constants'),
         require('../lib/common/logger'),
         require('../lib/common/model'),
         require('../lib/common/message'),
 
-        require('../lib/models/catalog'),
-        require('../lib/models/node'),
-        require('../lib/models/poller'),
-
-        //require('../lib/protocol/configuration'),
-        //dihelper.requireGlob(__dirname + '../lib/protocol/*.js')
+        // Glob requireables
+        dihelper.requireGlob(__dirname + '/../lib/services/*.js'),
+        dihelper.requireGlob(__dirname + '/../lib/models/*.js'),
+        dihelper.requireGlob(__dirname + '/../lib/protocol/*.js')
 
 ])),
 
@@ -99,9 +90,9 @@ global.helper = {
         }
 
         var waterline = injector.get('Services.Waterline');
-        var nconf = injector.get('Services.Configuration');
+        var config = injector.get('Services.Configuration');
 
-        nconf.set('mongo', {
+        config.set('mongo', {
             adapter: 'mongo',
             host: 'localhost',
             port: 27017,
@@ -141,16 +132,4 @@ global.helper = {
         });
     }
 };
-
-var config = helper.baseInjector.get('Services.Configuration'); // jshint ignore:line
-
-config.defaults({
-    mongo: {
-        host: 'localhost',
-        port: 27017,
-        database: 'renasar-pxe-test',
-        user: '',
-        password: ''
-    }
-});
 
