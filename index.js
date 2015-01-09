@@ -6,7 +6,7 @@
 var _ = require('lodash');
 
 module.exports = function (di, directory) {
-    var helper = require('./lib/common/di.js')(di, directory || __dirname);
+    var helper = require('./lib/common/di')(di, directory || __dirname);
 
     return {
         helper: helper,
