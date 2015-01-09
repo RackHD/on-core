@@ -26,7 +26,9 @@ module.exports = function (di, directory) {
                 helper.requireGlob(__dirname + '/lib/models/*.js'),
 
                 // Non Glob Requirables
+                require('./lib/common/assert'),
                 require('./lib/common/constants'),
+                require('./lib/common/errors'),
                 require('./lib/common/logger'),
                 require('./lib/common/model'),
                 require('./lib/common/message'),
