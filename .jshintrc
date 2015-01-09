@@ -72,7 +72,6 @@
         "request": false,
         "helper": false,
         "chai": false,
-        "sinon": false,
-        "_": false
+        "sinon": false
     }
 }
