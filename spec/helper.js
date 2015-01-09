@@ -35,8 +35,8 @@ global.should = chai.should(); // jshint ignore:line
 /**
  *  set up di for testing
  */
-var di = require('di'),
-    dihelper = require('../lib/common/di')(di, __dirname);
+global.di = require('di');
+global.dihelper = require('../lib/common/di')(di, __dirname);
 
 /**
  *  set up global lodash as _ for testing
@@ -88,7 +88,8 @@ global.helper = {
         require('../lib/models/node'),
         require('../lib/models/poller'),
 
-        dihelper.requireGlob(__dirname + '../lib/protocol/*.js')
+        //require('../lib/protocol/configuration'),
+        //dihelper.requireGlob(__dirname + '../lib/protocol/*.js')
 
 ])),
 
