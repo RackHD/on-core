@@ -133,16 +133,3 @@ global.helper = {
     }
 };
 
-var config = helper.baseInjector.get('Services.Configuration'); // jshint ignore:line
-
-config.defaults({
-    mongo: {
-        adapter: 'mongo',
-        host: 'localhost',
-        port: 27017,
-        database: 'renasar-pxe-test',
-        user: '',
-        password: ''
-    }
-});
-
