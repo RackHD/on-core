@@ -29,5 +29,6 @@ The series for CI systems (Jenkins):
     # verify hint/style
     ./node_modules/.bin/jshint -c .jshintrc --reporter=checkstyle lib > checkstyle-result.xml || true
     ./node_modules/.bin/istanbul cover _mocha -- $(find spec -name '*-spec.js') -R xunit-file --require spec/helper.js
-    ./node_modules/.bin/istanbul report coverage
+    ./node_modules/.bin/istanbul report cobertura
+    ./node_modules/.bin/istanbul report text-summary
 
