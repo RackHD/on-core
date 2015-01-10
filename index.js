@@ -29,7 +29,8 @@ module.exports = function (di, directory) {
                 require('./lib/common/constants'),
                 require('./lib/common/logger'),
                 require('./lib/common/model'),
-                require('./lib/common/message')
+                require('./lib/common/message'),
+                require('./lib/common/subscription')
             ]
         )
     };
