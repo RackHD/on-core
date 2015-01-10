@@ -76,6 +76,7 @@ global.helper = {
         require('../lib/common/logger'),
         require('../lib/common/model'),
         require('../lib/common/message'),
+        require('../lib/common/subscription'),
 
         // Glob requireables
         dihelper.requireGlob(__dirname + '/../lib/services/*.js'),
