@@ -19,12 +19,18 @@ module.exports = function (di, directory) {
                 helper.requireWrapper('waterline', 'Waterline'),
                 helper.requireWrapper('sails-mongo', 'MongoAdapter'),
                 helper.requireWrapper('amqplib', 'amqp'),
+                helper.requireWrapper('domain', 'domain'),
+                helper.requireWrapper('node-uuid', 'uuid'),
+                helper.requireWrapper('stack-trace', 'stack-trace'),
+                helper.requireWrapper('colors/safe', 'colors'),
+                helper.requireWrapper('prettyjson', 'prettyjson'),
+                helper.requireWrapper('lru-cache', 'lru-cache'),
 
                 // Glob Requirables
                 helper.requireGlob(__dirname + '/lib/common/*.js'),
                 helper.requireGlob(__dirname + '/lib/models/*.js'),
-                helper.requireGlob(__dirname + '/lib/protocol/*.js'),
-                helper.requireGlob(__dirname + '/lib/services/*.js'),
+                helper.requireGlob(__dirname + '/lib/protocol/**/*.js'),
+                helper.requireGlob(__dirname + '/lib/services/*.js')
             ]
         )
     };

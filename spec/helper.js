@@ -36,7 +36,7 @@ global.should = chai.should(); // jshint ignore:line
  *  set up di for testing
  */
 var di = require('di');
-var dihelper = require('../lib/common/di')(di, __dirname);
+var dihelper = require('../lib/di')(di, __dirname);
 
 /**
  *  set up global lodash as _ for testing
@@ -64,24 +64,24 @@ global.helper = {
  */
     baseInjector: new di.Injector(_.flatten([ // jshint ignore:line
         // NPM Packages
-        dihelper.simpleWrapper(_, '_'), //jshint ignore:line
+        dihelper.requireWrapper('lodash', '_'),
         dihelper.requireWrapper('q', 'Q'),
         dihelper.requireWrapper('nconf'),
         dihelper.requireWrapper('waterline', 'Waterline'),
         dihelper.requireWrapper('sails-mongo', 'MongoAdapter'),
         dihelper.requireWrapper('amqplib', 'amqp'),
+        dihelper.requireWrapper('domain', 'domain'),
+        dihelper.requireWrapper('node-uuid', 'uuid'),
+        dihelper.requireWrapper('stack-trace', 'stack-trace'),
+        dihelper.requireWrapper('colors/safe', 'colors'),
+        dihelper.requireWrapper('prettyjson', 'prettyjson'),
+        dihelper.requireWrapper('lru-cache', 'lru-cache'),
 
-        // Non Glob Requirables
-        require('../lib/common/constants'),
-        require('../lib/common/logger'),
-        require('../lib/common/model'),
-        require('../lib/common/message'),
-        require('../lib/common/subscription'),
-
-        // Glob requireables
-        dihelper.requireGlob(__dirname + '/../lib/services/*.js'),
+        // Glob Requirables
+        dihelper.requireGlob(__dirname + '/../lib/common/*.js'),
         dihelper.requireGlob(__dirname + '/../lib/models/*.js'),
-        dihelper.requireGlob(__dirname + '/../lib/protocol/*.js')
+        dihelper.requireGlob(__dirname + '/../lib/protocol/**/*.js'),
+        dihelper.requireGlob(__dirname + '/../lib/services/*.js')
 
 ])),
 
@@ -120,7 +120,7 @@ global.helper = {
             injector = this.baseInjector;
         }
         var Q = injector.get('Q');
-        return helper.initializeWaterline(injector).then(function (waterline) { // jshint ignore:line
+        return this.initializeWaterline(injector).then(function (waterline) { // jshint ignore:line
             /* drop doesn't actually return a promise, but leaving this Q.all in here in case
              * we need to switch to using destroy() */
             return Q.all(_.map(waterline, function (collection) { // jshint ignore:line

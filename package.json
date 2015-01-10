@@ -27,6 +27,7 @@
     "lodash": "^2.4.1",
     "lru-cache": "^2.5.0",
     "nconf": "^0.7.1",
+    "node-uuid": "^1.4.2",
     "prettyjson": "^1.0.0",
     "q": "^1.1.2",
     "resolve": "^1.0.0",
