@@ -7,7 +7,7 @@
 var assertPlus = require('assert-plus');
 
 describe("AssertService", function() {
-    var assert = helper.baseInjector.get('Services.Assert'),
+    var assert = helper.baseInjector.get('Assert'),
         config = helper.baseInjector.get('Services.Configuration');
 
     _.methods(assertPlus).forEach(function (method) {

@@ -6,7 +6,7 @@
 var _ = require('lodash');
 
 module.exports = function (di, directory) {
-    var helper = require('./lib/common/di')(di, directory || __dirname);
+    var helper = require('./lib/di')(di, directory || __dirname);
 
     return {
         helper: helper,
@@ -21,16 +21,10 @@ module.exports = function (di, directory) {
                 helper.requireWrapper('amqplib', 'amqp'),
 
                 // Glob Requirables
+                helper.requireGlob(__dirname + '/lib/common/*.js'),
+                helper.requireGlob(__dirname + '/lib/models/*.js'),
                 helper.requireGlob(__dirname + '/lib/protocol/*.js'),
                 helper.requireGlob(__dirname + '/lib/services/*.js'),
-                helper.requireGlob(__dirname + '/lib/models/*.js'),
-
-                // Non Glob Requirables
-                require('./lib/common/constants'),
-                require('./lib/common/logger'),
-                require('./lib/common/model'),
-                require('./lib/common/message'),
-                require('./lib/common/subscription')
             ]
         )
     };
