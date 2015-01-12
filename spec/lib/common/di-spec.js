@@ -7,7 +7,7 @@ describe('dihelper', function () {
     var di = require('di');
     describe("initialized ", function () {
 
-        var dihelper = helper.require('/lib/common/di')(di);
+        var dihelper = helper.require('/lib/di')(di);
 
         it('initialized ok', function () {
             should.exist(dihelper);
