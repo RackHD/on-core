@@ -37,7 +37,8 @@
     "stack-trace": "0.0.9",
     "validate.js": "^0.3.2",
     "validator": "^3.27.0",
-    "waterline": "^0.10.15"
+    "waterline": "^0.10.15",
+    "waterline-criteria": "^0.11.1"
   },
   "devDependencies": {
     "chai": "^1.10.0",

@@ -17,6 +17,7 @@ module.exports = function (di, directory) {
                 helper.requireWrapper('q', 'Q'),
                 helper.requireWrapper('nconf'),
                 helper.requireWrapper('waterline', 'Waterline'),
+                helper.requireWrapper('waterline-criteria', 'WaterlineCriteria'),
                 helper.requireWrapper('sails-mongo', 'MongoAdapter'),
                 helper.requireWrapper('amqplib', 'amqp'),
                 helper.requireWrapper('domain', 'domain'),
