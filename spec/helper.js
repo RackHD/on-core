@@ -53,6 +53,13 @@ global.helper = {
     },
 
 /**
+ * Helper for glob requiring files based on the cwd which is the root of the project.
+ */
+    requireGlob: function (pathPattern) {
+        return dihelper.requireGlob(this.relativeToRoot(pathPattern));
+    },
+
+/**
  * Helper to generate a full path relative to the root directory.
  */
     relativeToRoot: function (file) {
@@ -130,6 +137,30 @@ global.helper = {
                 return waterline;
             });
         });
+    },
+
+    initializeMessenger: function(injector) {
+        if (arguments.length === 0) {
+            injector = this.baseInjector;
+        }
+
+        var messenger = injector.get('Services.Messenger'),
+            config = injector.get('Services.Configuration');
+
+        config.set("amqp", "amqp://localhost");
+        config.set("port", 514);
+
+        return messenger.start();
+    },
+
+    stopMessenger: function(injector) {
+        if (arguments.length === 0) {
+            injector = this.baseInjector;
+        }
+
+        var messenger = injector.get('Services.Messenger');
+
+        return messenger.stop();
     }
 };
 
