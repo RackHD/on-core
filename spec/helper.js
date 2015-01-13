@@ -90,11 +90,10 @@ global.helper = {
             injector = this.baseInjector;
         }
 
-        var waterline = injector.get('Services.Waterline');
-        var config = injector.get('Services.Configuration');
+        var config = injector.get('Services.Configuration'),
+            waterline = injector.get('Services.Waterline');
 
         config.set('mongo', {
-            adapter: 'mongo',
             host: 'localhost',
             port: 27017,
             database: 'renasar-pxe-test',
