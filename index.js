@@ -27,6 +27,7 @@ module.exports = function (di, directory) {
                 helper.requireWrapper('lru-cache', 'lru-cache'),
                 helper.requireWrapper('memwatch', 'memwatch'),
                 helper.requireWrapper('node-statsd', 'node-statsd'),
+                helper.requireWrapper('validate.js', 'validate'),
 
                 // Glob Requirables
                 helper.requireGlob(__dirname + '/lib/common/*.js'),
