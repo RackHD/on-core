@@ -3,10 +3,8 @@
 'use strict';
 
 describe('dihelper', function () {
-
     var di = require('di');
     describe("initialized ", function () {
-
         var dihelper = helper.require('/lib/di')(di);
 
         it('initialized ok', function () {

@@ -5,7 +5,7 @@
 'use strict';
 
 describe("Errors", function() {
-    var Errors = helper.baseInjector.get('Errors');
+    var Errors = helper.injector.get('Errors');
 
     describe('BaseError', function () {
         var error = new Errors.BaseError('message');

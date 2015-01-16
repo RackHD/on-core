@@ -4,74 +4,78 @@
 'use strict';
 
 describe("Event subscriber functions", function() {
-    var injector;
-    var events;
+    helper.before();
 
     before(function() {
-        injector = helper.baseInjector.createChild(_.flatten([
-            helper.requireGlob(__dirname + '/../lib/protocol/**/*.js'),
-            helper.requireGlob(__dirname + '/../lib/services/*.js')
-        ]));
-        events = injector.get('Protocol.Events');
-        return helper.initializeMessenger(injector);
+        this.events = helper.injector.get('Protocol.Events');
     });
 
+    helper.after();
+
     it("should subscribe to an HTTP response event", function(done) {
-        var task = injector.get('Protocol.Task');
-        var data = {
-            test: 1,
-            data: [1, 2]
-        };
-        var id = "testIdHttpResponse";
+        var self = this,
+            task = helper.injector.get('Protocol.Task'),
+            data = {
+                test: 1,
+                data: [1, 2]
+            },
+            id = "testIdHttpResponse";
+
         task.subscribeHttpResponse(id, function(_data) {
             expect(_data).to.deep.equal(data);
             done();
         })
         .then(function(sub) {
             expect(sub).to.be.ok;
-            events.publishHttpResponse(id, data);
+            self.events.publishHttpResponse(id, data);
         });
     });
 
     it("should subscribe to a TFTP success event", function(done) {
-        var task = injector.get('Protocol.Task');
-        var data = {
-            test: 1,
-            data: [1, 2]
-        };
-        var id = "testIdTftpSuccess";
+        var self = this,
+            task = helper.injector.get('Protocol.Task'),
+            data = {
+                test: 1,
+                data: [1, 2]
+            },
+            id = "testIdTftpSuccess";
+
         task.subscribeTftpSuccess(id, function(_data) {
             expect(_data).to.deep.equal(data);
             done();
         })
         .then(function(sub) {
             expect(sub).to.be.ok;
-            events.publishTftpSuccess(id, data);
+            self.events.publishTftpSuccess(id, data);
         });
     });
 
     it("should subscribe to a DHCP lease bind event", function(done) {
-        var task = injector.get('Protocol.Task');
-        var data = {
-            test: 1,
-            data: [1, 2]
-        };
-        var id = "testIdDhcpLease";
+        var self = this,
+            task = helper.injector.get('Protocol.Task'),
+            data = {
+                test: 1,
+                data: [1, 2]
+            },
+            id = "testIdDhcpLease";
+
         task.subscribeDhcpBoundLease(id, function(_data) {
             expect(_data).to.deep.equal(data);
             done();
         })
         .then(function(sub) {
             expect(sub).to.be.ok;
-            events.publishDhcpBoundLease(id, data);
+            self.events.publishDhcpBoundLease(id, data);
         });
     });
 
     it("should not subscribe to a response for other identifiers", function(done) {
-        var Q = injector.get('Q');
-        var task = injector.get('Protocol.Task');
-        var otherId = "testidother";
-        var id = "testid";
+        var self = this,
+            Q = helper.injector.get('Q'),
+            task = helper.injector.get('Protocol.Task'),
+            otherId = "testidother",
+            id = "testid";
+
         task.subscribeHttpResponse(id, function() {
             var err = new Error("Did not expect to receive a message from " +
                                 " routing keys not mapped to " + id);
@@ -79,7 +83,7 @@ describe("Event subscriber functions", function() {
         })
         .then(function(sub) {
             expect(sub).to.be.ok;
-            events.publishHttpResponse(otherId, {});
+            self.events.publishHttpResponse(otherId, {});
             return Q.delay(1000);
         })
         .then(function() {

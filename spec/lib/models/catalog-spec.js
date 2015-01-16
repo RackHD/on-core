@@ -6,12 +6,14 @@
 var base = require('./base-spec');
 
 describe('Catalog Model', function () {
-    base.before(function (waterline, context) {
-        context.model = waterline.catalogs;
+    helper.before();
+
+    base.before(function (context) {
+        context.model = helper.injector.get('Services.Waterline').catalogs;
         context.attributes = context.model._attributes;
     });
 
-    base.after();
+    helper.after();
 
     describe('Base', function () {
         base.examples();

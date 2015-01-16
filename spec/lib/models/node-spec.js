@@ -6,12 +6,14 @@
 var base = require('./base-spec');
 
 describe('Node Model', function () {
-    base.before(function (waterline, context) {
-        context.model = waterline.nodes;
+    helper.before();
+
+    base.before(function (context) {
+        context.model = helper.injector.get('Services.Waterline').nodes;
         context.attributes = context.model._attributes;
     });
 
-    base.after();
+    helper.after();
 
     describe('Base', function () {
         base.examples();
@@ -19,7 +21,7 @@ describe('Node Model', function () {
 
     describe('Attributes', function () {
         describe('profile', function () {
-            beforeEach(function () {
+            before(function () {
                 this.subject = this.attributes.profile;
             });
 
@@ -37,7 +39,7 @@ describe('Node Model', function () {
         });
 
         describe('name', function () {
-            beforeEach(function () {
+            before(function () {
                 this.subject = this.attributes.name;
             });
 
@@ -51,7 +53,7 @@ describe('Node Model', function () {
         });
 
         describe('obmSettings', function () {
-            beforeEach(function () {
+            before(function () {
                 this.subject = this.attributes.obmSettings;
             });
 
@@ -66,7 +68,7 @@ describe('Node Model', function () {
         });
 
         describe('ipAddresses', function () {
-            beforeEach(function () {
+            before(function () {
                 this.subject = this.attributes.ipAddresses;
             });
 
@@ -81,7 +83,7 @@ describe('Node Model', function () {
         });
 
         describe('catalogs', function () {
-            beforeEach(function () {
+            before(function () {
                 this.subject = this.attributes.catalogs;
             });
 
@@ -92,7 +94,7 @@ describe('Node Model', function () {
         });
 
         describe('sku', function () {
-            beforeEach(function () {
+            before(function () {
                 this.subject = this.attributes.sku;
             });
 

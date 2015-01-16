@@ -5,31 +5,19 @@
 
 module.exports = {
     before: function (callback) {
-        before(function (done) {
-            var context = this;
-
-            helper.dropAndReinitialize().then(function (services) {
-                callback(services, context);
-                done();
-            }).catch(function (error) {
-                done(error);
-            });
-        });
-    },
-    after: function () {
-        after(function () {
-            return helper.closeWaterline();
+        before(function () {
+            callback(this);
         });
     },
     examples: function () {
-        beforeEach(function () {
+        before(function () {
             expect(this.model).to.be.ok;
             expect(this.attributes).to.be.ok;
         });
 
         describe('Attributes', function () {
             describe('id', function () {
-                beforeEach(function () {
+                before(function () {
                     this.subject = this.attributes.id;
                 });
 
@@ -51,7 +39,7 @@ module.exports = {
             });
 
             describe('createdAt', function () {
-                beforeEach(function () {
+                before(function () {
                     this.subject = this.attributes.createdAt;
                 });
 
@@ -61,7 +49,7 @@ module.exports = {
             });
 
             describe('updatedAt', function () {
-                beforeEach(function () {
+                before(function () {
                     this.subject = this.attributes.updatedAt;
                 });
 

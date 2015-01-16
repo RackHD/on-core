@@ -3,6 +3,8 @@
 
 var path = require('path');
 
+var longjohn = require('longjohn');
+
 /**
  *  set up global request mocking library supertest as request
  */
@@ -19,8 +21,8 @@ global.sinonPromise = require('sinon-promise')(global.sinon);
  *  set up global chai for testing
  */
 global.chai = require('chai');
-global.chai.use(require("chai-as-promised"));
-global.chai.use(require("sinon-chai"));
+global.chai.use(require('chai-as-promised'));
+global.chai.use(require('sinon-chai'));
 
 /**
  *  set up global expect for testing
@@ -69,98 +71,71 @@ global.helper = {
  * Most commonly used classes / modules, override or extend as needed
  * with child injector
  */
-    baseInjector: new di.Injector(_.flatten([ // jshint ignore:line
-        // NPM Packages
-        dihelper.requireWrapper('lodash', '_'),
-        dihelper.requireWrapper('q', 'Q'),
-        dihelper.requireWrapper('nconf'),
-        dihelper.requireWrapper('waterline', 'Waterline'),
-        dihelper.requireWrapper('sails-mongo', 'MongoAdapter'),
-        dihelper.requireWrapper('amqplib', 'amqp'),
-        dihelper.requireWrapper('domain', 'domain'),
-        dihelper.requireWrapper('node-uuid', 'uuid'),
-        dihelper.requireWrapper('stack-trace', 'stack-trace'),
-        dihelper.requireWrapper('colors/safe', 'colors'),
-        dihelper.requireWrapper('prettyjson', 'prettyjson'),
-        dihelper.requireWrapper('lru-cache', 'lru-cache'),
+    injector: new di.Injector(require('../index')(di, '..').injectables),
 
-        // Glob Requirables
-        dihelper.requireGlob(__dirname + '/../lib/common/*.js'),
-        dihelper.requireGlob(__dirname + '/../lib/models/*.js'),
-        dihelper.requireGlob(__dirname + '/../lib/protocol/**/*.js'),
-        dihelper.requireGlob(__dirname + '/../lib/services/*.js')
+    start: function (injector) {
+        var self = this;
 
-])),
-
-    initializeWaterline: function (injector) {
-        if (arguments.length === 0) {
-            injector = this.baseInjector;
+        if (injector === undefined) {
+            injector = this.injector;
         }
 
-        var config = injector.get('Services.Configuration'),
-            waterline = injector.get('Services.Waterline');
-
-        config.set('mongo', {
+        injector.get(
+            'Services.Configuration'
+        ).set('mongo', {
             host: 'localhost',
             port: 27017,
             database: 'renasar-pxe-test',
             user: '',
             password: ''
+        }).set(
+            'amqp', 'amqp://localhost'
+        );
+
+        return injector.get('Services.Core').start().then(function (core) {
+            self.core = core;
         });
-
-        return waterline.start();
     },
 
-    closeWaterline: function (injector) {
-        if (arguments.length === 0) {
-            injector = this.baseInjector;
-        }
+    reset: function () {
+        var waterline = this.injector.get('Services.Waterline'),
+            Q = this.injector.get('Q'),
+            _ = this.injector.get('_');
 
-        var waterline = injector.get('Services.Waterline');
-
-        return waterline.stop();
-    },
-
-    dropAndReinitialize: function(injector) {
-        if (arguments.length === 0) {
-            injector = this.baseInjector;
-        }
-        var Q = injector.get('Q');
-        return this.initializeWaterline(injector).then(function (waterline) { // jshint ignore:line
-            /* drop doesn't actually return a promise, but leaving this Q.all in here in case
-             * we need to switch to using destroy() */
-            return Q.all(_.map(waterline, function (collection) { // jshint ignore:line
+        return Q.all(
+            _.map(waterline, function (collection) {
                 if (typeof collection.drop === 'function') {
                     return collection.drop({});
                 }
-            })).then(function () {
-                return waterline;
-            });
+            })
+        );
+    },
+
+    stop: function () {
+        if (this.core) {
+            return this.core.stop();
+        } else {
+            return this.injector.get('Services.Core').stop();
+        }
+    },
+
+    before: function (callback) {
+        var Q = this.injector.get('Q'),
+            _ = this.injector.get('_');
+
+        before(function () {
+            if (_.isFunction(callback)) {
+                return Q.resolve(callback(this)).then(helper.start.bind(helper));
+            } else {
+                return helper.start();
+            }
         });
     },
 
-    initializeMessenger: function(injector) {
-        if (arguments.length === 0) {
-            injector = this.baseInjector;
-        }
-
-        var messenger = injector.get('Services.Messenger'),
-            config = injector.get('Services.Configuration');
-
-        config.set("amqp", "amqp://localhost");
-        config.set("port", 514);
-
-        return messenger.start();
-    },
-
-    stopMessenger: function(injector) {
-        if (arguments.length === 0) {
-            injector = this.baseInjector;
-        }
-
-        var messenger = injector.get('Services.Messenger');
-
-        return messenger.stop();
+    after: function () {
+        after(function () {
+            return helper.stop();
+        });
     }
 };
 
