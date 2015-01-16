@@ -4,10 +4,8 @@
 'use strict';
 
 describe("Event subscriber functions", function() {
-    helper.before();
-
-    before(function() {
-        this.events = helper.injector.get('Protocol.Events');
+    helper.before(function(context) {
+        context.events = helper.injector.get('Protocol.Events');
     });
 
     helper.after();

@@ -44,6 +44,7 @@ var dihelper = require('../lib/di')(di, __dirname);
  *  set up global lodash as _ for testing
  */
 global._ = require('lodash');
+global.Q = require('Q');
 
 global.helper = {
 
@@ -71,16 +72,18 @@ global.helper = {
  * Most commonly used classes / modules, override or extend as needed
  * with child injector
  */
+    di: dihelper,
+
     injector: new di.Injector(require('../index')(di, '..').injectables),
 
     start: function (injector) {
         var self = this;
 
-        if (injector === undefined) {
-            injector = this.injector;
+        if (injector) {
+            this.injector = injector;
         }
 
-        injector.get(
+        this.injector.get(
             'Services.Configuration'
         ).set('mongo', {
             host: 'localhost',
@@ -92,7 +95,7 @@ global.helper = {
             'amqp', 'amqp://localhost'
         );
 
-        return injector.get('Services.Core').start().then(function (core) {
+        return this.injector.get('Services.Core').start().then(function (core) {
             self.core = core;
         });
     },
@@ -120,9 +123,6 @@ global.helper = {
     },
 
     before: function (callback) {
-        var Q = this.injector.get('Q'),
-            _ = this.injector.get('_');
-
         before(function () {
             if (_.isFunction(callback)) {
                 return Q.resolve(callback(this)).then(helper.start.bind(helper));

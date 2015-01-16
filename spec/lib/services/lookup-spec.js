@@ -9,6 +9,12 @@ describe('Lookup Service', function() {
         context.dhcpProtocol = helper.injector.get('Protocol.Dhcp');
     });
 
+    afterEach(function () {
+        if (this.subscription) {
+            this.subscription.dispose();
+        }
+    });
+
     helper.after();
 
     it('should lookup the mac address for an IP', function() {

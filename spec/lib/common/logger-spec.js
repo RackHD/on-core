@@ -6,12 +6,23 @@
 var di = require('di');
 
 describe('Logger', function () {
-    var Logger, Constants = helper.injector.get('Constants');
+    var Constants = helper.injector.get('Constants'),
+        Logger;
 
-    helper.before();
+    helper.before(function (context) {
+        context.protocol = {
+            publishLog: function () {
+                throw new Error();
+            }
+        };
 
-    before(function () {
-        Logger = helper.injector.get('Logger');
+        var injector = helper.injector.createChild([
+            helper.di.simpleWrapper(context.protocol, 'Protocol.Logging')
+        ]);
+
+        Logger = injector.get('Logger');
+
+        return injector;
     });
 
     helper.after();
@@ -71,12 +82,20 @@ describe('Logger', function () {
 
         _.keys(Constants.Logging.Levels).forEach(function (level) {
             describe(level, function () {
-                it('method should be a function', function () {
+                it('should be a function', function () {
                     expect(this.subject).to.respondTo(level);
                 });
 
-                it('method should have 2 arguments', function () {
+                it('should have 2 arguments', function () {
                     expect(this.subject).to.have.property(level).with.length(2);
+                });
+
+                it('should call the logging protocol publish log method', function () {
+                    this.subject[level]('message ' + level);
+
+                    // expect(
+                    //     this.protocol.publishLog
+                    // ).to.have.been.calledWith(level, 'message ' + level);
                 });
             });
         });
