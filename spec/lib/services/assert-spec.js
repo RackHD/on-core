@@ -7,8 +7,16 @@
 var assertPlus = require('assert-plus');
 
 describe("AssertService", function() {
-    var assert = helper.baseInjector.get('Assert'),
-        config = helper.baseInjector.get('Services.Configuration');
+    var assert, config;
+
+    helper.before();
+
+    before(function () {
+        assert = helper.injector.get('Assert'),
+        config = helper.injector.get('Services.Configuration');
+    });
+
+    helper.after();
 
     _.methods(assertPlus).forEach(function (method) {
         it('should have a ' + method + ' method', function () {
