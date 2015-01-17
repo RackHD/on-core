@@ -33,6 +33,7 @@
     "prettyjson": "^1.0.0",
     "q": "^1.1.2",
     "resolve": "^1.0.0",
+    "rx": "^2.3.24",
     "sails-mongo": "^0.10.5",
     "stack-trace": "0.0.9",
     "validate.js": "^0.3.2",
