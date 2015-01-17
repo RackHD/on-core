@@ -42,7 +42,6 @@ var dihelper = require('../lib/di')(di, __dirname);
  *  set up global lodash as _ for testing
  */
 global._ = require('lodash');
-global.Q = require('Q');
 
 function provider(object) {
     var provides = _.detect(object.annotations, function (annotation) {
@@ -158,6 +157,7 @@ global.helper = {
 
     before: function (callback) {
         before(function () {
+            var Q = require('q');
             if (_.isFunction(callback)) {
                 return Q.resolve(callback(this)).then(helper.start.bind(helper));
             } else {
