@@ -6,23 +6,18 @@
 var di = require('di');
 
 describe('Logger', function () {
-    var Constants = helper.injector.get('Constants'),
-        Logger;
+    var Logger;
 
     helper.before(function (context) {
         context.protocol = {
-            publishLog: function () {
-                throw new Error();
-            }
+            publishLog: sinon.spy()
         };
 
-        var injector = helper.injector.createChild([
-            helper.di.simpleWrapper(context.protocol, 'Protocol.Logging')
-        ]);
+        return helper.di.simpleWrapper(context.protocol, 'Protocol.Logging');
+    });
 
-        Logger = injector.get('Logger');
-
-        return injector;
+    before(function () {
+        Logger = helper.injector.get('Logger');
     });
 
     helper.after();
@@ -80,7 +75,17 @@ describe('Logger', function () {
             this.subject = new Logger('Test');
         });
 
-        _.keys(Constants.Logging.Levels).forEach(function (level) {
+        [
+            'emerg',
+            'alert',
+            'crit',
+            'error',
+            'warning',
+            'notice',
+            'info',
+            'debug',
+            'silly'
+        ].forEach(function (level) {
             describe(level, function () {
                 it('should be a function', function () {
                     expect(this.subject).to.respondTo(level);
@@ -90,12 +95,18 @@ describe('Logger', function () {
                     expect(this.subject).to.have.property(level).with.length(2);
                 });
 
-                it('should call the logging protocol publish log method', function () {
+                it('should call the logging protocol publish log method', function (done) {
+                    var self = this;
+
                     this.subject[level]('message ' + level);
 
-                    // expect(
-                    //     this.protocol.publishLog
-                    // ).to.have.been.calledWith(level, 'message ' + level);
+                    setImmediate(function () {
+                        expect(
+                            self.protocol.publishLog.lastCall
+                        ).to.have.been.calledWith(level);
+
+                       done();
+                    });
                 });
             });
         });

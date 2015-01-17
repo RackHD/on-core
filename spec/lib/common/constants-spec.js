@@ -4,8 +4,10 @@
 'use strict';
 
 describe('Constants', function () {
-    helper.before(function (context) {
-        context.subject = helper.injector.get('Constants');
+    helper.before();
+
+    before(function () {
+        this.subject = helper.injector.get('Constants');
     });
 
     helper.after();

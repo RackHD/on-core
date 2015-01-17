@@ -4,9 +4,13 @@
 'use strict';
 
 describe('Lookup Service', function() {
-    helper.before(function(context) {
-        context.lookupService = helper.injector.get('Services.Lookup');
-        context.dhcpProtocol = helper.injector.get('Protocol.Dhcp');
+    var lookupService, dhcpProtocol;
+
+    helper.before();
+
+    before(function() {
+        lookupService = helper.injector.get('Services.Lookup');
+        dhcpProtocol = helper.injector.get('Protocol.Dhcp');
     });
 
     afterEach(function () {
@@ -29,15 +33,15 @@ describe('Lookup Service', function() {
             }
         }
 
-        return self.dhcpProtocol.subscribeLookupIpLease(lookupIpLease)
+        return dhcpProtocol.subscribeLookupIpLease(lookupIpLease)
             .then(function(subscription) {
                 expect(subscription).to.be.ok;
                 self.subscription = subscription;
-                return self.lookupService.ipAddressToMacAddress('10.1.1.2');
+                return lookupService.ipAddressToMacAddress('10.1.1.2');
             })
             .then(function(mac) {
                 expect(mac).to.equal('01:01:01:01:01:01');
-                return self.lookupService.ipAddressToMacAddress('10.1.1.3');
+                return lookupService.ipAddressToMacAddress('10.1.1.3');
             })
             .then(function(mac) {
                 expect(mac).to.equal('02:02:02:02:02:02');
@@ -58,15 +62,15 @@ describe('Lookup Service', function() {
             }
         }
 
-        return self.dhcpProtocol.subscribeLookupIpLease(lookupIpLease)
+        return dhcpProtocol.subscribeLookupIpLease(lookupIpLease)
             .then(function(subscription) {
                 expect(subscription).to.be.ok;
                 self.subscription = subscription;
-                return self.lookupService.ipAddressToMacAddress(cachedIp);
+                return lookupService.ipAddressToMacAddress(cachedIp);
             })
             .then(function(mac) {
                 expect(mac).to.equal('03:03:03:03:03:03');
-                return self.lookupService.ipAddressToMacAddress(cachedIp);
+                return lookupService.ipAddressToMacAddress(cachedIp);
             })
             .then(function(mac) {
                 expect(lookupIpLease()).to.equal('04:04:04:04:04:04');

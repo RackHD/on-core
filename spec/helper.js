@@ -3,8 +3,6 @@
 
 var path = require('path');
 
-var longjohn = require('longjohn');
-
 /**
  *  set up global request mocking library supertest as request
  */
@@ -46,6 +44,14 @@ var dihelper = require('../lib/di')(di, __dirname);
 global._ = require('lodash');
 global.Q = require('Q');
 
+function provider(object) {
+    var provides = _.detect(object.annotations, function (annotation) {
+        return _.has(annotation, 'token');
+    });
+
+    return provides ? provides.token : undefined;
+}
+
 global.helper = {
 
 /**
@@ -74,15 +80,42 @@ global.helper = {
  */
     di: dihelper,
 
-    injector: new di.Injector(require('../index')(di, '..').injectables),
+    injector: undefined,
 
-    start: function (injector) {
+    start: function (overrides) {
         var self = this;
 
-        if (injector) {
-            this.injector = injector;
+        // Start with the core dependencies.
+        var dependencies = require('../index')(di, '..').injectables;
+
+        // If overrides are provided then we'll process those before
+        // creating the injector.
+        if (overrides !== undefined) {
+            // Overrids could be a single or an array so treat them
+            // as equivalents by flattening.
+            _.flatten([overrides]).forEach(function (override) {
+                // Get the provider string for the current override.
+                var provides = provider(override);
+
+                if (provides) {
+                    // Remove any matching dependencies from the core
+                    // depdencies.
+                    _.remove(dependencies, function (dependency) {
+                        var p = provider(dependency);
+
+                        return p && p === provides;
+                    });
+                }
+
+                // Push the new dependency onto the list of dependencies.
+                dependencies.push(override);
+            });
         }
 
+        // Initialize the injector with the new list of dependencies.
+        this.injector = new di.Injector(dependencies);
+
+        // Setup core configuration.
         this.injector.get(
             'Services.Configuration'
         ).set('mongo', {
@@ -95,6 +128,7 @@ global.helper = {
             'amqp', 'amqp://localhost'
         );
 
+        // Start the core services.
         return this.injector.get('Services.Core').start().then(function (core) {
             self.core = core;
         });
@@ -118,7 +152,7 @@ global.helper = {
         if (this.core) {
             return this.core.stop();
         } else {
-            return this.injector.get('Services.Core').stop();
+            return Q.resolve();
         }
     },
 
