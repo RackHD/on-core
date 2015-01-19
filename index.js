@@ -28,6 +28,9 @@ module.exports = function (di, directory) {
                 helper.requireWrapper('memwatch', 'memwatch'),
                 helper.requireWrapper('node-statsd', 'node-statsd'),
                 helper.requireWrapper('validate.js', 'validate'),
+                helper.requireWrapper('validator', 'validator'),
+                helper.requireWrapper('assert-plus', 'assert-plus'),
+                helper.requireWrapper('ejs', 'ejs'),
 
                 // Glob Requirables
                 helper.requireGlob(__dirname + '/lib/common/*.js'),
