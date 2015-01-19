@@ -1,2 +1,2 @@
-set 209:string http://<%=server%>:<%=port%>/api/rack/templates/esx-pxelinux-cfg
+set 209:string http://<%=server%>:<%=port%>/api/common/templates/esx-pxelinux-cfg
 chain tftp://<%=server%>/undionly.kpxe

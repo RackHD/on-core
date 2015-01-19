@@ -23,7 +23,7 @@ esxcli system settings advanced set -o /UserVars/ESXiShellInteractiveTimeout -i 
 esxcli network firewall set --default-action false --enabled no
  
 #copy the SSH key over 
-wget http://<%=server%>:<%=port%>/api/rack/templates/renasar-ansible.pub -O /vmfs/volumes/datastore1/authorized_keys
+wget http://<%=server%>:<%=port%>/api/common/templates/renasar-ansible.pub -O /vmfs/volumes/datastore1/authorized_keys
 cat /vmfs/volumes/datastore1/authorized_keys >> /etc/ssh/keys-root/authorized_keys
 rm /vmfs/volumes/datastore1/authorized_keys
 

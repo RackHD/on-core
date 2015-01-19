@@ -917,7 +917,7 @@
        <script>
           <interpreter>shell</interpreter>
           <chrooted config:type="boolean">true</chrooted>
-          <location>http://<%=server%>:<%=port%>/api/rack/templates/suse_setup_ssh_keys.sh</location>
+          <location>http://<%=server%>:<%=port%>/api/common/templates/suse_setup_ssh_keys.sh</location>
           <notification>Please wait while script is running...</notification>
        </script>
     </post-scripts>
