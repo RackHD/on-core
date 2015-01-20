@@ -36,6 +36,7 @@
     "sails-mongo": "^0.10.5",
     "stack-trace": "0.0.9",
     "validate.js": "^0.3.2",
+    "validator": "^3.27.0",
     "waterline": "^0.10.15"
   },
   "devDependencies": {

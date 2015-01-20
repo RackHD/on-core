@@ -42,6 +42,7 @@ var dihelper = require('../lib/di')(di, __dirname);
  *  set up global lodash as _ for testing
  */
 global._ = require('lodash');
+global.Q = require('Q');
 
 function provider(object) {
     var provides = _.detect(object.annotations, function (annotation) {

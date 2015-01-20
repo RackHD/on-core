@@ -19,7 +19,7 @@ describe("Event subscriber functions", function() {
                 test: 1,
                 data: [1, 2]
             },
-            id = "testIdHttpResponse";
+            id = "5498a7632b9ef0a8b94307a8";
 
         task.subscribeHttpResponse(id, function(_data) {
             expect(_data).to.deep.equal(data);
@@ -38,7 +38,7 @@ describe("Event subscriber functions", function() {
                 test: 1,
                 data: [1, 2]
             },
-            id = "testIdTftpSuccess";
+            id = "5498a7632b9ef0a8b94307a8";
 
         task.subscribeTftpSuccess(id, function(_data) {
             expect(_data).to.deep.equal(data);
@@ -57,7 +57,7 @@ describe("Event subscriber functions", function() {
                 test: 1,
                 data: [1, 2]
             },
-            id = "testIdDhcpLease";
+            id = "5498a7632b9ef0a8b94307a8";
 
         task.subscribeDhcpBoundLease(id, function(_data) {
             expect(_data).to.deep.equal(data);
@@ -69,12 +69,14 @@ describe("Event subscriber functions", function() {
         });
     });
 
+    // TODO: this test should subscribe to the catch all to know when to timeout
+    // in order to speed up execution.
     it("should not subscribe to a response for other identifiers", function(done) {
         var self = this,
             Q = helper.injector.get('Q'),
             task = helper.injector.get('Protocol.Task'),
-            otherId = "testidother",
-            id = "testid";
+            otherId = "5498a7632b9ef0a8b94307a9",
+            id = "5498a7632b9ef0a8b94307a8";
 
         task.subscribeHttpResponse(id, function() {
             var err = new Error("Did not expect to receive a message from " +

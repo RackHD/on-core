@@ -4,7 +4,10 @@
 
 'use strict';
 
+// Required because they are used pre-initialization of injector
+// for building out test cases.
 var assertPlus = require('assert-plus');
+var validator = require('validator');
 
 describe("AssertService", function() {
     var assert, config;
@@ -25,8 +28,6 @@ describe("AssertService", function() {
     });
 
     it('should work the way assert-plus intended', function () {
-        config.set('assert', 'throw');
-
         expect(function () {
             assert.bool('not a bool');
         }).to.throw();
@@ -44,21 +45,19 @@ describe("AssertService", function() {
         }).to.throw();
     });
 
-    it('should noop if configured off', function () {
-        expect(function() {
-            config.set('assert', 'off');
-
-            assert.ok(false);
-        }).to.not.throw();
+    _.methods(validator).forEach(function (method) {
+        it('should have a ' + method + ' method', function () {
+            expect(assert).to.respondTo(method);
+        });
     });
 
-    it('should log only if configured to log', function () {
+    it('should work the way validator intended', function () {
         expect(function () {
-            config.set('assert', 'log');
+            assert.isIP('not an ip');
+        }).to.throw();
 
-            assert.ok(undefined);
+        expect(function () {
+            assert.isIP('10.1.1.1');
         }).to.not.throw();
     });
-
-    it('should exit if configured to exit');
 });
