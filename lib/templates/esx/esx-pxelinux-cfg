@@ -4,4 +4,4 @@ PROMPT 0
 TIMEOUT 80
 LABEL install
   KERNEL http://<%=server%>:<%=port%>/vmware/mboot.c32
-  APPEND -c http://<%=server%>:<%=port%>/api/rack/templates/<%=esxBootConfigTemplate%>
+  APPEND -c http://<%=server%>:<%=port%>/api/common/templates/<%=esxBootConfigTemplate%>

@@ -69,7 +69,7 @@ export PATH
 echo "renasar ALL=(ALL)       ALL" >> /etc/sudoers
 echo "emc ALL=(ALL)       ALL" >> /etc/sudoers
 mkdir /home/<%=username%>/.ssh;
-/usr/bin/wget http://<%=server%>:<%=port%>/api/rack/templates/renasar-ansible.pub -O /home/<%=username%>/.ssh/authorized_keys
+/usr/bin/wget http://<%=server%>:<%=port%>/api/common/templates/renasar-ansible.pub -O /home/<%=username%>/.ssh/authorized_keys
 chown -R <%=username%>:<%=username%> /home/<%=username%>/.ssh
 
 ) 2>&1 >/root/install-post-sh.log
