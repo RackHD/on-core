@@ -31,11 +31,13 @@ module.exports = function (di, directory) {
                 helper.requireWrapper('validator', 'validator'),
                 helper.requireWrapper('assert-plus', 'assert-plus'),
                 helper.requireWrapper('ejs', 'ejs'),
+                helper.requireWrapper('anchor', 'anchor'),
 
                 // Glob Requirables
                 helper.requireGlob(__dirname + '/lib/common/*.js'),
                 helper.requireGlob(__dirname + '/lib/models/*.js'),
-                helper.requireGlob(__dirname + '/lib/protocol/**/*.js'),
+                helper.requireGlob(__dirname + '/lib/protocol/*.js'),
+                helper.requireGlob(__dirname + '/lib/serializables/*.js'),
                 helper.requireGlob(__dirname + '/lib/services/*.js')
             ]
         )
