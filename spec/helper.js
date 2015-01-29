@@ -84,7 +84,19 @@ global.helper = {
 
     start: function (overrides) {
         var self = this;
+        // Setup test injector.
+        this.setupInjector(overrides);
 
+        // Setup core configuration.
+        this.setupTestConfig();
+
+        // Start the core services.
+        return this.injector.get('Services.Core').start().then(function (core) {
+            self.core = core;
+        });
+    },
+
+    setupInjector: function (overrides) {
         // Start with the core dependencies.
         var dependencies = require('../index')(di, '..').injectables;
 
@@ -113,10 +125,11 @@ global.helper = {
         }
 
         // Initialize the injector with the new list of dependencies.
-        this.injector = new di.Injector(dependencies);
+        return this.injector = new di.Injector(dependencies);
+    },
 
-        // Setup core configuration.
-        this.injector.get(
+    setupTestConfig: function () {
+        return this.injector.get(
             'Services.Configuration'
         ).set('mongo', {
             host: 'localhost',
@@ -127,11 +140,6 @@ global.helper = {
         }).set(
             'amqp', 'amqp://localhost'
         );
-
-        // Start the core services.
-        return this.injector.get('Services.Core').start().then(function (core) {
-            self.core = core;
-        });
     },
 
     reset: function () {
