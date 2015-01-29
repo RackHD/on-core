@@ -71,25 +71,31 @@ describe("Event subscriber functions", function() {
 
     // TODO: this test should subscribe to the catch all to know when to timeout
     // in order to speed up execution.
-    it("should not subscribe to a response for other identifiers", function(done) {
+    it("should not subscribe to a response for other identifiers", function() {
         var self = this,
             Q = helper.injector.get('Q'),
             task = helper.injector.get('Protocol.Task'),
             otherId = "5498a7632b9ef0a8b94307a9",
-            id = "5498a7632b9ef0a8b94307a8";
+            id = "5498a7632b9ef0a8b94307a8",
+            deferred = Q.defer();
 
-        task.subscribeHttpResponse(id, function() {
-            var err = new Error("Did not expect to receive a message from " +
-                                " routing keys not mapped to " + id);
-            done(err);
-        })
-        .then(function(sub) {
+        task.subscribeHttpResponse(otherId, function () {
+            setImmediate(function () {
+                deferred.resolve();
+            });
+        }).then(function (sub) {
             expect(sub).to.be.ok;
-            self.events.publishHttpResponse(otherId, {});
-            return Q.delay(1000);
-        })
-        .then(function() {
-            done();
+            task.subscribeHttpResponse(id, function() {
+                var err = new Error("Did not expect to receive a message from " +
+                                    " routing keys not mapped to " + otherId);
+                deferred.reject(err);
+            })
+            .then(function(sub) {
+                expect(sub).to.be.ok;
+                self.events.publishHttpResponse(otherId, {});
+            });
         });
+
+        return deferred.promise;
     });
 });
