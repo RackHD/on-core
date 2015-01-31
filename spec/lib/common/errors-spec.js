@@ -15,29 +15,59 @@ describe("Errors", function() {
 
     helper.after();
 
+    describe('Error', function () {
+        describe('toJSON', function () {
+            before(function () {
+                this.subject = new Error('test').toJSON();
+            });
+
+            it('should have a name property', function () {
+                this.subject.name.should.equal('Error');
+            });
+
+            it('should have a message property', function () {
+                this.subject.message.should.equal('test');
+            });
+
+            it('should have a stack property', function () {
+                this.subject.stack.should.not.equal(undefined);
+            });
+
+            it('should have a context property', function () {
+                this.subject.context.should.deep.equal({});
+            });
+
+            it('should include additional properties in context', function () {
+                var error = new Error('test');
+                error.status = 200;
+                error.toJSON().context.status.should.equal(200);
+            });
+        });
+    });
+
     describe('BaseError', function () {
         before(function () {
             this.subject = new Errors.BaseError('message');
         });
 
         it('should be an instance of Error', function () {
-            expect(this.subject).to.be.an.instanceof(Error);
+            this.subject.should.be.an.instanceof(Error);
         });
 
         it('should be an instance of BaseError', function () {
-            expect(this.subject).to.be.an.instanceof(Errors.BaseError);
+            this.subject.should.be.an.instanceof(Errors.BaseError);
         });
 
         it('should have a name of BaseError', function () {
-            expect(this.subject.name).to.be.equal('BaseError');
+            this.subject.name.should.be.equal('BaseError');
         });
 
         it('should have a message of message', function () {
-            expect(this.subject.message).to.be.equal('message');
+            this.subject.message.should.be.equal('message');
         });
 
         it('should provide the correct stack trace', function () {
-            expect(this.subject.stack.split('\n')[1]).to.contain(__filename);
+            this.subject.stack.split('\n')[1].should.contain(__filename);
         });
     });
 
@@ -47,27 +77,27 @@ describe("Errors", function() {
         });
 
         it('should be an instance of Error', function () {
-            expect(this.subject).to.be.an.instanceof(Error);
+            this.subject.should.be.an.instanceof(Error);
         });
 
         it('should be an instance of BaseError', function () {
-            expect(this.subject).to.be.an.instanceof(Errors.BaseError);
+            this.subject.should.be.an.instanceof(Errors.BaseError);
         });
 
         it('should be an instance of MyError', function () {
-            expect(this.subject).to.be.an.instanceof(Errors.MyError);
+            this.subject.should.be.an.instanceof(Errors.MyError);
         });
 
         it('should have a name of MyError', function () {
-            expect(this.subject.name).to.be.equal('MyError');
+            this.subject.name.should.be.equal('MyError');
         });
 
         it('should have a message of message', function () {
-            expect(this.subject.message).to.be.equal('message');
+            this.subject.message.should.be.equal('message');
         });
 
         it('should provide the correct stack trace', function () {
-            expect(this.subject.stack.split('\n')[1]).to.contain(__filename);
+            this.subject.stack.split('\n')[1].should.contain(__filename);
         });
     });
 });
