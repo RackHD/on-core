@@ -98,16 +98,8 @@ describe('Node Model', function () {
                 this.subject = this.attributes.sku;
             });
 
-            it('should be a string', function () {
-                expect(this.subject.type).to.equal('string');
-            });
-
-            it('should be required', function () {
-                expect(this.subject.required).to.equal(true);
-            });
-
-            it('should default to unknown', function () {
-                expect(this.subject.defaultsTo).to.equal('unknown');
+            it('should be a relation to the skus model', function () {
+                expect(this.subject.model).to.equal('skus');
             });
         });
     });
