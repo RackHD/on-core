@@ -4,13 +4,14 @@
 'use strict';
 
 describe('Lookup Service', function() {
-    var lookupService, dhcpProtocol;
+    var lookupService, dhcpProtocol, MacAddress, IpAddress;
 
     helper.before();
 
     before(function() {
         lookupService = helper.injector.get('Services.Lookup');
         dhcpProtocol = helper.injector.get('Protocol.Dhcp');
+        MacAddress = helper.injector.get('MacAddress');
     });
 
     afterEach(function () {
@@ -26,11 +27,13 @@ describe('Lookup Service', function() {
 
         function lookupIpLease(ip) {
             if (ip === '10.1.1.2') {
-                return { mac: '01:01:01:01:01:01' };
+                return new MacAddress({ value: '01:01:01:01:01:01' });
             }
             if (ip === '10.1.1.3') {
-                return { mac: '02:02:02:02:02:02' };
+                return new MacAddress({ value: '02:02:02:02:02:02' });
             }
+
+            throw new Error('should not be here');
         }
 
         return dhcpProtocol.subscribeLookupIpLease(lookupIpLease)
@@ -55,10 +58,10 @@ describe('Lookup Service', function() {
 
         function lookupIpLease() {
             if (calledOnce) {
-                return { mac: '04:04:04:04:04:04' };
+                return new MacAddress({ value: '04:04:04:04:04:04' });
             } else {
                 calledOnce = true;
-                return { mac: '03:03:03:03:03:03' };
+                return new MacAddress({ value: '03:03:03:03:03:03' });
             }
         }
 
@@ -73,7 +76,7 @@ describe('Lookup Service', function() {
                 return lookupService.ipAddressToMacAddress(cachedIp);
             })
             .then(function(mac) {
-                expect(lookupIpLease().mac).to.equal('04:04:04:04:04:04');
+                expect(lookupIpLease().value).to.equal('04:04:04:04:04:04');
                 expect(mac).to.equal('03:03:03:03:03:03');
             });
     });
