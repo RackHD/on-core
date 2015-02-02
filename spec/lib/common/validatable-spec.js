@@ -6,12 +6,13 @@
 var util = require('util');
 
 describe('Validatable', function () {
-    var Validatable, Subject;
+    var Validatable, Subject, Errors;
 
     helper.before();
 
     before(function () {
         Validatable = helper.injector.get('Validatable');
+        Errors = helper.injector.get('Errors');
     });
 
     helper.after();
@@ -40,7 +41,9 @@ describe('Validatable', function () {
             });
 
             it('should reject on failure', function () {
-                return new Subject({ name: 1337 }).validate().should.be.rejected;
+                return new Subject(
+                    { name: 1337 }
+                ).validate().should.be.rejectedWith(Errors.ValidationError);
             });
         });
 
