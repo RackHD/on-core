@@ -65,21 +65,6 @@ describe('Graph Object Model', function () {
             });
         });
 
-        describe('options', function () {
-            before(function () {
-                this.subject = this.attributes.options;
-            });
-
-            it('should be required', function () {
-                expect(this.subject.required).to.equal(true);
-            });
-
-            it('should be json', function () {
-                expect(this.subject.type).to.equal('json');
-                expect(this.subject.json).to.be.true;
-            });
-        });
-
         describe('tasks', function () {
             before(function () {
                 this.subject = this.attributes.tasks;
