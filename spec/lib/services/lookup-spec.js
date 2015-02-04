@@ -27,10 +27,10 @@ describe('Lookup Service', function() {
 
         function lookupIpLease(ip) {
             if (ip === '10.1.1.2') {
-                return new MacAddress({ value: '01:01:01:01:01:01' });
+                return '01:01:01:01:01:01';
             }
             if (ip === '10.1.1.3') {
-                return new MacAddress({ value: '02:02:02:02:02:02' });
+                return '02:02:02:02:02:02';
             }
 
             throw new Error('should not be here');
@@ -58,10 +58,10 @@ describe('Lookup Service', function() {
 
         function lookupIpLease() {
             if (calledOnce) {
-                return new MacAddress({ value: '04:04:04:04:04:04' });
+                return '04:04:04:04:04:04';
             } else {
                 calledOnce = true;
-                return new MacAddress({ value: '03:03:03:03:03:03' });
+                return '03:03:03:03:03:03';
             }
         }
 
@@ -76,7 +76,7 @@ describe('Lookup Service', function() {
                 return lookupService.ipAddressToMacAddress(cachedIp);
             })
             .then(function(mac) {
-                expect(lookupIpLease().value).to.equal('04:04:04:04:04:04');
+                expect(lookupIpLease()).to.equal('04:04:04:04:04:04');
                 expect(mac).to.equal('03:03:03:03:03:03');
             });
     });
