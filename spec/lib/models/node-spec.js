@@ -82,6 +82,18 @@ describe('Node Model', function () {
             });
         });
 
+        describe('workflows', function () {
+            before(function () {
+                this.subject = this.attributes.workflows;
+            });
+
+            it('should be a dominant relation to graphobjects via nodes', function () {
+                expect(this.subject.collection).to.equal('graphobjects');
+                expect(this.subject.via).to.equal('nodes');
+                expect(this.subject.dominant).to.equal(true);
+            });
+        });
+
         describe('catalogs', function () {
             before(function () {
                 this.subject = this.attributes.catalogs;

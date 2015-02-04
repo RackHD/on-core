@@ -79,5 +79,16 @@ describe('Graph Object Model', function () {
                 expect(this.subject.json).to.be.true;
             });
         });
+
+        describe('nodes', function () {
+            before(function () {
+                this.subject = this.attributes.nodes;
+            });
+
+            it('should be a relation to nodes via workflows', function () {
+                expect(this.subject.collection).to.equal('nodes');
+                expect(this.subject.via).to.equal('workflows');
+            });
+        });
     });
 });
