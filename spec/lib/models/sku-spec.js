@@ -47,6 +47,26 @@ describe('Sku Model', function () {
                 expect(this.subject.type).to.equal('json');
             });
         });
+
+        describe('discoveryGraphName', function () {
+            before(function () {
+                this.subject = this.attributes.discoveryGraphName;
+            });
+
+            it('should be a string', function () {
+                expect(this.subject.type).to.equal('string');
+            });
+        });
+
+        describe('discoveryGraphOptions', function () {
+            before(function () {
+                this.subject = this.attributes.discoveryGraphOptions;
+            });
+
+            it('should be json', function () {
+                expect(this.subject.type).to.equal('json');
+            });
+        });
     });
 });
 
