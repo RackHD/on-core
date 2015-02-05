@@ -4,13 +4,14 @@
 'use strict';
 
 describe('Lookup Service', function() {
-    var lookupService, dhcpProtocol;
+    var lookupService, dhcpProtocol, MacAddress, IpAddress;
 
     helper.before();
 
     before(function() {
         lookupService = helper.injector.get('Services.Lookup');
         dhcpProtocol = helper.injector.get('Protocol.Dhcp');
+        MacAddress = helper.injector.get('MacAddress');
     });
 
     afterEach(function () {
@@ -31,6 +32,8 @@ describe('Lookup Service', function() {
             if (ip === '10.1.1.3') {
                 return { mac: '02:02:02:02:02:02' };
             }
+
+            throw new Error('should not be here');
         }
 
         return dhcpProtocol.subscribeLookupIpLease(lookupIpLease)
