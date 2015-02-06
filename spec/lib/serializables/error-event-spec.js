@@ -46,7 +46,7 @@ describe('ErrorEvent', function () {
         });
 
         it('should assign error.context to context', function () {
-            this.subject.context.should.deep.equal({ hello: 'world' });
+            this.subject.context.should.have.property('hello', 'world');
         });
     });
 });
