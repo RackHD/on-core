@@ -1,6 +1,9 @@
 /*globals global,require,__dirname */
 'use strict';
 
+// Set a global test environment.
+process.env.NODE_ENV = 'test';
+
 var path = require('path');
 
 /**
