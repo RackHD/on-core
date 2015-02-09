@@ -38,13 +38,12 @@ describe('Workitem Model', function () {
             var yesterday = new Date(now - 60 * 60 * 24 * 1000);
             var tomorrow = new Date(now + 60 * 60 * 24 * 1000);
             return workitems.create([{
-                name: 'First Yesterday',
+                name: 'First Past',
                 pollInterval: 10 * 1000,
-                nextScheduled: yesterday
             }, {
                 name: 'Second Yesterday',
                 pollInterval: 10 * 1000,
-                nextScheduled: new Date(yesterday.valueOf() + 1000)
+                nextScheduled: new Date(yesterday + 1000)
             }, {
                 name: 'First Tomorrow',
                 pollInterval: 10 * 1000,
@@ -71,7 +70,7 @@ describe('Workitem Model', function () {
             var now = new Date();
             return workitems.startNextScheduled(workerId, {}, 10 * 1000).then(function(scheduled) {
                 expect(scheduled).to.be.an('object');
-                expect(scheduled.name).to.equal('First Yesterday');
+                expect(scheduled.name).to.equal('First Past');
                 expect(scheduled.id).to.equal(defaultItems[0].id);
                 expect(scheduled.lastStarted).to.be.an.instanceof(Date);
                 expect(scheduled.leaseToken).to.equal(workerId);
