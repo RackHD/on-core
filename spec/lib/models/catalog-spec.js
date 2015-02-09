@@ -3,6 +3,7 @@
 
 'use strict';
 
+var Q = require('q');
 var base = require('./base-spec');
 
 describe('Catalog Model', function () {
@@ -61,6 +62,19 @@ describe('Catalog Model', function () {
                 expect(this.subject.type).to.equal('json');
                 expect(this.subject.json).to.equal(true);
             });
+        });
+    });
+
+    describe('creation', function() {
+        it('should create a catalog', function() {
+            return Q.resolve(this.model.create({
+                node: "54d93422b492492333333333",
+                source: 'testcatalog',
+                data: {
+                    testvalue1: 'test1',
+                    testvalue2: 'test2'
+                }
+            }));
         });
     });
 });
