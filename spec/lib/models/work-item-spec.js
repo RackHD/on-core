@@ -63,7 +63,7 @@ describe('Workitem Model', function () {
             workerId = uuid.v4();
             return createWorkItems().then(function (items) {
                 expect(items).to.have.length(4);
-                defaultItems = items;
+                defaultItems = _.sortBy(items, 'id');
             });
         });
 
