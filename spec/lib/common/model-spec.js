@@ -4,5 +4,5 @@
 'use strict';
 
 describe(require('path').basename(__filename), function () {
-    it('needs specs');
+    it('should be covered by the base model tests');
 });
