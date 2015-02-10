@@ -152,8 +152,8 @@ global.helper = {
 
         return Q.all(
             _.map(waterline, function (collection) {
-                if (typeof collection.drop === 'function') {
-                    return collection.drop({});
+                if (typeof collection.destroy === 'function') {
+                    return collection.destroy({});
                 }
             })
         );
@@ -169,6 +169,7 @@ global.helper = {
 
     before: function (callback) {
         before(function () {
+            this.timeout(10000);
             var Q = require('q');
             if (_.isFunction(callback)) {
                 return Q.resolve(callback(this)).then(helper.start.bind(helper));

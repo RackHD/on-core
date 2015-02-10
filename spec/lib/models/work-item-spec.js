@@ -167,9 +167,9 @@ describe('Workitem Model', function () {
         it('should create ipmi pollers and then find them with findPollers', function () {
             var nodeId = '47bd8fb80abc5a6b5e7b10df';
             return workitems.createIpmiPollers(nodeId).then(function (items) {
-                items = _.sortBy(items, 'node');
+                items = _.sortBy(items, 'id');
                 return workitems.findPollers().then(function (pollers) {
-                    pollers = _.sortBy(pollers, 'node');
+                    pollers = _.sortBy(pollers, 'id');
                     expect(pollers).to.have.length(3);
                     pollers.forEach(function (poller, index) {
                         expect(poller.id).to.equal(items[index].id);
