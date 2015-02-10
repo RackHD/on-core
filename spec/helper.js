@@ -128,7 +128,7 @@ global.helper = {
         }
 
         // Initialize the injector with the new list of dependencies.
-        return this.injector = new di.Injector(dependencies);
+        this.injector = new di.Injector(dependencies);
     },
 
     setupTestConfig: function () {

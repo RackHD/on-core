@@ -34,6 +34,7 @@ module.exports = function (di, directory) {
                 helper.requireWrapper('assert-plus', 'assert-plus'),
                 helper.requireWrapper('ejs', 'ejs'),
                 helper.requireWrapper('anchor', 'anchor'),
+                helper.requireWrapper('fs', 'fs'),
 
                 // Glob Requirables
                 helper.requireGlob(__dirname + '/lib/common/*.js'),
