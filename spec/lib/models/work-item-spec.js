@@ -22,7 +22,7 @@ describe('Workitem Model', function () {
 
 
 
-    beforeEach(function () {
+    beforeEach("work-item-spec beforeEach", function () {
         return helper.reset();
     });
 
@@ -58,7 +58,7 @@ describe('Workitem Model', function () {
         var defaultItems;
         var workerId;
 
-        beforeEach(function () {
+        beforeEach("work-item-spec.Work Queue Behavior beforeEach", function () {
             workerId = uuid.v4();
             return createWorkItems().then(function (items) {
                 expect(items).to.have.length(4);

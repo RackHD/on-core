@@ -18,11 +18,11 @@ describe('Protocol.Waterline', function() {
         waterlineProtocol = helper.injector.get('Protocol.Waterline');
     });
 
-    beforeEach(function () {
+    beforeEach("waterline-spec beforeEach", function () {
         collection = { identity: 'dummy' };
     });
 
-    afterEach(function () {
+    afterEach("waterline-spec afterEach", function () {
         if (subscription) {
             subscription.dispose();
             subscription = null;
