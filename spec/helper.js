@@ -152,8 +152,8 @@ global.helper = {
 
         return Q.all(
             _.map(waterline, function (collection) {
-                if (typeof collection.drop === 'function') {
-                    return collection.drop({});
+                if (typeof collection.destroy === 'function') {
+                    return collection.destroy({});
                 }
             })
         );
