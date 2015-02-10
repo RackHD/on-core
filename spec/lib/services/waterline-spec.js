@@ -23,7 +23,7 @@ describe(require('path').basename(__filename), function () {
         });
     }
 
-    beforeEach(function() {
+    beforeEach("waterline-spec beforeEach", function() {
         helper.setupInjector([
             helper.di.overrideInjection(waterlineProtocolFactory, 'Protocol.Waterline', ['Rx']),
             helper.di.overrideInjection(testModelFactory, 'Models.TestObject', ['Model'])
@@ -46,14 +46,14 @@ describe(require('path').basename(__filename), function () {
             subject.onNext({ event: event, record: record });
         }
 
-        beforeEach(function () {
+        beforeEach("waterline-spec.observe() beforeEach", function () {
             this.timeout(10000);
             return waterline.start().then(function () {
                 return helper.reset();
             });
         });
 
-        afterEach(function () {
+        afterEach("waterline-spec.observe() afterEach", function () {
             return waterline.stop();
         });
 

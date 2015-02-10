@@ -168,7 +168,7 @@ global.helper = {
     },
 
     before: function (callback) {
-        before(function () {
+        before("helper.before", function () {
             this.timeout(10000);
             var Q = require('q');
             if (_.isFunction(callback)) {
@@ -180,7 +180,7 @@ global.helper = {
     },
 
     after: function () {
-        after(function () {
+        after("helper.after", function () {
             return helper.stop();
         });
     }
