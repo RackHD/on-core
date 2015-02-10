@@ -47,6 +47,7 @@ describe(require('path').basename(__filename), function () {
         }
 
         beforeEach(function () {
+            this.timeout(10000);
             return waterline.start().then(function () {
                 return helper.reset();
             });

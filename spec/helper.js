@@ -169,6 +169,7 @@ global.helper = {
 
     before: function (callback) {
         before(function () {
+            this.timeout(10000);
             var Q = require('q');
             if (_.isFunction(callback)) {
                 return Q.resolve(callback(this)).then(helper.start.bind(helper));
