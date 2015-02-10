@@ -222,6 +222,10 @@ global.helper = {
      * variable "overrides" into helper.start(), which in turn passes it down
      * helper.setupInjector() to do the shimming.
      *
+     * You can return a single thing to be overridden, or you can return an
+     * array of overrides, and the helper will shim in the item or list of
+     * items respectively.
+     *
      * If you just invoke helper.before() with no callback included, it'll just
      * do the work of invoking helper.start() to initialize connections and
      * services needed for the modules.
