@@ -45,6 +45,7 @@
   "devDependencies": {
     "chai": "^1.10.0",
     "chai-as-promised": "^4.1.1",
+    "express": "^4.10.7",
     "istanbul": "^0.3.5",
     "jsdoc": "^3.3.0-alpha13",
     "jshint": "^2.5.11",
