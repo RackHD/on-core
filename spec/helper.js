@@ -131,6 +131,12 @@ global.helper = {
         return this.injector = new di.Injector(dependencies);
     },
 
+    /**
+     * Sets up values in the configuration service to testing - using AMQP and a test
+     * MongoDB database
+     *
+     * @returns {Q.promise}
+     */
     setupTestConfig: function () {
         return this.injector.get(
             'Services.Configuration'
@@ -144,6 +150,22 @@ global.helper = {
             'amqp', 'amqp://localhost'
         );
     },
+
+    /**
+     * maps through all collections loaded into Services.Waterline
+     * and destroys them to reset testing state.
+     *
+     * Usage:
+     *
+     *     beforeEach(function() {
+     *         this.timeout(5000); // gives the system 5 seconds to do the wiping
+     *         return waterline.start().then(function() {
+     *             return helper.reset();
+     *         })
+     *     })
+     *
+     * @returns {Q.promise}
+     */
 
     reset: function () {
         var waterline = this.injector.get('Services.Waterline'),
@@ -159,6 +181,11 @@ global.helper = {
         );
     },
 
+    /**
+     * Invokes core.stop() if this.core exists to shut down services
+     *
+     * @returns {Q.promise}
+     */
     stop: function () {
         if (this.core) {
             return this.core.stop();
@@ -166,6 +193,43 @@ global.helper = {
             return Q.resolve();
         }
     },
+
+    /**
+     *
+     * @param callback
+     *
+     * Sets up a mocha "before" block that provides an opportunity to override
+     * modules in the injector and then starts relevant services.
+     *
+     * Usage:
+     *
+     *     helper.before(function(context) {
+     *       context.someMock = {
+     *         mockedFunction: sinon.stub().yields()
+     *       }
+     *
+     *       return helper.di.simpleWrapper(context.someMock, 'injectorName')
+     *     });
+     *
+     * or
+     *
+     *     helper.before();
+     *
+     * This creates a mock object for one of the components you'd normally get
+     * through the injector and by returning it at the tail end of the
+     * helper.before(), it force loads the mock you made into the injector as
+     * an updated item. (i.e. it passes the return value through as the
+     * variable "overrides" into helper.start(), which in turn passes it down
+     * helper.setupInjector() to do the shimming.
+     *
+     * You can return a single thing to be overridden, or you can return an
+     * array of overrides, and the helper will shim in the item or list of
+     * items respectively.
+     *
+     * If you just invoke helper.before() with no callback included, it'll just
+     * do the work of invoking helper.start() to initialize connections and
+     * services needed for the modules.
+     */
 
     before: function (callback) {
         before("helper.before", function () {
@@ -179,6 +243,14 @@ global.helper = {
         });
     },
 
+    /**
+     * Usage:
+     *
+     *     helper.after();
+     *
+     * Sets up a mocha "after" function for the describe block in a spec that
+     * does the relevant shutdown of core services.
+     */
     after: function () {
         after("helper.after", function () {
             return helper.stop();
