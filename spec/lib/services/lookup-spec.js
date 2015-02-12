@@ -4,7 +4,7 @@
 'use strict';
 
 describe('Lookup Service', function() {
-    var lookupService, dhcpProtocol, MacAddress, IpAddress;
+    var lookupService, dhcpProtocol, MacAddress;
 
     helper.before();
 

@@ -3,7 +3,6 @@
 
 'use strict';
 
-var Q = require('q');
 var base = require('./base-spec');
 
 describe('Catalog Model', function () {
