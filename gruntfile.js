@@ -85,7 +85,7 @@ function prepareGrunt(grunt) {
                 // grunt watch:mochaTest
                 mochaTest: {
                     files: allFiles,
-                    tasks: ['mochaTest:min'],
+                    tasks: ['mochaTest:test'],
                     options:{
                         interrupt: true,
                         atBegin: true
@@ -105,7 +105,7 @@ function prepareGrunt(grunt) {
                 },
                 min: {
                     options: {
-                        reporter: 'min',
+                        reporter: 'spec',
                         require: 'spec/helper'
                     },
                     src: allSpecFiles

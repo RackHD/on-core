@@ -39,6 +39,10 @@ describe('Result', function () {
             it('should resolve if valid', function () {
                 return this.subject.validate().should.be.resolved;
             });
+
+            it('should resolve if not valid since it has no rules', function () {
+                return new Result().validate().should.be.resolved;
+            });
         });
     });
 });
