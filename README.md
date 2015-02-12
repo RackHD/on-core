@@ -14,6 +14,11 @@ Scheduler Objects
 ###lib/services
 Standard Service Objects
 
+## Development Notes
+
+Run `grunt watch` to have grunt listen for file changes and run the specs and linter automatically.  Grunt is
+configured to use the grunt-notify plugin so it will also provide desktop notifications for test results.
+
 ## CI notes
 
 Default clean setup and run with "npm test" is now oriented to immediate
