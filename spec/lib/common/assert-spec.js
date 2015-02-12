@@ -60,4 +60,38 @@ describe("AssertService", function() {
             assert.isIP('10.1.1.1');
         }).to.not.throw();
     });
+
+    describe('arguments', function () {
+        it('should do throw if no arguments are present', function () {
+            expect(function () {
+                assert.isMac();
+            }).to.throw();
+
+            expect(function () {
+                assert.ok();
+            }).to.throw();
+        });
+    });
+
+    describe('macaddress', function () {
+        it('should throw on an invalid mac address', function () {
+            expect(function () {
+                assert.isMac('invalid');
+            }).to.throw();
+
+            expect(function () {
+                assert.isMac('00:11:22:33:44:55:66');
+            }).to.throw();
+
+            expect(function () {
+                assert.isMac('00:11:22:33:44');
+            }).to.throw();
+        });
+
+        it('should not throw on a valid mac address', function () {
+            expect(function () {
+                assert.isMac('00:11:22:33:44:55');
+            });
+        });
+    });
 });

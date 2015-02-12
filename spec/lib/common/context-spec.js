@@ -72,6 +72,13 @@ describe('Context', function () {
         it('should chain itself for subsequent calls', function () {
             this.subject.push('foo', 'bar').foo.should.deep.equal(['bar']);
         });
+
+        it('should use the same value array if pushed to more than once', function () {
+            this.subject
+                .push('bar', 'foo')
+                .push('bar', 'oof')
+                .bar.should.deep.equal(['foo', 'oof']);
+        });
     });
 
     describe('pop', function () {
