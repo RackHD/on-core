@@ -5,7 +5,7 @@
 
 describe('Subscription', function () {
     var Subscription;
-    
+
     helper.before();
 
     before(function () {
@@ -18,7 +18,7 @@ describe('Subscription', function () {
             deleteQueue: sinon.stub().returns(
                 Q.resolve()
             )
-        }
+        };
 
         this.subject = new Subscription(
             this.messenger,
@@ -27,7 +27,7 @@ describe('Subscription', function () {
                 queue: 'queue'
             }
         );
-    })
+    });
 
     helper.after();
 
