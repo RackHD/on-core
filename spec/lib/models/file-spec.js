@@ -81,7 +81,7 @@ describe('File Model', function () {
 
         });
 
-        describe('sha', function() {
+        describe('sha256', function() {
             before(function () {
                 this.subject = this.attributes.sha;
             });
