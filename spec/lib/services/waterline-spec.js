@@ -3,7 +3,7 @@
 
 'use strict';
 
-describe(require('path').basename(__filename), function () {
+describe('Services.Waterline', function () {
     var waterline;
     function waterlineProtocolFactory(Rx) {
         return {
@@ -23,7 +23,8 @@ describe(require('path').basename(__filename), function () {
         });
     }
 
-    beforeEach("waterline-spec beforeEach", function() {
+    beforeEach("set up test dependencies", function() {
+        this.timeout(5000);
         helper.setupInjector([
             helper.di.overrideInjection(waterlineProtocolFactory, 'Protocol.Waterline', ['Rx']),
             helper.di.overrideInjection(testModelFactory, 'Models.TestObject', ['Model'])
@@ -33,6 +34,7 @@ describe(require('path').basename(__filename), function () {
     });
 
     it('should start and stop', function () {
+        this.timeout(5000);
         return waterline.start().then(function () {
             return waterline.stop();
         });
@@ -46,14 +48,14 @@ describe(require('path').basename(__filename), function () {
             subject.onNext({ event: event, record: record });
         }
 
-        beforeEach("waterline-spec.observe() beforeEach", function () {
-            this.timeout(10000);
+        beforeEach("start waterline", function () {
+            this.timeout(5000);
             return waterline.start().then(function () {
                 return helper.reset();
             });
         });
 
-        afterEach("waterline-spec.observe() afterEach", function () {
+        afterEach("stop waterline", function () {
             return waterline.stop();
         });
 
