@@ -83,7 +83,7 @@ describe('File Model', function () {
 
         describe('sha256', function() {
             before(function () {
-                this.subject = this.attributes.sha;
+                this.subject = this.attributes.sha256;
             });
 
             it('should be a string', function () {
@@ -98,7 +98,7 @@ describe('File Model', function () {
 
         describe('version', function() {
             before(function () {
-                this.subject = this.attributes.sha;
+                this.subject = this.attributes.version;
             });
 
             it('should be a string', function () {
