@@ -85,7 +85,7 @@ function prepareGrunt(grunt) {
                 // grunt watch:mochaTest
                 mochaTest: {
                     files: allFiles,
-                    tasks: ['mochaTest:test'],
+                    tasks: ['coverage'],
                     options:{
                         interrupt: true,
                         atBegin: true
