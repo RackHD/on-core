@@ -116,6 +116,9 @@ function prepareGrunt(grunt) {
                 coverage: {
                     src: 'spec',
                     options: {
+                        excludes: [
+                            'spec/**/*.js'
+                        ],
                         mask: '**/*-spec.js',
                         reportFormats: ['html'],
                         mochaOptions: [
