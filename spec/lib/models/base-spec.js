@@ -21,8 +21,12 @@ module.exports = {
                     this.subject = this.attributes.id;
                 });
 
-                it('should be a string', function () {
-                    expect(this.subject.type).to.equal('string');
+                it('should be the correct type', function () {
+                    if (this.model.connection[0] === 'disk') {
+                        expect(this.subject.type).to.equal('integer');
+                    } else {
+                        expect(this.subject.type).to.equal('string');
+                    }
                 });
 
                 it('should be a primary key', function () {
