@@ -110,6 +110,20 @@ function prepareGrunt(grunt) {
                     },
                     src: allSpecFiles
                 }
+            },
+
+            'mocha_istanbul': {
+                coverage: {
+                    src: 'spec',
+                    options: {
+                        mask: '**/*-spec.js',
+                        reportFormats: ['html'],
+                        mochaOptions: [
+                            '--require',
+                            'spec/helper'
+                        ]
+                    }
+                }
             }
         });
 
@@ -117,7 +131,11 @@ function prepareGrunt(grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-mocha-test');
+    grunt.loadNpmTasks('grunt-mocha-istanbul');
     grunt.loadNpmTasks('grunt-notify');
+
+    // Whenever the "coverage" task is run, run these tasks
+    grunt.registerTask('coverage', ['mocha_istanbul:coverage']);
 
     // Whenever the "test" task is run, run these tasks
     grunt.registerTask('test', ['jshint', 'mochaTest:test']);
