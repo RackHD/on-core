@@ -5,7 +5,7 @@
 
 var base = require('./base-spec');
 
-describe('Sku Model', function () {
+describe('Models.Sku', function () {
     helper.before();
 
     base.before(function (context) {
@@ -66,6 +66,54 @@ describe('Sku Model', function () {
             it('should be json', function () {
                 expect(this.subject.type).to.equal('json');
             });
+        });
+    });
+
+    describe('SKU Rules', function () {
+        beforeEach(function () {
+            return helper.reset();
+        });
+
+        it('should validate SKU with rules', function () {
+            return this.model.create({
+                name: 'test1',
+                rules: [
+                    {
+                        path: 'dmi.memory.total',
+                        equals: '32946864kB'
+                    }
+                ]
+            }).should.be.fulfilled;
+        });
+
+        it('should not validate SKU rules with invalid values', function () {
+            return this.model.create({
+                name: 'test2',
+                rules: [1, 2, 3]
+            }).should.be.rejectedWith(Error);
+        });
+
+        it('should not validate SKU rules with a missing path', function () {
+            return this.model.create({
+                name: 'test3',
+                rules: [
+                    {
+                        path: null,
+                    }
+                ]
+            }).should.be.rejectedWith(Error);
+        });
+
+        it('should not validate SKU rules with an invalid validation rule', function () {
+            return this.model.create({
+                name: 'test4',
+                rules: [
+                    {
+                        path: 'dmi.memory.free',
+                        badMatcher: 'asdf'
+                    }
+                ]
+            }).should.be.rejectedWith(Error);
         });
     });
 });

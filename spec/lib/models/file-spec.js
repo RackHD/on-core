@@ -5,7 +5,7 @@
 
 var base = require('./base-spec');
 
-describe('File Model', function () {
+describe('Models.File', function () {
     helper.before();
 
     base.before(function (context) {
@@ -109,6 +109,41 @@ describe('File Model', function () {
                 expect(this.subject.defaultsTo).to.equal(0);
             });
 
+        });
+    });
+
+    describe('object returned from toJSON()', function () {
+        var file;
+
+        before('reset DB collections', function () {
+            return helper.reset();
+        });
+
+        before('create record', function () {
+            return this.model.create({
+                basename: 'test.txt',
+                filename: 'asdf/test.txt',
+                uuid: '00000000-0000-4000-8000-000000000000',
+                md5: '1748378563801794b10c9d8b109d6b10',
+                sha256: '1748378563801794b10c9d8b109d6b101748378563801794b10c9d8b109d6b10'
+            }).then(function (file_) {
+                file = file_.toJSON();
+            }).catch(function (err) {
+                console.log(err);
+                throw err;
+            });
+        });
+
+        it('should not have createdAt', function () {
+            expect(file).to.not.have.property('createdAt');
+        });
+
+        it('should not have updatedAt', function () {
+            expect(file).to.not.have.property('updatedAt');
+        });
+
+        it('should not have id', function () {
+            expect(file).to.not.have.property('id');
         });
     });
 });

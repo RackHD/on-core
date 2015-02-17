@@ -5,7 +5,7 @@
 
 var base = require('./base-spec');
 
-describe('Catalog Model', function () {
+describe('Models.Catalog', function () {
     helper.before();
 
     base.before(function (context) {
@@ -66,14 +66,45 @@ describe('Catalog Model', function () {
 
     describe('creation', function() {
         it('should create a catalog', function() {
-            return Q.resolve(this.model.create({
+            return this.model.create({
                 node: "54d93422b492492333333333",
                 source: 'testcatalog',
                 data: {
                     testvalue1: 'test1',
-                    testvalue2: 'test2'
+                    testvalue2: 'test2',
+                    testarray1: [
+                        {
+                            testarrayvalue1: 'test3'
+                        }
+                    ]
                 }
-            }));
+            });
+        });
+
+        it('should replace dots in catalog keys with underscores', function() {
+            return this.model.create({
+                node: "54d93422b492492313333333",
+                source: 'testcatalog2',
+                data: {
+                    'testvalue1.test': 'test1'
+                }
+            }).then(function (catalog) {
+                /*jshint sub: true */
+                expect(catalog.data['testvalue1_test']).to.equal('test1');
+            });
+        });
+
+        it('should replace dollar signs in catalog keys with underscores', function() {
+            return this.model.create({
+                node: "54d93422b492492323333333",
+                source: 'testcatalog3',
+                data: {
+                    'testvalue1$test': 'test1'
+                }
+            }).then(function (catalog) {
+                /*jshint sub: true */
+                expect(catalog.data['testvalue1_test']).to.equal('test1');
+            });
         });
     });
 });
