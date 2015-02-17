@@ -85,7 +85,7 @@ function prepareGrunt(grunt) {
                 // grunt watch:mochaTest
                 mochaTest: {
                     files: allFiles,
-                    tasks: ['mochaTest:test'],
+                    tasks: ['coverage'],
                     options:{
                         interrupt: true,
                         atBegin: true
@@ -116,6 +116,9 @@ function prepareGrunt(grunt) {
                 coverage: {
                     src: 'spec',
                     options: {
+                        excludes: [
+                            'spec/**/*.js'
+                        ],
                         mask: '**/*-spec.js',
                         reportFormats: ['html'],
                         mochaOptions: [
