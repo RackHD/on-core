@@ -5,7 +5,7 @@
 
 var base = require('./base-spec');
 
-describe('Graph Definition Model', function () {
+describe('Models.GraphDefinition', function () {
     helper.before();
 
     base.before(function (context) {
@@ -64,6 +64,36 @@ describe('Graph Definition Model', function () {
             it('should be json', function () {
                 expect(this.subject.json).to.equal(true);
             });
+        });
+    });
+
+    describe('object returned from toJSON()', function () {
+        var graph;
+
+        before('reset DB collections', function () {
+            return helper.reset();
+        });
+
+        before('create record', function () {
+            return this.model.create({
+                friendlyName: 'Dummy',
+                injectableName: 'Graph.Dummy',
+                tasks: [{ /* placeholder */ }]
+            }).then(function (graph_) {
+                graph = graph_.toJSON();
+            });
+        });
+
+        it('should not have createdAt', function () {
+            expect(graph).to.not.have.property('createdAt');
+        });
+
+        it('should not have updatedAt', function () {
+            expect(graph).to.not.have.property('updatedAt');
+        });
+
+        it('should not have id', function () {
+            expect(graph).to.not.have.property('id');
         });
     });
 });

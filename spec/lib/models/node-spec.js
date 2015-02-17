@@ -5,7 +5,7 @@
 
 var base = require('./base-spec');
 
-describe('Node Model', function () {
+describe('Models.Node', function () {
     helper.before();
 
     base.before(function (context) {

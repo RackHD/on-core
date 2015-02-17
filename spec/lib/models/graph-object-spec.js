@@ -5,7 +5,7 @@
 
 var base = require('./base-spec');
 
-describe('Graph Object Model', function () {
+describe('Models.GraphObject', function () {
     helper.before();
 
     base.before(function (context) {
@@ -89,6 +89,37 @@ describe('Graph Object Model', function () {
                 expect(this.subject.collection).to.equal('nodes');
                 expect(this.subject.via).to.equal('workflows');
             });
+        });
+    });
+
+    describe('object returned from deserialize()', function () {
+        var graph;
+
+        before('reset DB collections', function () {
+            return helper.reset();
+        });
+
+        before('create record', function () {
+            return this.model.create({
+                instanceId: '00000000-0000-4000-8000-000000000000',
+                context: { /* placeholder */ },
+                definition: { /* placeholder */ },
+                tasks: [{ /* placeholder */ }]
+            }).then(function (graph_) {
+                graph = graph_.deserialize();
+            });
+        });
+
+        it('should not have createdAt', function () {
+            expect(graph).to.not.have.property('createdAt');
+        });
+
+        it('should not have updatedAt', function () {
+            expect(graph).to.not.have.property('updatedAt');
+        });
+
+        it('should not have id', function () {
+            expect(graph).to.not.have.property('id');
         });
     });
 });

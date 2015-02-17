@@ -6,7 +6,7 @@
 
 var base = require('./base-spec');
 
-describe('Workitem Model', function () {
+describe('Models.WorkItem', function () {
     helper.before();
 
     var workitems;
@@ -18,12 +18,6 @@ describe('Workitem Model', function () {
         uuid = helper.injector.get('uuid');
         workitems = context.model = helper.injector.get('Services.Waterline').workitems;
         context.attributes = context.model._attributes;
-    });
-
-
-
-    beforeEach("work-item-spec beforeEach", function () {
-        return helper.reset();
     });
 
     helper.after();
@@ -58,7 +52,11 @@ describe('Workitem Model', function () {
         var defaultItems;
         var workerId;
 
-        beforeEach("work-item-spec.Work Queue Behavior beforeEach", function () {
+        beforeEach('reset DB collections', function () {
+            return helper.reset();
+        });
+
+        beforeEach('create test work items', function () {
             workerId = uuid.v4();
             return createWorkItems().then(function (items) {
                 expect(items).to.have.length(4);
@@ -139,6 +137,36 @@ describe('Workitem Model', function () {
                 expect(scheduled[0]).to.be.an('object');
                 expect(scheduled[1]).to.be.an('object');
                 expect(scheduled[0].id).to.not.equal(scheduled[1].id);
+            });
+        });
+
+        it('should start two items and mark as succeded', function () {
+            var otherWorkerId = uuid.v4();
+            return Q.all([
+                workitems.startNextScheduled(workerId, {}, 10 * 1000),
+                workitems.startNextScheduled(otherWorkerId, {}, 10 * 1000)
+            ])
+            .then(function(scheduled) {
+                return workitems.setSucceeded(null, scheduled).then(function (succeeded) {
+                    expect(succeeded).to.have.length(2);
+                    expect(succeeded[0].leaseToken).to.equal(null);
+                    expect(succeeded[1].leaseToken).to.equal(null);
+                });
+            });
+        });
+
+        it('should start two items and mark as failed', function () {
+            var otherWorkerId = uuid.v4();
+            return Q.all([
+                workitems.startNextScheduled(workerId, {}, 10 * 1000),
+                workitems.startNextScheduled(otherWorkerId, {}, 10 * 1000)
+            ])
+            .then(function(scheduled) {
+                return workitems.setFailed(null, scheduled).then(function (failed) {
+                    expect(failed).to.have.length(2);
+                    expect(failed[0].leaseToken).to.equal(null);
+                    expect(failed[1].leaseToken).to.equal(null);
+                });
             });
         });
 
