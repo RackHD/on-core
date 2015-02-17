@@ -7,6 +7,12 @@ process.env.NODE_ENV = 'test';
 var path = require('path');
 
 /**
+ *  set up global lodash as _ for testing
+ */
+global._ = require('lodash');
+global.Q = require('q');
+
+/**
  *  set up global request mocking library supertest as request
  */
 global.request = require('supertest');
@@ -16,7 +22,7 @@ global.request = require('supertest');
  *  invoking sinon-chai extension to chai.
  */
 global.sinon = require('sinon');
-global.sinonPromise = require('sinon-promise')(global.sinon);
+global.sinonPromise = require('sinon-as-promised')(Q.promise);
 
 /**
  *  set up global chai for testing
@@ -40,12 +46,6 @@ global.should = chai.should(); // jshint ignore:line
  */
 var di = require('di');
 var dihelper = require('../lib/di')(di, __dirname);
-
-/**
- *  set up global lodash as _ for testing
- */
-global._ = require('lodash');
-global.Q = require('q');
 
 function provider(object) {
     var provides = _.detect(object.annotations, function (annotation) {
