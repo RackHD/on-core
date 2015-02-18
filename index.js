@@ -36,6 +36,7 @@ module.exports = function (di, directory) {
                 helper.requireWrapper('ejs', 'ejs'),
                 helper.requireWrapper('anchor', 'anchor'),
                 helper.requireWrapper('fs', 'fs'),
+                helper.requireWrapper('child_process', 'child_process'),
 
                 // Glob Requirables
                 helper.requireGlob(__dirname + '/lib/common/*.js'),
