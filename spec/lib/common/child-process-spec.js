@@ -39,11 +39,11 @@ describe("ChildProcess", function () {
             var newProcess = new ChildProcess();
             expect(newProcess._fileExists(__dirname + "/child-process-spec.js")).to.equal(true);
         });
-        it('should return fasle if a file doesnt exist', function () {
+        it('should return false if a file doesnt exist', function () {
             var newProcess = new ChildProcess();
             expect(newProcess._fileExists(__dirname + "/NoFilehere.js")).to.equal(false);
         });
-        it('should return fasle if a file is actually a directory', function () {
+        it('should return false if a file is actually a directory', function () {
             var newProcess = new ChildProcess();
             expect(newProcess._fileExists(__dirname)).to.equal(false);
         });
@@ -81,18 +81,21 @@ describe("ChildProcess", function () {
             newProcess._getPaths = sinon.stub().returns([__dirname]);
             var logger = helper.injector.get('Logger').initialize();
             loggerSpy = sinon.spy(logger, 'log');
-
         });
 
-        beforeEach("run beforeEach", function() {
+        beforeEach("ChildProcess.run     beforeEach", function() {
             loggerSpy.reset();
+        });
+
+        after("ChildProcess.run after", function() {
+            loggerSpy.restore();
         });
 
         it('should do return a rejected promise if the command doesnt exist', function () {
             return newProcess.run("nonExistanceCommand").should.be.rejected;
         });
 
-        it('should do return a rejected promise if the args arent an array of strings', function () {
+        it('should do return a rejected promise if args are not an array of strings', function () {
             var mockSpawnedProcess = new events.EventEmitter();
             var execFileStub = this.childprocess.execFile;
             execFileStub.returns(mockSpawnedProcess)
@@ -153,29 +156,53 @@ describe("ChildProcess", function () {
     });
 
     describe("killSafe", function () {
-        it("will just emit a log message if the process hasn't been run", function () {
+
+        var loggerSpy;
+
+        before("ChildProcess.run before", function () {
+            var logger = helper.injector.get('Logger').initialize();
+            loggerSpy = sinon.spy(logger, 'log');
+        });
+
+        beforeEach("run beforeEach", function() {
+            loggerSpy.reset();
+        });
+
+        after("ChildProcess.run after", function() {
+            loggerSpy.restore();
+        });
+
+        it("should emit a log message if the process hasn't been run", function () {
             var newProcess = new ChildProcess();
             newProcess.killSafe('foo');
+            expect(loggerSpy.called).to.equal(true);
         });
-        it("will log message if the process has already been killed", function () {
+
+        it("should log message if the process has already been killed", function () {
             var newProcess = new ChildProcess();
             newProcess.hasBeenKilled = true;
             newProcess.killSafe('foo');
+            expect(loggerSpy.called).to.equal(true);
         });
-        it("will log message if the process doesn't have a spawned instance", function () {
+
+        it("should log message if the process doesn't have a spawned instance", function () {
             var newProcess = new ChildProcess();
             newProcess.hasRun = true;
             newProcess.hasBeenKilled = true;
             newProcess.killSafe('foo');
+            expect(loggerSpy.called).to.equal(true);
         });
-        it("will log message if the spawned instance for the process doesn't have a kill function", function () {
+
+        it("should log message if the spawned instance for the process doesn't have a kill function", function () {
             var newProcess = new ChildProcess();
             newProcess.hasRun = true;
             newProcess.hasBeenKilled = true;
             newProcess.spawnInstance = {};
             newProcess.killSafe('foo');
+            expect(loggerSpy.called).to.equal(true);
         });
-        it("will log message if the spawned instance for the process doesn't have a kill function", function () {
+
+        it("should invoke the kill function", function () {
             var killStub = sinon.stub();
             var newProcess = new ChildProcess();
             newProcess.hasRun = true;
@@ -183,6 +210,7 @@ describe("ChildProcess", function () {
             newProcess.spawnInstance = { kill: killStub };
             newProcess.killSafe('foo');
             expect(killStub.called).to.be.equal(true);
+            expect(loggerSpy.called).to.equal(false);
         });
     });
 });
