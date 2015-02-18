@@ -13,7 +13,10 @@ describe("ChildProcess", function () {
         context.childprocess = {
             execFile: sinon.stub()
         };
-        return helper.di.simpleWrapper(context.childprocess, 'child_process');
+        return [
+            helper.di.simpleWrapper(context.childprocess, 'child_process'),
+            helper.require('/spec/mocks/logger.js')
+        ];
     });
 
     helper.after();
@@ -71,10 +74,18 @@ describe("ChildProcess", function () {
 
     describe("run", function () {
         var newProcess;
+        var loggerSpy;
 
         before("ChildProcess.run before", function () {
             newProcess = new ChildProcess();
             newProcess._getPaths = sinon.stub().returns([__dirname]);
+            var logger = helper.injector.get('Logger').initialize();
+            loggerSpy = sinon.spy(logger, 'log');
+
+        });
+
+        beforeEach("run beforeEach", function() {
+            loggerSpy.reset();
         });
 
         it('should do return a rejected promise if the command doesnt exist', function () {
@@ -108,6 +119,35 @@ describe("ChildProcess", function () {
                 .callsArgWith(3, {code: -1}, undefined, "stderr result");
             return newProcess.run("child-process-spec.js").should.be.rejected.then(function () {
                 expect(execFileStub.called).to.equal(true);
+            });
+        });
+
+        it("on emit of 'close' from spawnprocess, should log and report killed", function() {
+            var mockSpawnedProcess = new events.EventEmitter();
+            var execFileStub = this.childprocess.execFile;
+            execFileStub.returns(mockSpawnedProcess)
+                .callsArgWith(3, undefined, "stdout result", undefined);
+
+            return newProcess.run("child-process-spec.js").then(function() {
+                mockSpawnedProcess.emit('close', -1, 'someSignal');
+            }).should.be.fulfilled.then(function () {
+                expect(execFileStub.called).to.equal(true);
+                expect(loggerSpy.called).to.equal(true);
+                expect(newProcess.hasBeenKilled).to.equal(true);
+            });
+        });
+
+        it("on emit of 'error' from spawnprocess, should log and report killed", function() {
+            var mockSpawnedProcess = new events.EventEmitter();
+            var execFileStub = this.childprocess.execFile;
+            execFileStub.returns(mockSpawnedProcess)
+                .callsArgWith(3, undefined, "stdout result", undefined);
+
+            return newProcess.run("child-process-spec.js").then(function() {
+                mockSpawnedProcess.emit('error', -1, 'someSignal');
+            }).should.be.fulfilled.then(function () {
+                expect(execFileStub.called).to.equal(true);
+                expect(loggerSpy.called).to.equal(true);
             });
         });
     });
