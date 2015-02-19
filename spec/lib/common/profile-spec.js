@@ -3,7 +3,7 @@
 
 'use strict';
 
-describe(require('path').basename(__filename), function () {
+describe('Profiles', function () {
     var waterline;
     var loader;
     var Logger;
