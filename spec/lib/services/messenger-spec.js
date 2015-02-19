@@ -4,16 +4,17 @@
 'use strict';
 
 describe('Messenger', function () {
-    var subscription, ErrorEvent, tracer;
+    var subscription, ErrorEvent, IpAddress, tracer;
 
     helper.before();
 
     before(function () {
         this.subject = helper.injector.get('Services.Messenger');
         ErrorEvent = helper.injector.get('ErrorEvent');
+        IpAddress = helper.injector.get('IpAddress');
         tracer = helper.injector.get('Tracer');
 
-        return this.subject.exchange('test', 'topic');
+        return this.subject.exchange('test', { type: 'topic' });
     });
 
     afterEach(function () {
@@ -28,15 +29,39 @@ describe('Messenger', function () {
 
     helper.after();
 
-    describe('start', function () {
-        it('needs tests');
-    });
-
-    describe('stop', function () {
-        it('needs tests');
+    describe('exchange', function () {
+        it('should reject when trying to create an exchange with no options', function () {
+            return this.subject.exchange(
+                'invalid'
+            ).should.be.rejectedWith(Error, 'Unable to Create Exchange without Options.');
+        });
     });
 
     describe('publish/subscribe', function () {
+        it('should resolve if the published data is an object', function () {
+            return this.subject.publish(
+                'test',
+                'test',
+                { hello: 'world' }
+            ).should.be.fulfilled;
+        });
+
+        it('should reject if the published data is invalid', function () {
+            return this.subject.publish(
+                'test',
+                'test',
+                new IpAddress({ value: 'invalid' })
+            ).should.be.rejected;
+        });
+
+        it('should resolve if the published data is valid', function () {
+            return this.subject.publish(
+                'test',
+                'test',
+                new IpAddress({ value: '10.1.1.1' })
+            ).should.be.fulfilled;
+        });
+
         it('should send data to the proper exchange', function (done) {
             var self = this;
 
@@ -87,32 +112,21 @@ describe('Messenger', function () {
             });
         });
 
-        it('should fulfill on successful publish', function (done) {
-            var self = this;
-
-            this.subject.subscribe(
-                'test',
+        it('should reject if subscribed to an invalid exchange', function () {
+            return this.subject.subscribe(
+                'invalid',
                 '#',
-                function (data) {
-                    data.should.deep.equal({ hello: 'world' });
-
-                    done();
-                }
-            ).then(function (sub) {
-                subscription = sub;
-
-                return self.subject.publish(
-                    'test',
-                    'test',
-                    { hello: 'world' }
-                ).should.be.fulfilled;
-            }).catch(function (error) {
-                done(error);
-            });
+                function (){}
+            ).should.be.rejectedWith(Error, 'Invalid Exchange Specified for Subscription.');
         });
 
-        it('should reject on failed publish');
-        it('should provide tracer context to the subscriber');
+        it('should reject if published to an invalid exchange', function () {
+            return this.subject.publish(
+                'invalid',
+                'invalid',
+                { hello: 'invalid' }
+            ).should.be.rejectedWith(Error, 'Invalid Exchange Specified for Publish.');
+        });
     });
 
     describe('request', function () {
@@ -174,7 +188,46 @@ describe('Messenger', function () {
                 ).should.be.rejectedWith(Error, 'Request Timed Out.');
         });
 
-        it('should provide tracer context to the responder');
-        it('should update the requester context with the responder changes');
+        it('should reject request messages which are not what the subscriber expects', function () {
+            var self = this;
+
+            return this.subject.subscribe(
+                'test',
+                '#',
+                function () {
+                    throw new Error('Should Never Get Here');
+                },
+                IpAddress
+            ).then(function (sub) {
+                subscription = sub;
+
+                return self.subject.request(
+                    'test',
+                    'test',
+                    { value: 'invalid' }
+                ).should.be.rejectedWith(ErrorEvent, 'Invalid Request Type.');
+            });
+        });
+
+        it('should reject response messages which are not what the requester expects', function () {
+            var self = this;
+
+            return this.subject.subscribe(
+                'test',
+                '#',
+                function (data, message) {
+                    message.resolve({ hello: 'world' });
+                }
+            ).then(function (sub) {
+                subscription = sub;
+
+                return self.subject.request(
+                    'test',
+                    'test',
+                    { value: 'invalid' },
+                    IpAddress
+                ).should.be.rejectedWith(Error, 'Invalid Response Type.');
+            });
+        });
     });
 });

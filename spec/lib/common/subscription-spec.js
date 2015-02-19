@@ -11,45 +11,20 @@ describe('Subscription', function () {
     before(function () {
         Subscription = helper.injector.get('Subscription');
 
-        this.messenger = {
-            cancel: sinon.stub().returns(
-                Q.resolve()
-            ),
-            deleteQueue: sinon.stub().returns(
-                Q.resolve()
-            )
+        this.queue = {
+            destroy: sinon.spy()
         };
 
         this.subject = new Subscription(
-            this.messenger,
-            {
-                consumerTag: 'consumerTag',
-                queue: 'queue'
-            }
+            this.queue
         );
     });
 
     helper.after();
 
     describe('constructor', function () {
-        it('assigns messenger to messenger', function () {
-            this.subject.messenger.should.deep.equal(this.messenger);
-        });
-
-        it('assigns options to options', function () {
-            this.subject.options.should.deep.equal({
-                consumerTag: 'consumerTag',
-                queue: 'queue'
-            });
-        });
-
-        [
-            'queue',
-            'consumerTag'
-        ].forEach(function (property) {
-            it ('provides a ' + property + ' accessor', function () {
-                this.subject[property].should.equal(property);
-            });
+        it('assigns queue to queue', function () {
+            this.subject.queue.should.deep.equal(this.queue);
         });
     });
 
@@ -58,8 +33,7 @@ describe('Subscription', function () {
             var self = this;
 
             return this.subject.dispose().then(function () {
-                self.messenger.cancel.should.have.been.calledWith('consumerTag');
-                self.messenger.deleteQueue.should.have.been.calledWith('queue');
+                return self.queue.destroy.should.have.been.calledWith;
             });
         });
     });
