@@ -33,7 +33,7 @@ describe('Models.WorkItem', function () {
             var tomorrow = new Date(now + 60 * 60 * 24 * 1000);
             return workitems.create([{
                 name: 'First Past',
-                pollInterval: 10 * 1000,
+                pollInterval: 10 * 1000
             }, {
                 name: 'Second Yesterday',
                 pollInterval: 10 * 1000,
@@ -41,7 +41,7 @@ describe('Models.WorkItem', function () {
             }, {
                 name: 'First Tomorrow',
                 pollInterval: 10 * 1000,
-                nextScheduled: tomorrow,
+                nextScheduled: tomorrow
             }, {
                 name: 'Second Tomorrow',
                 pollInterval: 10 * 1000,
