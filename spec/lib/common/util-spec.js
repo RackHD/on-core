@@ -33,6 +33,14 @@ describe('Util', function () {
             util.provides(Test).should.equal('ProvidedByTest');
         });
 
+        it('should return undefined if only an inject annotation is present', function () {
+            function Test () {}
+
+            di.annotate(Test, new di.Inject(['ProvidedByTest']));
+
+            should.equal(util.provides(Test), undefined);
+        });
+
         it('should return undefined if no annotation is present', function () {
             function Test () {}
 
