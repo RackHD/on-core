@@ -107,4 +107,56 @@ describe('Models.Catalog', function () {
             });
         });
     });
+
+    describe('findLatestCatalogOfSource', function () {
+
+        var nodes;
+        var catalogs;
+        var nodeId;
+
+        before("findLatestCatalogOfSource before", function() {
+            nodes = helper.injector.get('Services.Waterline').nodes;
+            catalogs = this.model;
+        });
+
+        beforeEach('reset DB collections', function () {
+            return helper.reset();
+        });
+
+        beforeEach('create test node with two catalogs', function () {
+            return nodes.create({ name: 'testNodeName' })
+                .then(function(node) {
+                    nodeId = node.id;
+                    //console.log("Node ID: ",nodeId);
+                    // create first catalog
+                    return catalogs.create({
+                        node: nodeId,
+                        source: 'testcatalog',
+                        data: {
+                            testvalue1: 'firstcatalog'
+                        }
+                    });
+                })
+                .then(function() {
+                    // create second catalog
+                    return catalogs.create({
+                        node: nodeId,
+                        source: 'testcatalog',
+                        data: {
+                            testvalue1: 'lastcatalog'
+                        }
+                    });
+                });
+        });
+
+        it("should return the last catalog created", function() {
+            return catalogs.findLatestCatalogOfSource(nodeId, 'testcatalog')
+                .then(function(catalogs) {
+                    expect(catalogs).to.be.an('Object');
+                    expect(catalogs.source).to.equal('testcatalog');
+                    expect(catalogs.data.testvalue1).to.equal('lastcatalog');
+                });
+        });
+
+    });
 });
