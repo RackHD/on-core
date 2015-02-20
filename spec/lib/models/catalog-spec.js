@@ -151,11 +151,10 @@ describe('Models.Catalog', function () {
 
         it("should return the last catalog created", function() {
             return catalogs.findLatestCatalogOfSource(nodeId, 'testcatalog')
-                .then(function(catalogs, err) {
-                    expect(err).to.be.undefined;
-                    expect(catalogs).to.be.an('Array').with.length(1);
-                    expect(catalogs[0].source).to.equal('testcatalog');
-                    expect(catalogs[0].data.testvalue1).to.equal('lastcatalog');
+                .then(function(catalogs) {
+                    expect(catalogs).to.be.an('Object');
+                    expect(catalogs.source).to.equal('testcatalog');
+                    expect(catalogs.data.testvalue1).to.equal('lastcatalog');
                 });
         });
 
