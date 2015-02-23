@@ -15,7 +15,7 @@ describe("Task subscriber functions", function() {
 
     describe("Run", function() {
         var testSubscription;
-        afterEach("cancel aftereEach", function() {
+        afterEach("cancel afterEach", function() {
             // unsubscribe to clean up after ourselves
             return testSubscription.dispose();
         });
@@ -49,7 +49,7 @@ describe("Task subscriber functions", function() {
 
     describe("Cancel", function() {
         var testSubscription;
-        afterEach("cancel aftereEach", function() {
+        afterEach("cancel afterEach", function() {
             return testSubscription.dispose();
         });
 
@@ -245,7 +245,7 @@ describe("Task subscriber functions", function() {
     describe("respondCommands", function() {
 
         var testSubscription;
-        afterEach("cancel aftereEach", function() {
+        afterEach("cancel afterEach", function() {
             // unsubscribe to clean up after ourselves
             return testSubscription.dispose();
         });
@@ -489,7 +489,7 @@ describe("Task subscriber functions", function() {
     describe("runIpmiCommand", function() {
 
         var testSubscription;
-        afterEach("cancel aftereEach", function() {
+        afterEach("cancel afterEach", function() {
             // unsubscribe to clean up after ourselves
             return testSubscription.dispose();
         });
@@ -524,7 +524,7 @@ describe("Task subscriber functions", function() {
     describe("ipmiCommandResult", function() {
 
         var testSubscription;
-        afterEach("cancel aftereEach", function() {
+        afterEach("cancel afterEach", function() {
             // unsubscribe to clean up after ourselves
             return testSubscription.dispose();
         });
@@ -559,7 +559,7 @@ describe("Task subscriber functions", function() {
 
     describe("runSNMPCommand", function() {
         var testSubscription;
-        afterEach("cancel aftereEach", function() {
+        afterEach("cancel afterEach", function() {
             // unsubscribe to clean up after ourselves
             return testSubscription.dispose();
         });
@@ -593,7 +593,7 @@ describe("Task subscriber functions", function() {
     describe("SNMPCommandResult", function() {
 
         var testSubscription;
-        afterEach("cancel aftereEach", function() {
+        afterEach("cancel afterEach", function() {
             // unsubscribe to clean up after ourselves
             return testSubscription.dispose();
         });
