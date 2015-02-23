@@ -3,6 +3,17 @@
 
 'use strict';
 
-describe(require('path').basename(__filename), function () {
-    it('needs specs');
+describe("Event protocol subscribers", function () {
+
+    helper.before();
+
+    before(function () {
+        this.events = helper.injector.get('Protocol.Events');
+        this.task = helper.injector.get('Protocol.Task');
+    });
+
+    helper.after();
+
+    it("needs tests");
+
 });
