@@ -3,7 +3,7 @@
 
 'use strict';
 
-describe("Task subscriber functions", function() {
+describe("Task protocol functions", function() {
     helper.before();
 
     before(function () {
