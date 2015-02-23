@@ -12,14 +12,8 @@ describe("Http Protocol functions", function () {
 
     helper.after();
 
-    describe("publish http response", function() {
-        //NOTE: no matching internal code to listen for these events
-        it("should publish a poller alert event", function() {
-            var self = this,
-                data = { foo: 'bar' };
-
-            return self.http.publishResponse(data);
-        });
+    it("should load", function() {
+        expect(this.http).to.be.ok;
     });
 
 });
