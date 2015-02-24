@@ -41,7 +41,9 @@ describe("Task protocol functions", function() {
                 testSubscription = subscription;
 
                 return self.task.run(taskId, args);
-            });
+            }).catch(function(err) {
+                deferred.reject(err);
+            });;
 
             return deferred.promise;
         });
@@ -74,7 +76,9 @@ describe("Task protocol functions", function() {
                 testSubscription = subscription;
 
                 return self.task.cancel(taskId, args);
-            });
+            }).catch(function(err) {
+                deferred.reject(err);
+            });;
 
             return deferred.promise;
         });
@@ -269,7 +273,9 @@ describe("Task protocol functions", function() {
                 expect(subscription).to.be.ok;
                 testSubscription = subscription;
                 return self.task.respondCommands(taskId, testData);
-            });
+            }).catch(function(err) {
+                deferred.reject(err);
+            });;
 
             return deferred.promise;
         });
@@ -480,7 +486,9 @@ describe("Task protocol functions", function() {
                     expect(sub).to.be.ok;
                     self.events.publishHttpResponse(otherId, {});
                 });
-            });
+            }).catch(function(err) {
+                deferred.reject(err);
+            });;
 
             return deferred.promise;
         });
@@ -515,7 +523,9 @@ describe("Task protocol functions", function() {
 
                 testSubscription = subscription;
                 return self.task.publishRunIpmiCommand(testUuid, testCommand, testData);
-            });
+            }).catch(function(err) {
+                deferred.reject(err);
+            });;
 
             return deferred.promise;
         });
@@ -551,7 +561,9 @@ describe("Task protocol functions", function() {
 
                 testSubscription = subscription;
                 return self.task.publishIpmiCommandResult(testUuid, testCommand, testData);
-            });
+            }).catch(function(err) {
+                deferred.reject(err);
+            });;
 
             return deferred.promise;
         });
@@ -584,7 +596,9 @@ describe("Task protocol functions", function() {
 
                 testSubscription = subscription;
                 return self.task.publishRunSnmpCommand(testUuid, testData);
-            });
+            }).catch(function(err) {
+                deferred.reject(err);
+            });;
 
             return deferred.promise;
 
@@ -618,7 +632,9 @@ describe("Task protocol functions", function() {
 
                 testSubscription = subscription;
                 return self.task.publishSnmpCommandResult(testUuid, testData);
-            });
+            }).catch(function(err) {
+                deferred.reject(err);
+            });;
 
             return deferred.promise;
         });
