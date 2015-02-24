@@ -151,7 +151,7 @@ describe("ChildProcess", function () {
             };
             var _runSpy = sinon.spy(child, '_run');
 
-            return child.run({ retries: 1 })
+            return child.run({ retries: 1, delay: 0 })
             .then(function() {
                 expect(_runSpy).to.have.been.calledOnce;
             });
@@ -163,7 +163,7 @@ describe("ChildProcess", function () {
             };
             var _runSpy = sinon.spy(child, '_run');
 
-            return child.run({ retries: 2 })
+            return child.run({ retries: 2, delay: 0 })
             .catch(function(e) {
                 expect(e).to.deep.equal(new Error('test failure'));
                 expect(_runSpy).to.have.been.calledThrice;
@@ -198,9 +198,32 @@ describe("ChildProcess", function () {
             };
             var _runSpy = sinon.spy(child, '_run');
 
-            return child.run({ retries: 2 })
+            return child.run({ retries: 2, delay: 0 })
             .then(function() {
                 expect(_runSpy).to.have.been.calledThrice;
+            });
+        });
+
+        it("should retry with exponential backoff delay", function() {
+            var retries = 5;
+            var delay = 1;
+            child._run = function() {
+                child._deferred.reject(new Error('test failure'));
+            };
+            var _runSpy = sinon.spy(child, '_run');
+            var _retrySpy = sinon.spy(child, '_runWithRetries');
+
+            return child.run({ retries: retries, delay: delay })
+            .catch(function(e) {
+                expect(e).to.deep.equal(new Error('test failure'));
+                expect(_runSpy.callCount).to.equal(retries + 1);
+                expect(_retrySpy.callCount).to.equal(retries + 1);
+                expect(_retrySpy.getCall(0)).to.have.been.calledWith(0, 1, 5);
+                expect(_retrySpy.getCall(1)).to.have.been.calledWith(1, 2, 5);
+                expect(_retrySpy.getCall(2)).to.have.been.calledWith(2, 4, 5);
+                expect(_retrySpy.getCall(3)).to.have.been.calledWith(3, 8, 5);
+                expect(_retrySpy.getCall(4)).to.have.been.calledWith(4, 16, 5);
+                expect(_retrySpy.getCall(5)).to.have.been.calledWith(5, 32, 5);
             });
         });
 
