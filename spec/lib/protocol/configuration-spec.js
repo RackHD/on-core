@@ -8,26 +8,60 @@ describe("Configuration Protocol functions", function () {
     helper.before();
 
     before(function () {
-        this.http = helper.injector.get('Protocol.Configuration');
+        this.configuration = helper.injector.get('Protocol.Configuration');
     });
 
     helper.after();
 
     describe("subscribeSet", function() {
-        it("should subscribe", function() {
-            var self = this;
+        var testSubscription;
+        afterEach("cancel afterEach", function() {
+            // unsubscribe to clean up after ourselves
+            if (testSubscription) {
+                return testSubscription.dispose();
+            }
+        });
 
-            return self.http.subscribeSet(function(_data) {
-                //NOTE(heckj): need matching code to invoke this subscription
+        it("should subscribe and publish sets", function() {
+            var self = this,
+                Q = helper.injector.get('Q'),
+                deferred = Q.defer(),
+                data = { key: 'bar', value: 'baz' };
+
+            self.configuration.subscribeSet(function(data) {
+                try {
+                    expect(data).to.have.property('key', 'bar');
+                    expect(data).to.have.property('value', 'baz');
+                    deferred.resolve();
+                } catch(err) {
+                    deferred.reject(err);
+                }
+            }).then(function(subscription) {
+                expect(subscription).to.be.ok;
+                testSubscription = subscription;
+
+                return self.configuration.publishSet(data);
+            }).catch(function(err) {
+                deferred.reject(err);
             });
+
+            return deferred.promise;
         });
     });
 
-    describe("subscribeGet", function() {
+    describe.skip("subscribeGet", function() {
+        var testSubscription;
+        afterEach("cancel afterEach", function() {
+            // unsubscribe to clean up after ourselves
+            if (testSubscription) {
+                return testSubscription.dispose();
+            }
+        });
+
         it("should subscribe", function() {
             var self = this;
 
-            return self.http.subscribeGet(function(_data) {
+            return self.configuration.subscribeGet(function(_data) {
                 //NOTE(heckj): need matching code to invoke this subscription
             });
         });
