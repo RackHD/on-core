@@ -43,7 +43,7 @@ describe("Logging protocol functions", function () {
             'debug',
             'silly'
         ].forEach(function (level) {
-                it("should publish a poller alert event with level " + level, function () {
+                it("should publish a log message with level " + level, function () {
                     //NOTE: no matching internal code to listen for these events
                     var self = this,
                         Q = helper.injector.get('Q'),
