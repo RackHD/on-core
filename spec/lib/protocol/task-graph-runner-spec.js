@@ -562,7 +562,6 @@ describe("TaskGraph Runner protocol functions", function () {
         });
     });
 
-
     describe("resumeTaskGraph", function() {
 
         var testSubscription;
