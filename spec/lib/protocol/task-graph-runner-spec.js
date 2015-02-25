@@ -48,6 +48,30 @@ describe("TaskGraph Runner protocol functions", function () {
             });
         });
 
+        it("should subscribe and receive getTaskGraphLibrary results without a filter", function() {
+            var self = this,
+                testData = { abc: '123' };
+
+            return self.taskgraphrunner.subscribeGetTaskGraphLibrary(function(filter) {
+                expect(filter).to.be.undefined;
+                return testData;
+            }).then(function(subscription) {
+                expect(subscription).to.be.ok;
+
+                testSubscription = subscription;
+                return self.taskgraphrunner.getTaskGraphLibrary();
+            }).then(function(data) {
+                expect(data).to.deep.equal(testData);
+
+            }).then(function() {
+                // unsubscribe to clean up after ourselves
+                return testSubscription.dispose();
+            }).then(function(resolvedUnsubscribe) {
+                // verify we unsubscribed correctly
+                expect(resolvedUnsubscribe).to.be.ok;
+            });
+        });
+
         it("should subscribe and receive getTaskGraphLibrary failures", function() {
             var self = this,
                 testFilter = { foo: 'bar'},
@@ -97,6 +121,30 @@ describe("TaskGraph Runner protocol functions", function () {
 
                 testSubscription = subscription;
                 return self.taskgraphrunner.getTaskLibrary(testFilter);
+            }).then(function(data) {
+                expect(data).to.deep.equal(testData);
+
+            }).then(function() {
+                // unsubscribe to clean up after ourselves
+                return testSubscription.dispose();
+            }).then(function(resolvedUnsubscribe) {
+                // verify we unsubscribed correctly
+                expect(resolvedUnsubscribe).to.be.ok;
+            });
+        });
+
+        it("should subscribe and receive getTaskLibrary results without a filter", function() {
+            var self = this,
+                testData = { abc: '123' };
+
+            return self.taskgraphrunner.subscribeGetTaskLibrary(function(filter) {
+                expect(filter).to.be.undefined;
+                return testData;
+            }).then(function(subscription) {
+                expect(subscription).to.be.ok;
+
+                testSubscription = subscription;
+                return self.taskgraphrunner.getTaskLibrary();
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
 
@@ -170,6 +218,30 @@ describe("TaskGraph Runner protocol functions", function () {
             });
         });
 
+        it("should subscribe and receive getActiveTaskGraph results without a filter", function() {
+            var self = this,
+                testData = { abc: '123' };
+
+            return self.taskgraphrunner.subscribeGetActiveTaskGraph(function(filter) {
+                expect(filter).to.be.undefined;
+                return testData;
+            }).then(function(subscription) {
+                expect(subscription).to.be.ok;
+
+                testSubscription = subscription;
+                return self.taskgraphrunner.getActiveTaskGraph();
+            }).then(function(data) {
+                expect(data).to.deep.equal(testData);
+
+            }).then(function() {
+                // unsubscribe to clean up after ourselves
+                return testSubscription.dispose();
+            }).then(function(resolvedUnsubscribe) {
+                // verify we unsubscribed correctly
+                expect(resolvedUnsubscribe).to.be.ok;
+            });
+        });
+
         it("should subscribe and receive getActiveTaskGraph failures", function() {
             var self = this,
                 testFilter = { foo: 'bar'},
@@ -219,6 +291,30 @@ describe("TaskGraph Runner protocol functions", function () {
 
                 testSubscription = subscription;
                 return self.taskgraphrunner.getActiveTaskGraphs(testFilter);
+            }).then(function(data) {
+                expect(data).to.deep.equal(testData);
+
+            }).then(function() {
+                // unsubscribe to clean up after ourselves
+                return testSubscription.dispose();
+            }).then(function(resolvedUnsubscribe) {
+                // verify we unsubscribed correctly
+                expect(resolvedUnsubscribe).to.be.ok;
+            });
+        });
+
+        it("should subscribe and receive getActiveTaskGraphs results without a filter", function() {
+            var self = this,
+                testData = { abc: '123' };
+
+            return self.taskgraphrunner.subscribeGetActiveTaskGraphs(function(filter) {
+                expect(filter).to.be.undefined;
+                return testData;
+            }).then(function(subscription) {
+                expect(subscription).to.be.ok;
+
+                testSubscription = subscription;
+                return self.taskgraphrunner.getActiveTaskGraphs();
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
 
@@ -292,6 +388,30 @@ describe("TaskGraph Runner protocol functions", function () {
             });
         });
 
+        it("should subscribe and receive defineTaskGraph results without a filter", function() {
+            var self = this,
+                testData = { abc: '123' };
+
+            return self.taskgraphrunner.subscribeDefineTaskGraph(function(filter) {
+                expect(filter).to.be.undefined;
+                return testData;
+            }).then(function(subscription) {
+                expect(subscription).to.be.ok;
+
+                testSubscription = subscription;
+                return self.taskgraphrunner.defineTaskGraph();
+            }).then(function(data) {
+                expect(data).to.deep.equal(testData);
+
+            }).then(function() {
+                // unsubscribe to clean up after ourselves
+                return testSubscription.dispose();
+            }).then(function(resolvedUnsubscribe) {
+                // verify we unsubscribed correctly
+                expect(resolvedUnsubscribe).to.be.ok;
+            });
+        });
+
         it("should subscribe and receive defineTaskGraph failures", function() {
             var self = this,
                 testFilter = { foo: 'bar'},
@@ -353,6 +473,30 @@ describe("TaskGraph Runner protocol functions", function () {
             });
         });
 
+        it("should subscribe and receive defineTask results without a filter", function() {
+            var self = this,
+                testData = { abc: '123' };
+
+            return self.taskgraphrunner.subscribeDefineTask(function(filter) {
+                expect(filter).to.be.undefined;
+                return testData;
+            }).then(function(subscription) {
+                expect(subscription).to.be.ok;
+
+                testSubscription = subscription;
+                return self.taskgraphrunner.defineTask();
+            }).then(function(data) {
+                expect(data).to.deep.equal(testData);
+
+            }).then(function() {
+                // unsubscribe to clean up after ourselves
+                return testSubscription.dispose();
+            }).then(function(resolvedUnsubscribe) {
+                // verify we unsubscribed correctly
+                expect(resolvedUnsubscribe).to.be.ok;
+            });
+        });
+
         it("should subscribe and receive defineTask failures", function() {
             var self = this,
                 testFilter = { foo: 'bar'},
@@ -402,6 +546,30 @@ describe("TaskGraph Runner protocol functions", function () {
 
                 testSubscription = subscription;
                 return self.taskgraphrunner.runTaskGraph(testFilter);
+            }).then(function(data) {
+                expect(data).to.deep.equal(testData);
+
+            }).then(function() {
+                // unsubscribe to clean up after ourselves
+                return testSubscription.dispose();
+            }).then(function(resolvedUnsubscribe) {
+                // verify we unsubscribed correctly
+                expect(resolvedUnsubscribe).to.be.ok;
+            });
+        });
+
+        it("should subscribe and receive runTaskGraph results without a filter", function() {
+            var self = this,
+                testData = { abc: '123' };
+
+            return self.taskgraphrunner.subscribeRunTaskGraph(function(filter) {
+                expect(filter).to.be.undefined;
+                return testData;
+            }).then(function(subscription) {
+                expect(subscription).to.be.ok;
+
+                testSubscription = subscription;
+                return self.taskgraphrunner.runTaskGraph();
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
 
