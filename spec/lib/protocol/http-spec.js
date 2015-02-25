@@ -3,6 +3,17 @@
 
 'use strict';
 
-describe(require('path').basename(__filename), function () {
-    it('needs specs');
+describe("Http Protocol functions", function () {
+    helper.before();
+
+    before(function () {
+        this.http = helper.injector.get('Protocol.Http');
+    });
+
+    helper.after();
+
+    it("should load", function() {
+        expect(this.http).to.be.ok;
+    });
+
 });
