@@ -22,7 +22,7 @@ describe("Schedular protocol functions", function () {
             }
         });
 
-        it("should publish and receive a schedule reques", function () {
+        it("should publish and receive a schedule request", function () {
             //NOTE: no matching internal code to listen for these events
             var self = this,
                 Q = helper.injector.get('Q'),
