@@ -4,7 +4,7 @@
 'use strict';
 
 describe('Lookup Service', function() {
-    var lookupService, dhcpProtocol, MacAddress;
+    var lookupService, dhcpProtocol, MacAddress, Errors;
 
     helper.before();
 
@@ -12,6 +12,7 @@ describe('Lookup Service', function() {
         lookupService = helper.injector.get('Services.Lookup');
         dhcpProtocol = helper.injector.get('Protocol.Dhcp');
         MacAddress = helper.injector.get('MacAddress');
+        Errors = helper.injector.get('Errors');
     });
 
     afterEach(function () {
@@ -21,6 +22,30 @@ describe('Lookup Service', function() {
     });
 
     helper.after();
+
+    describe('macAddressToNodeId', function() {
+        var macAddressToNodeStub;
+
+        before('macAddressToNodeId before', function() {
+            macAddressToNodeStub = sinon.stub(lookupService, 'macAddressToNode');
+        });
+
+        beforeEach('macAddressToNodeId beforeEach', function() {
+            macAddressToNodeStub.reset();
+        });
+
+        after('macAddressToNodeId after', function() {
+            macAddressToNodeStub.restore();
+        });
+
+        it('macAddressToNodeId should return a LookupError if there is no node', function() {
+            macAddressToNodeStub.resolves(null);
+
+            return lookupService.macAddressToNodeId('08:00:27:7a:c0:00').should.be.rejectedWith(
+                            Errors.LookupError,
+                            'Unable to locate node via MAC address.');
+        });
+    });
 
     it('should lookup the mac address for an IP', function() {
         var self = this;
