@@ -244,6 +244,13 @@ describe('dihelper', function () {
         });
         describe('exec', function () {
             var simpleWrapper = dihelper.simpleWrapper;
+            it("should throw error if last argument isn't a function", function() {
+                var fooObject = {};
+                var injector = new di.Injector([]);
+                expect(function() {
+                    injector.exec('blah', fooObject);
+                }).to.throw(Error, 'last argument must be a function');
+            });
             it('empty injector string val', function () {
                 var fooObject = function (val) {
                     return 'before:' + val + ':after';
@@ -301,6 +308,15 @@ describe('dihelper', function () {
                         foo_.should.equal(foo);
                     });
             });
+            it("should throw error if last argument isn't a function", function() {
+                var foo = {foo: 1};
+                var injector = new di.Injector();
+                expect(function() {
+                    injector.childExec(
+                        simpleWrapper(foo, 'foo'),
+                        { notAFunction: 1 });
+                }).to.throw(Error, 'last argument must be a function');
+            });
         });
 
         describe('getMatching', function () {
@@ -321,6 +337,11 @@ describe('dihelper', function () {
                     given.should.include(mod);
                 });
             }
+            it('should throw an error if not a string or regex', function () {
+                expect(function() {
+                    injector.getMatching({});
+                }).to.throw(Error, 'pattern must be a string or RegExp');
+            });
 
             it('should get tokens split by a dot using a wildcard character', function () {
                 var modules = injector.getMatching('module.*');
@@ -345,6 +366,21 @@ describe('dihelper', function () {
                 var modules = childInjector.getMatching('module.*');
                 verifyModules(modules, [foo, bar, baz, qux]);
             });
+        });
+    });
+    describe("provideName", function() {
+        it("throws an error if token isn't a string", function() {
+            var dihelper = helper.require('/lib/di')(di);
+            expect(function() {
+                dihelper.testFunctions.provideName({}, 123)
+            }).to.throw(Error, 'Must provide string as name of module');
+        });
+    });
+    describe("addInject", function() {
+        it("should return immediately if inject doesn't exist", function() {
+            var obj = {}
+            var dihelper = helper.require('/lib/di')(di);
+            dihelper.testFunctions.addInject(obj);
         });
     });
 });
