@@ -42,6 +42,8 @@
     "validator": "^3.27.0",
     "waterline": "^0.10.15",
     "waterline-criteria": "^0.11.1"
+    "waterline-criteria": "^0.11.1",
+    "pluralize": "~1.1.2"
   },
   "devDependencies": {
     "chai": "^2.0.0",
