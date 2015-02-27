@@ -4,6 +4,7 @@
 'use strict';
 
 describe("TaskGraph Runner protocol functions", function () {
+
     helper.before();
 
     before(function () {
