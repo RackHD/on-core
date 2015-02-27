@@ -369,7 +369,7 @@ describe('dihelper', function () {
         });
     });
     describe("provideName", function() {
-        it("throws an error if token isn't a string", function() {
+        it("should throw an error if token isn't a string", function() {
             var dihelper = helper.require('/lib/di')(di);
             expect(function() {
                 dihelper.testFunctions.provideName({}, 123)
@@ -384,5 +384,4 @@ describe('dihelper', function () {
         });
     });
 });
-
 
