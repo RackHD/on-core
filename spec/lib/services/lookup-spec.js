@@ -8,7 +8,7 @@ describe('Lookup Service', function () {
 
     helper.before();
 
-    before(function () {
+    before("Lookup Service before", function () {
         lookupService = helper.injector.get('Services.Lookup');
         waterline = helper.injector.get('Services.Waterline');
         dhcpProtocol = helper.injector.get('Protocol.Dhcp');
@@ -16,7 +16,7 @@ describe('Lookup Service', function () {
         Errors = helper.injector.get('Errors');
     });
 
-    afterEach(function () {
+    afterEach("Lookup Service afterEach", function () {
         if (this.subscription) {
             this.subscription.dispose();
         }
