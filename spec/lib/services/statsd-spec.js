@@ -46,17 +46,17 @@ describe("StatsD Service", function () {
         });
     });
     describe("handleStats", function() {
-        var guageSpy;
+        var gaugeSpy;
         var statsdService;
         before("handleStats before", function() {
             statsdService = helper.injector.get('Services.StatsD');
-            guageSpy = sinon.spy(statsdService, "gauge");
+            gaugeSpy = sinon.spy(statsdService, "gauge");
         });
         beforeEach("handleStats beforeEach", function() {
-            guageSpy.reset();
+            gaugeSpy.reset();
         });
         after("handleStats after", function() {
-            guageSpy.restore();
+            gaugeSpy.restore();
         });
 
         it("should invoke statsD guage on receiving stats", function() {
@@ -68,11 +68,11 @@ describe("StatsD Service", function () {
                 usage_trend : 3  //jshint ignore:line
             };
             statsdService.handleStats(testStats);
-            expect(guageSpy.getCall(0)).to.have.been.calledWith("memwatch.estimated_base", 1);
-            expect(guageSpy.getCall(1)).to.have.been.calledWith("memwatch.current_base", 2);
-            expect(guageSpy.getCall(2)).to.have.been.calledWith("memwatch.min", 0);
-            expect(guageSpy.getCall(3)).to.have.been.calledWith("memwatch.max", 5);
-            expect(guageSpy.getCall(4)).to.have.been.calledWith("memwatch.usage_trend", 3);
+            expect(gaugeSpy.getCall(0)).to.have.been.calledWith("memwatch.estimated_base", 1);
+            expect(gaugeSpy.getCall(1)).to.have.been.calledWith("memwatch.current_base", 2);
+            expect(gaugeSpy.getCall(2)).to.have.been.calledWith("memwatch.min", 0);
+            expect(gaugeSpy.getCall(3)).to.have.been.calledWith("memwatch.max", 5);
+            expect(gaugeSpy.getCall(4)).to.have.been.calledWith("memwatch.usage_trend", 3);
         });
     });
 
