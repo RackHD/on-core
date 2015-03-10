@@ -5,9 +5,6 @@
 
 describe("StatsD Service", function () {
 
-
-
-
     helper.before(function(context) {
         var util = require('util');
         var events = require('events');
@@ -24,6 +21,7 @@ describe("StatsD Service", function () {
             helper.require('/spec/mocks/logger.js')
         ];
     });
+
     helper.after();
 
     describe("handleLeak", function() {
