@@ -193,14 +193,17 @@ describe("ChildProcess", function () {
             expect(loggerSpy.called).to.equal(true);
         });
 
-        it("should log message if the spawned instance for the process doesn't have a kill function", function () {
-            var newProcess = new ChildProcess();
-            newProcess.hasRun = true;
-            newProcess.hasBeenKilled = true;
-            newProcess.spawnInstance = {};
-            newProcess.killSafe('foo');
-            expect(loggerSpy.called).to.equal(true);
-        });
+        it(
+            "should log message if the spawned instance doesn't have a kill function",
+            function () {
+                var newProcess = new ChildProcess();
+                newProcess.hasRun = true;
+                newProcess.hasBeenKilled = true;
+                newProcess.spawnInstance = {};
+                newProcess.killSafe('foo');
+                expect(loggerSpy.called).to.equal(true);
+            }
+        );
 
         it("should invoke the kill function", function () {
             var killStub = sinon.stub();

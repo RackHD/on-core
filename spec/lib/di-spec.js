@@ -372,13 +372,13 @@ describe('dihelper', function () {
         it("should throw an error if token isn't a string", function() {
             var dihelper = helper.require('/lib/di')(di);
             expect(function() {
-                dihelper.testFunctions.provideName({}, 123)
+                dihelper.testFunctions.provideName({}, 123);
             }).to.throw(Error, 'Must provide string as name of module');
         });
     });
     describe("addInject", function() {
         it("should return immediately if inject doesn't exist", function() {
-            var obj = {}
+            var obj = {};
             var dihelper = helper.require('/lib/di')(di);
             dihelper.testFunctions.addInject(obj);
         });
