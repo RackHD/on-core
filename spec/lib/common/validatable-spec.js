@@ -24,8 +24,12 @@ describe('Validatable', function () {
                     Validatable.call(
                         this,
                         {
-                            name: {
-                                type: 'string'
+                            id: 'Subject',
+                            type: 'object',
+                            properties: {
+                                name: {
+                                    type: 'string'
+                                }
                             }
                         }
                     );
@@ -37,13 +41,13 @@ describe('Validatable', function () {
             });
 
             it('should resolve on success', function () {
-                return new Subject({ name: 'test' }).validate().should.be.fulfilled;
+                return new Subject({ name: 'test' }).validate();
             });
 
             it('should reject on failure', function () {
                 return new Subject(
                     { name: 1337 }
-                ).validate().should.be.rejectedWith(Errors.ValidationError);
+                ).validate().should.be.rejectedWith(Errors.SchemaError);
             });
         });
 
@@ -53,9 +57,14 @@ describe('Validatable', function () {
                     Validatable.call(
                         this,
                         {
-                            name: {
-                                required: true
-                            }
+                            id: 'Subject',
+                            type: 'object',
+                            properties: {
+                                name: {
+                                    type: 'string'
+                                }
+                            },
+                            required: [ 'name' ]
                         }
                     );
 
@@ -66,11 +75,13 @@ describe('Validatable', function () {
             });
 
             it('should resolve on success', function () {
-                return new Subject({ name: 'test' }).validate().should.be.fulfilled;
+                return new Subject({ name: 'test' }).validate();
             });
 
             it('should reject on failure', function () {
-                return new Subject({ arbitrary: 1337 }).validate().should.be.rejected;
+                return new Subject(
+                    { arbitrary: 1337 }
+                ).validate().should.be.rejectedWith(Errors.SchemaError);
             });
         });
 
@@ -80,8 +91,13 @@ describe('Validatable', function () {
                     Validatable.call(
                         this,
                         {
-                            ip: {
-                                ipv4: true
+                            id: 'Subject',
+                            type: 'object',
+                            properties: {
+                                ip: {
+                                    type: 'string',
+                                    format: 'ipv4'
+                                }
                             }
                         }
                     );
@@ -93,11 +109,13 @@ describe('Validatable', function () {
             });
 
             it('should resolve ipv4', function () {
-                return new Subject({ ip: '10.1.1.1' }).validate().should.be.fulfilled;
+                return new Subject({ ip: '10.1.1.1' }).validate();
             });
 
             it('should reject non-ipv4', function () {
-                return new Subject({ ip: 'garbage' }).validate().should.be.rejected;
+                return new Subject(
+                    { ip: 'garbage' }
+                ).validate().should.be.rejectedWith(Errors.SchemaError);
             });
         });
     });

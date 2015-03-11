@@ -24,9 +24,15 @@ describe('Serializable', function () {
                 Serializable.call(
                     this,
 
-                    // Rules
+                    // Schema
                     {
-                        name: { type: 'string' }
+                        id: '/FactoryObject',
+                        type: 'object',
+                        properties: {
+                            name: {
+                                type: 'string'
+                            }
+                        }
                     },
 
                     // Default Values

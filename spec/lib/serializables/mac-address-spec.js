@@ -4,7 +4,7 @@
 'use strict';
 
 describe('MacAddress', function () {
-    var MacAddress, Serializable, Validatable;
+    var MacAddress, Serializable, Validatable, Errors;
 
     helper.before();
 
@@ -12,6 +12,7 @@ describe('MacAddress', function () {
         MacAddress = helper.injector.get('MacAddress');
         Serializable = helper.injector.get('Serializable');
         Validatable = helper.injector.get('Validatable');
+        Errors = helper.injector.get('Errors');
     });
 
     before(function () {
@@ -37,17 +38,19 @@ describe('MacAddress', function () {
     describe('validation', function () {
         describe('resolved', function () {
             it('should resolve if valid', function () {
-                return this.subject.validate().should.be.resolved;
+                return this.subject.validate();
             });
         });
 
         describe('rejected', function () {
             it('should reject if value is not present', function () {
-                return new MacAddress().validate().should.be.rejected;
+                return new MacAddress().validate().should.be.rejectedWith(Errors.SchemaError);
             });
 
             it('should reject if value is not a mac address', function () {
-                return new MacAddress({ value: 'invalid' }).validate().should.be.rejected;
+                return new MacAddress(
+                    { value: 'invalid' }
+                ).validate().should.be.rejectedWith(Errors.SchemaError);
             });
         });
     });
