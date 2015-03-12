@@ -9,6 +9,8 @@ describe('Model', function () {
         publishRecord: sinon.stub().returns(Q.resolve())
     };
 
+    var Errors;
+
     function testModelFactory(Model) {
         return Model.extend({
             connection: 'mongo',
@@ -28,6 +30,7 @@ describe('Model', function () {
         ]);
         helper.setupTestConfig();
         waterline = helper.injector.get('Services.Waterline');
+        Errors = helper.injector.get('Errors');
         return waterline.start();
     });
 
@@ -266,26 +269,10 @@ describe('Model', function () {
         });
 
         describe('update by bad identifier with updateByIdentifier()', function () {
-            var updated;
-
-            before('set up mocks', function () {
-                waterlineProtocol.publishRecord = sinon.stub().returns(Q.resolve());
-            });
-
-            before('update the record', function () {
+            it('should reject with a not found error', function () {
                 return waterline.testobjects.updateByIdentifier('invalid object', {
                     dummy: 'updatemebyidentifier'
-                }).then(function (updated_) {
-                    updated = updated_;
-                });
-            });
-
-            it('should not return an updated object', function () {
-                expect(updated).to.be.undefined;
-            });
-
-            it('should not have called publishRecord()', function () {
-                expect(waterlineProtocol.publishRecord).to.not.have.been.called;
+                }).should.be.rejectedWith(Errors.NotFoundError);
             });
         });
     });

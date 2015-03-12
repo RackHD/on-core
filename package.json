@@ -42,7 +42,6 @@
     "validate.js": "^0.3.2",
     "validator": "^3.27.0",
     "waterline": "^0.10.15",
-    "waterline-criteria": "^0.11.1"
     "waterline-criteria": "^0.11.1",
     "pluralize": "~1.1.2"
   },
