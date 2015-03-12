@@ -12,11 +12,12 @@ di.annotate(mockLoggerFactory,
         'Constants',
         'Assert',
         'LogEvent',
-        '_'
+        '_',
+        'console'
     )
 );
 
-function mockLoggerFactory(Constants, assert, LogEvent, _) {
+function mockLoggerFactory(Constants, assert, LogEvent, _, console) {
 
     /**
      * Logger is a logger class which provides methods for logging based

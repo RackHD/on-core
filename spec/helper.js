@@ -55,6 +55,10 @@ function provider(object) {
     return provides ? provides.token : undefined;
 }
 
+var nullConsole = {
+    log: function () {}
+};
+
 global.helper = {
 
 /**
@@ -114,7 +118,7 @@ global.helper = {
 
                 if (provides) {
                     // Remove any matching dependencies from the core
-                    // depdencies.
+                    // dependencies.
                     _.remove(dependencies, function (dependency) {
                         var p = provider(dependency);
 
@@ -126,6 +130,14 @@ global.helper = {
                 dependencies.push(override);
             });
         }
+
+        _.remove(dependencies, function (dependency) {
+            var p = provider(dependency);
+
+            return p && p === 'console';
+        });
+
+        dependencies.push(helper.di.simpleWrapper(nullConsole, 'console'));
 
         // Initialize the injector with the new list of dependencies.
         this.injector = new di.Injector(dependencies);

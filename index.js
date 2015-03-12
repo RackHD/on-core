@@ -37,6 +37,7 @@ module.exports = function (di, directory) {
                 helper.requireWrapper('fs', 'fs'),
                 helper.requireWrapper('child_process', 'child_process'),
                 helper.requireWrapper('jsonschema', 'jsonschema'),
+                helper.simpleWrapper(console, 'console'),
 
                 // Glob Requirables
                 helper.requireGlob(__dirname + '/lib/common/*.js'),
