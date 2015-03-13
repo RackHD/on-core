@@ -36,6 +36,7 @@ module.exports = function (di, directory) {
                 helper.requireWrapper('ejs', 'ejs'),
                 helper.requireWrapper('fs', 'fs'),
                 helper.requireWrapper('child_process', 'child_process'),
+                helper.requireWrapper('anchor', 'anchor'),
                 helper.requireWrapper('jsonschema', 'jsonschema'),
                 helper.simpleWrapper(console, 'console'),
 
