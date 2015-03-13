@@ -8,6 +8,7 @@ describe("ChildProcess", function () {
     var ChildProcess;
     var child;
     var _getPaths;
+    var _getPathsOrig;
 
     helper.before(function (context) {
         // Initial override just yields for core services startup.
@@ -27,6 +28,7 @@ describe("ChildProcess", function () {
         ChildProcess = helper.injector.get('ChildProcess');
         expect(ChildProcess).to.be.a('function');
 
+        _getPathsOrig = ChildProcess.prototype._getPaths;
         _getPaths = sinon.stub(ChildProcess.prototype, '_getPaths');
         _getPaths.returns([__dirname]);
     });
@@ -40,9 +42,39 @@ describe("ChildProcess", function () {
     });
 
     describe("_getPaths", function () {
-        it('should return paths', function () {
-            var paths = child._getPaths();
+        var origpath = process.env.path;
+        var origPath = process.env.Path;
+        var origPATH = process.env.PATH;
+
+        function assertPaths(paths) {
             expect(paths).to.be.an('Array');
+            expect(paths[0]).to.equal('a/b');
+            expect(paths[1]).to.equal('c/d');
+            expect(paths[2]).to.equal('e/f');
+        }
+
+        afterEach(function() {
+            process.env.path = origpath;
+            process.env.Path = origPath;
+            process.env.PATH = origPATH;
+        });
+
+        it('should split process.env.path', function () {
+            process.env.path = 'a/b:c/d:e/f';
+            assertPaths(_getPathsOrig());
+        });
+
+        it('should split process.env.Path', function () {
+            process.env.path = '';
+            process.env.Path = 'a/b:c/d:e/f';
+            assertPaths(_getPathsOrig());
+        });
+
+        it('should split process.env.PATH', function () {
+            process.env.path = '';
+            process.env.Path = '';
+            process.env.PATH = 'a/b:c/d:e/f';
+            assertPaths(_getPathsOrig());
         });
     });
 
