@@ -1,5 +1,5 @@
 {
-  "name": "renasar-core",
+  "name": "os-core",
   "version": "0.0.1",
   "description": "Renasar Core Library",
   "main": "index.js",
@@ -9,20 +9,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/renasar/renasar-core.git"
+    "url": "ssh://git@hwstashprd01.isus.emc.com:7999/onrack/on-core.git"
   },
   "author": "",
   "license": "Proprietary",
   "bugs": {
     "url": "https://github.com/renasar/renasar-core/issues"
   },
-  "homepage": "https://github.com/renasar/renasar-core",
+  "homepage": "https://hwstashprd01.isus.emc.com:8443/projects/ONRACK/repos/on-core/",
   "dependencies": {
     "amqp": "^0.2.3",
     "anchor": "^0.10.2",
     "assert-plus": "^0.1.5",
     "colors": "^1.0.3",
-    "di": "git+ssh://git@github.com/renasar/di.js.git",
+    "di": "git+ssh://git@hwstashprd01.isus.emc.com:7999/onrack/di.js.git",
     "ejs": "^2.0.8",
     "glob": "^4.3.2",
     "jsonschema": "^1.0.0",

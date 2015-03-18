@@ -155,7 +155,7 @@ global.helper = {
         ).set('mongo', {
             host: 'localhost',
             port: 27017,
-            database: 'renasar-pxe-test',
+            database: 'on-rack-test',
             user: '',
             password: ''
         }).set(
