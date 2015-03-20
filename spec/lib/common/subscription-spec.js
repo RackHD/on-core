@@ -12,11 +12,18 @@ describe('Subscription', function () {
         Subscription = helper.injector.get('Subscription');
 
         this.queue = {
-            destroy: sinon.spy()
+            unsubscribe: sinon.spy(),
+            destroy: sinon.spy(),
+            close: sinon.spy()
         };
 
+        this.options = {
+            consumerTag: 'fake'
+        }
+
         this.subject = new Subscription(
-            this.queue
+            this.queue,
+            this.options
         );
     });
 
@@ -26,14 +33,20 @@ describe('Subscription', function () {
         it('assigns queue to queue', function () {
             this.subject.queue.should.deep.equal(this.queue);
         });
+
+        it('assigns options to options', function () {
+            this.subject.options.should.deep.equal(this.options);
+        });
     });
 
     describe('dispose', function () {
-        it('should call messenger.cancel and messenger.deleteQueue', function () {
+        it('should call queue.unsubscribe and queue.destroy', function () {
             var self = this;
 
             return this.subject.dispose().then(function () {
-                return self.queue.destroy.should.have.been.calledWith;
+                self.queue.unsubscribe.should.have.been.calledWith('fake');
+                self.queue.destroy.should.have.been.called;
+                self.queue.close.should.have.been.called;
             });
         });
     });
