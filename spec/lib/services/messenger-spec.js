@@ -14,7 +14,10 @@ describe('Messenger', function () {
         IpAddress = helper.injector.get('IpAddress');
         tracer = helper.injector.get('Tracer');
 
-        return this.subject.exchange('test', { type: 'topic' });
+        return this.subject.exchange(
+            'test',
+            { type: 'topic', durable: true, autoDelete: false }
+        );
     });
 
     afterEach(function () {
