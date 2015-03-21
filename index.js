@@ -5,6 +5,8 @@
 
 var _ = require('lodash');
 
+require('./lib/extensions');
+
 module.exports = function (di, directory) {
     var helper = require('./lib/di')(di, directory || __dirname);
 
