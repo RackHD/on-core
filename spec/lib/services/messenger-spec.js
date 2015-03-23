@@ -120,7 +120,7 @@ describe('Messenger', function () {
                 'invalid',
                 '#',
                 function (){}
-            ).should.be.rejectedWith(Error, 'Invalid Exchange Specified for Subscription.');
+            ).should.be.rejectedWith(Error);
         });
 
         it('should reject if published to an invalid exchange', function () {
@@ -128,7 +128,7 @@ describe('Messenger', function () {
                 'invalid',
                 'invalid',
                 { hello: 'invalid' }
-            ).should.be.rejectedWith(Error, 'Invalid Exchange Specified for Publish.');
+            ).should.be.rejectedWith(Error);
         });
     });
 
@@ -188,7 +188,7 @@ describe('Messenger', function () {
                     'test',
                     'test',
                     { hello: 'world' }
-                ).should.be.rejectedWith(Error, 'Request Timed Out.');
+                ).should.be.rejectedWith(Error);
         });
 
         it('should reject request messages which are not what the subscriber expects', function () {
@@ -208,7 +208,7 @@ describe('Messenger', function () {
                     'test',
                     'test',
                     { value: 'invalid' }
-                ).should.be.rejectedWith(ErrorEvent, 'Invalid Request Type.');
+                ).should.be.rejectedWith(ErrorEvent);
             });
         });
 
@@ -229,7 +229,7 @@ describe('Messenger', function () {
                     'test',
                     { value: 'invalid' },
                     IpAddress
-                ).should.be.rejectedWith(Error, 'Invalid Response Type.');
+                ).should.be.rejectedWith(Error);
             });
         });
     });
