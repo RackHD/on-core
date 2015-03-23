@@ -10,7 +10,7 @@ var path = require('path');
  *  set up global lodash as _ for testing
  */
 global._ = require('lodash');
-global.Q = require('q');
+global.Q = require('bluebird-q');
 
 /**
  *  set up global request mocking library supertest as request
@@ -250,7 +250,7 @@ global.helper = {
     before: function (callback) {
         before("helper.before", function () {
             this.timeout(10000);
-            var Q = require('q');
+            var Q = require('bluebird-q');
             if (_.isFunction(callback)) {
                 return Q.resolve(callback(this)).then(helper.start.bind(helper));
             } else {
