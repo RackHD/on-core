@@ -123,7 +123,9 @@ function prepareGrunt(grunt) {
                         reportFormats: ['html'],
                         mochaOptions: [
                             '--require',
-                            'spec/helper'
+                            'spec/helper',
+                            '--reporter',
+                            'min'
                         ]
                     }
                 }
