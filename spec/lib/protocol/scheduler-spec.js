@@ -29,12 +29,16 @@ describe("Schedular protocol functions", function () {
                 uuid = helper.injector.get('uuid'),
                 deferred = Q.defer(),
                 taskId = uuid.v4(),
-                taskName = "testTaskName";
+                taskName = "testTaskName",
+                overrides = {
+                    timeout: -1
+                };
 
-            self.scheduler.subscribeSchedule(function (cbTaskId, cbTaskName) {
+            self.scheduler.subscribeSchedule(function (cbTaskId, cbTaskName, cbOverrides) {
                 try {
                     expect(cbTaskId).to.equal(taskId);
                     expect(cbTaskName).to.equal(taskName);
+                    expect(cbOverrides).to.deep.equal(overrides);
                     deferred.resolve();
                 } catch (err) {
                     deferred.reject(err);
@@ -43,7 +47,7 @@ describe("Schedular protocol functions", function () {
                 expect(subscription).to.be.ok;
                 testSubscription = subscription;
 
-                return self.scheduler.schedule(taskId, taskName);
+                return self.scheduler.schedule(taskId, taskName, overrides);
             }).catch(function (err) {
                 deferred.reject(err);
             });
