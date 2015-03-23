@@ -16,7 +16,7 @@ module.exports = function (di, directory) {
             [
                 // NPM Packages
                 helper.simpleWrapper(_, '_'),
-                helper.requireWrapper('q', 'Q'),
+                helper.requireWrapper('bluebird-q', 'Q'),
                 helper.requireWrapper('rx', 'Rx'),
                 helper.requireWrapper('nconf'),
                 helper.requireWrapper('waterline', 'Waterline'),
