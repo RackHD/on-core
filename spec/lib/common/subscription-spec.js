@@ -19,7 +19,7 @@ describe('Subscription', function () {
 
         this.options = {
             consumerTag: 'fake'
-        }
+        };
 
         this.subject = new Subscription(
             this.queue,

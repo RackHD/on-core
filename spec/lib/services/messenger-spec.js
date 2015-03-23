@@ -13,11 +13,6 @@ describe('Messenger', function () {
         ErrorEvent = helper.injector.get('ErrorEvent');
         IpAddress = helper.injector.get('IpAddress');
         tracer = helper.injector.get('Tracer');
-
-        return this.subject.exchange(
-            'test',
-            { type: 'topic', durable: true, autoDelete: false }
-        );
     });
 
     afterEach(function () {
@@ -31,14 +26,6 @@ describe('Messenger', function () {
     });
 
     helper.after();
-
-    describe('exchange', function () {
-        it('should reject when trying to create an exchange with no options', function () {
-            return this.subject.exchange(
-                'invalid'
-            ).should.be.rejectedWith(Error, 'Unable to Create Exchange without Options.');
-        });
-    });
 
     describe('publish/subscribe', function () {
         it('should resolve if the published data is an object', function () {
