@@ -6,24 +6,20 @@
 describe('FileLoader', function () {
     var FileLoader;
 
-    helper.before(function (context) {
-        // Initial override just yields for core services startup.
-        context.fs = {
-            writeFile: sinon.stub().yields(),
-            readFile: sinon.stub().yields(),
-            readdir: sinon.stub().yields()
-        };
-
-        return helper.di.simpleWrapper(context.fs, 'fs');
-    });
+    helper.before();
 
     before(function () {
         FileLoader = helper.injector.get('FileLoader');
 
+        this.fs = helper.injector.get('fs');
         this.subject = new FileLoader();
     });
 
-    helper.after();
+    helper.after(function () {
+        this.fs.writeFile.restore();
+        this.fs.readFile.restore();
+        this.fs.readdir.restore();
+    });
 
     describe('put', function () {
         it('should write the contents to the specified file', function () {
