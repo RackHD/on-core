@@ -41,6 +41,7 @@ module.exports = function (di, directory) {
                 helper.requireWrapper('anchor', 'anchor'),
                 helper.requireWrapper('jsonschema', 'jsonschema'),
                 helper.simpleWrapper(console, 'console'),
+                helper.simpleWrapper(require('events').EventEmitter, 'EventEmitter'),
 
                 // Glob Requirables
                 helper.requireGlob(__dirname + '/lib/common/*.js'),
