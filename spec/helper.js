@@ -249,10 +249,13 @@ global.helper = {
 
     before: function (callback) {
         before("helper.before", function () {
+            var self = this;
             this.timeout(10000);
             var Q = require('bluebird-q');
             if (_.isFunction(callback)) {
-                return Q.resolve(callback(this)).then(helper.start.bind(helper));
+                return Q.resolve().then(function() {
+                    return callback(self);
+                }).then(helper.start.bind(helper));
             } else {
                 return helper.start();
             }
