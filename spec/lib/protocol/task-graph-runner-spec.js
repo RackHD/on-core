@@ -4,26 +4,23 @@
 'use strict';
 
 describe("TaskGraph Runner protocol functions", function () {
+    var testSubscription;
 
     helper.before();
 
     before(function () {
         this.taskgraphrunner = helper.injector.get('Protocol.TaskGraphRunner');
-        //this.task = helper.injector.get('Protocol.Task');
     });
 
     helper.after();
 
+    afterEach(function() {
+        if (testSubscription) {
+            return testSubscription.dispose();
+        }
+    });
+
     describe("getTaskGraphLibrary", function() {
-
-        var testSubscription;
-        afterEach("getTaskGraphLibrary afterEach", function() {
-            // unsubscribe to clean up after ourselves
-            if (testSubscription) {
-                return testSubscription.dispose();
-            }
-        });
-
         it("should subscribe and receive getTaskGraphLibrary results", function() {
             var self = this,
                 testFilter = { foo: 'bar'},
@@ -40,12 +37,6 @@ describe("TaskGraph Runner protocol functions", function () {
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
 
-            }).then(function() {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function(resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -63,13 +54,6 @@ describe("TaskGraph Runner protocol functions", function () {
                 return self.taskgraphrunner.getTaskGraphLibrary();
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
-
-            }).then(function() {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function(resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -88,27 +72,11 @@ describe("TaskGraph Runner protocol functions", function () {
                 testSubscription = subscription;
 
                 return self.taskgraphrunner.getTaskGraphLibrary(testFilter);
-            }).should.be.rejectedWith(ErrorEvent, 'someError')
-                .then(function() {
-                    // unsubscribe to clean up after ourselves
-                    return testSubscription.dispose();
-                }).then(function(resolvedUnsubscribe) {
-                    // verify we unsubscribed correctly
-                    expect(resolvedUnsubscribe).to.be.ok;
-                });
+            }).should.be.rejectedWith(ErrorEvent, 'someError');
         });
     });
 
     describe("getTaskLibrary", function() {
-
-        var testSubscription;
-        afterEach("getTaskLibrary afterEach", function() {
-            // unsubscribe to clean up after ourselves
-            if (testSubscription) {
-                return testSubscription.dispose();
-            }
-        });
-
         it("should subscribe and receive getTaskLibrary results", function() {
             var self = this,
                 testFilter = { foo: 'bar'},
@@ -124,13 +92,6 @@ describe("TaskGraph Runner protocol functions", function () {
                 return self.taskgraphrunner.getTaskLibrary(testFilter);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
-
-            }).then(function() {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function(resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -149,12 +110,6 @@ describe("TaskGraph Runner protocol functions", function () {
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
 
-            }).then(function() {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function(resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -173,27 +128,11 @@ describe("TaskGraph Runner protocol functions", function () {
                 testSubscription = subscription;
 
                 return self.taskgraphrunner.getTaskLibrary(testFilter);
-            }).should.be.rejectedWith(ErrorEvent, 'someError')
-                .then(function() {
-                    // unsubscribe to clean up after ourselves
-                    return testSubscription.dispose();
-                }).then(function(resolvedUnsubscribe) {
-                    // verify we unsubscribed correctly
-                    expect(resolvedUnsubscribe).to.be.ok;
-                });
+            }).should.be.rejectedWith(ErrorEvent, 'someError');
         });
     });
 
     describe("getActiveTaskGraph", function() {
-
-        var testSubscription;
-        afterEach("getActiveTaskGraph afterEach", function() {
-            // unsubscribe to clean up after ourselves
-            if (testSubscription) {
-                return testSubscription.dispose();
-            }
-        });
-
         it("should subscribe and receive getActiveTaskGraph results", function() {
             var self = this,
                 testFilter = { foo: 'bar'},
@@ -209,13 +148,6 @@ describe("TaskGraph Runner protocol functions", function () {
                 return self.taskgraphrunner.getActiveTaskGraph(testFilter);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
-
-            }).then(function() {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function(resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -234,12 +166,6 @@ describe("TaskGraph Runner protocol functions", function () {
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
 
-            }).then(function() {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function(resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -258,27 +184,11 @@ describe("TaskGraph Runner protocol functions", function () {
                 testSubscription = subscription;
 
                 return self.taskgraphrunner.getActiveTaskGraph(testFilter);
-            }).should.be.rejectedWith(ErrorEvent, 'someError')
-                .then(function() {
-                    // unsubscribe to clean up after ourselves
-                    return testSubscription.dispose();
-                }).then(function(resolvedUnsubscribe) {
-                    // verify we unsubscribed correctly
-                    expect(resolvedUnsubscribe).to.be.ok;
-                });
+            }).should.be.rejectedWith(ErrorEvent, 'someError');
         });
     });
 
     describe("getActiveTaskGraphs", function() {
-
-        var testSubscription;
-        afterEach("getActiveTaskGraphs afterEach", function() {
-            // unsubscribe to clean up after ourselves
-            if (testSubscription) {
-                return testSubscription.dispose();
-            }
-        });
-
         it("should subscribe and receive getActiveTaskGraphs results", function() {
             var self = this,
                 testFilter = { foo: 'bar'},
@@ -294,13 +204,6 @@ describe("TaskGraph Runner protocol functions", function () {
                 return self.taskgraphrunner.getActiveTaskGraphs(testFilter);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
-
-            }).then(function() {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function(resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -318,13 +221,6 @@ describe("TaskGraph Runner protocol functions", function () {
                 return self.taskgraphrunner.getActiveTaskGraphs();
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
-
-            }).then(function() {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function(resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -343,27 +239,11 @@ describe("TaskGraph Runner protocol functions", function () {
                 testSubscription = subscription;
 
                 return self.taskgraphrunner.getActiveTaskGraphs(testFilter);
-            }).should.be.rejectedWith(ErrorEvent, 'someError')
-                .then(function() {
-                    // unsubscribe to clean up after ourselves
-                    return testSubscription.dispose();
-                }).then(function(resolvedUnsubscribe) {
-                    // verify we unsubscribed correctly
-                    expect(resolvedUnsubscribe).to.be.ok;
-                });
+            }).should.be.rejectedWith(ErrorEvent, 'someError');
         });
     });
 
     describe("defineTaskGraph", function() {
-
-        var testSubscription;
-        afterEach("defineTaskGraph afterEach", function() {
-            // unsubscribe to clean up after ourselves
-            if (testSubscription) {
-                return testSubscription.dispose();
-            }
-        });
-
         it("should subscribe and receive defineTaskGraph results", function() {
             var self = this,
                 testFilter = { foo: 'bar'},
@@ -379,13 +259,6 @@ describe("TaskGraph Runner protocol functions", function () {
                 return self.taskgraphrunner.defineTaskGraph(testFilter);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
-
-            }).then(function() {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function(resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -403,13 +276,6 @@ describe("TaskGraph Runner protocol functions", function () {
                 return self.taskgraphrunner.defineTaskGraph();
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
-
-            }).then(function() {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function(resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -428,27 +294,11 @@ describe("TaskGraph Runner protocol functions", function () {
                 testSubscription = subscription;
 
                 return self.taskgraphrunner.defineTaskGraph(testFilter);
-            }).should.be.rejectedWith(ErrorEvent, 'someError')
-                .then(function() {
-                    // unsubscribe to clean up after ourselves
-                    return testSubscription.dispose();
-                }).then(function(resolvedUnsubscribe) {
-                    // verify we unsubscribed correctly
-                    expect(resolvedUnsubscribe).to.be.ok;
-                });
+            }).should.be.rejectedWith(ErrorEvent, 'someError');
         });
     });
 
     describe("defineTask", function() {
-
-        var testSubscription;
-        afterEach("defineTask afterEach", function() {
-            // unsubscribe to clean up after ourselves
-            if (testSubscription) {
-                return testSubscription.dispose();
-            }
-        });
-
         it("should subscribe and receive defineTask results", function() {
             var self = this,
                 testFilter = { foo: 'bar'},
@@ -464,13 +314,6 @@ describe("TaskGraph Runner protocol functions", function () {
                 return self.taskgraphrunner.defineTask(testFilter);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
-
-            }).then(function() {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function(resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -488,13 +331,6 @@ describe("TaskGraph Runner protocol functions", function () {
                 return self.taskgraphrunner.defineTask();
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
-
-            }).then(function() {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function(resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -513,27 +349,11 @@ describe("TaskGraph Runner protocol functions", function () {
                 testSubscription = subscription;
 
                 return self.taskgraphrunner.defineTask(testFilter);
-            }).should.be.rejectedWith(ErrorEvent, 'someError')
-                .then(function() {
-                    // unsubscribe to clean up after ourselves
-                    return testSubscription.dispose();
-                }).then(function(resolvedUnsubscribe) {
-                    // verify we unsubscribed correctly
-                    expect(resolvedUnsubscribe).to.be.ok;
-                });
+            }).should.be.rejectedWith(ErrorEvent, 'someError');
         });
     });
 
     describe("runTaskGraph", function() {
-
-        var testSubscription;
-        afterEach("runTaskGraph afterEach", function() {
-            // unsubscribe to clean up after ourselves
-            if (testSubscription) {
-                return testSubscription.dispose();
-            }
-        });
-
         it("should subscribe and receive runTaskGraph results", function() {
             var self = this,
                 testFilter = { foo: 'bar'},
@@ -549,13 +369,6 @@ describe("TaskGraph Runner protocol functions", function () {
                 return self.taskgraphrunner.runTaskGraph(testFilter);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
-
-            }).then(function() {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function(resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -573,13 +386,6 @@ describe("TaskGraph Runner protocol functions", function () {
                 return self.taskgraphrunner.runTaskGraph();
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
-
-            }).then(function() {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function(resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -598,27 +404,11 @@ describe("TaskGraph Runner protocol functions", function () {
                 testSubscription = subscription;
 
                 return self.taskgraphrunner.runTaskGraph(testFilter);
-            }).should.be.rejectedWith(ErrorEvent, 'someError')
-                .then(function() {
-                    // unsubscribe to clean up after ourselves
-                    return testSubscription.dispose();
-                }).then(function(resolvedUnsubscribe) {
-                    // verify we unsubscribed correctly
-                    expect(resolvedUnsubscribe).to.be.ok;
-                });
+            }).should.be.rejectedWith(ErrorEvent, 'someError');
         });
     });
 
     describe("cancelTaskGraph", function() {
-
-        var testSubscription;
-        afterEach("cancelTaskGraph afterEach", function() {
-            // unsubscribe to clean up after ourselves
-            if (testSubscription) {
-                return testSubscription.dispose();
-            }
-        });
-
         it("should subscribe and receive cancelTaskGraph results", function() {
             var self = this,
                 testFilter = { foo: 'bar'},
@@ -634,13 +424,6 @@ describe("TaskGraph Runner protocol functions", function () {
                 return self.taskgraphrunner.cancelTaskGraph(testFilter);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
-
-            }).then(function() {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function(resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -659,27 +442,11 @@ describe("TaskGraph Runner protocol functions", function () {
                 testSubscription = subscription;
 
                 return self.taskgraphrunner.cancelTaskGraph(testFilter);
-            }).should.be.rejectedWith(ErrorEvent, 'someError')
-                .then(function() {
-                    // unsubscribe to clean up after ourselves
-                    return testSubscription.dispose();
-                }).then(function(resolvedUnsubscribe) {
-                    // verify we unsubscribed correctly
-                    expect(resolvedUnsubscribe).to.be.ok;
-                });
+            }).should.be.rejectedWith(ErrorEvent, 'someError');
         });
     });
 
     describe("pauseTaskGraph", function() {
-
-        var testSubscription;
-        afterEach("pauseTaskGraph afterEach", function() {
-            // unsubscribe to clean up after ourselves
-            if (testSubscription) {
-                return testSubscription.dispose();
-            }
-        });
-
         it("should subscribe and receive pauseTaskGraph results", function() {
             var self = this,
                 testFilter = { foo: 'bar'},
@@ -695,13 +462,6 @@ describe("TaskGraph Runner protocol functions", function () {
                 return self.taskgraphrunner.pauseTaskGraph(testFilter);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
-
-            }).then(function() {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function(resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -720,27 +480,11 @@ describe("TaskGraph Runner protocol functions", function () {
                 testSubscription = subscription;
 
                 return self.taskgraphrunner.pauseTaskGraph(testFilter);
-            }).should.be.rejectedWith(ErrorEvent, 'someError')
-                .then(function() {
-                    // unsubscribe to clean up after ourselves
-                    return testSubscription.dispose();
-                }).then(function(resolvedUnsubscribe) {
-                    // verify we unsubscribed correctly
-                    expect(resolvedUnsubscribe).to.be.ok;
-                });
+            }).should.be.rejectedWith(ErrorEvent, 'someError');
         });
     });
 
     describe("resumeTaskGraph", function() {
-
-        var testSubscription;
-        afterEach("resumeTaskGraph afterEach", function() {
-            // unsubscribe to clean up after ourselves
-            if (testSubscription) {
-                return testSubscription.dispose();
-            }
-        });
-
         it("should subscribe and receive resumeTaskGraph results", function() {
             var self = this,
                 testFilter = { foo: 'bar'},
@@ -756,13 +500,6 @@ describe("TaskGraph Runner protocol functions", function () {
                 return self.taskgraphrunner.resumeTaskGraph(testFilter);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
-
-            }).then(function() {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function(resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -781,15 +518,7 @@ describe("TaskGraph Runner protocol functions", function () {
                 testSubscription = subscription;
 
                 return self.taskgraphrunner.resumeTaskGraph(testFilter);
-            }).should.be.rejectedWith(ErrorEvent, 'someError')
-                .then(function() {
-                    // unsubscribe to clean up after ourselves
-                    return testSubscription.dispose();
-                }).then(function(resolvedUnsubscribe) {
-                    // verify we unsubscribed correctly
-                    expect(resolvedUnsubscribe).to.be.ok;
-                });
+            }).should.be.rejectedWith(ErrorEvent, 'someError');
         });
     });
-
 });

@@ -4,6 +4,7 @@
 'use strict';
 
 describe("DHCP protocol functions", function () {
+    var testSubscription;
 
     helper.before();
 
@@ -11,18 +12,15 @@ describe("DHCP protocol functions", function () {
         this.dhcp = helper.injector.get('Protocol.Dhcp');
     });
 
+    afterEach(function () {
+        if (testSubscription) {
+            return testSubscription.dispose();
+        }
+    });
+
     helper.after();
 
     describe("lookupIpLease", function () {
-
-        var testSubscription;
-        afterEach("lookupIpLease afterEach", function () {
-            // unsubscribe to clean up after ourselves
-            if (testSubscription) {
-                return testSubscription.dispose();
-            }
-        });
-
         it("should subscribe and receive lookupIpLease results", function () {
             var self = this,
                 testIP = "1.1.1.1",
@@ -38,13 +36,6 @@ describe("DHCP protocol functions", function () {
                 return self.dhcp.lookupIpLease(testIP);
             }).then(function (data) {
                 expect(data).to.equal("00:11:22:aa:bb:cc");
-
-            }).then(function () {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function (resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -63,13 +54,6 @@ describe("DHCP protocol functions", function () {
                     return self.dhcp.lookupIpLease(testIP);
                 }).then(function (data) {
                     expect(data).to.deep.equal({});
-
-                }).then(function () {
-                    // unsubscribe to clean up after ourselves
-                    return testSubscription.dispose();
-                }).then(function (resolvedUnsubscribe) {
-                    // verify we unsubscribed correctly
-                    expect(resolvedUnsubscribe).to.be.ok;
                 });
             });
 
@@ -88,27 +72,11 @@ describe("DHCP protocol functions", function () {
 
                 testSubscription = subscription;
                 return self.dhcp.lookupIpLease(testIP);
-            }).should.be.rejectedWith(ErrorEvent, 'someError')
-                .then(function () {
-                    // unsubscribe to clean up after ourselves
-                    return testSubscription.dispose();
-                }).then(function (resolvedUnsubscribe) {
-                    // verify we unsubscribed correctly
-                    expect(resolvedUnsubscribe).to.be.ok;
-                });
+            }).should.be.rejectedWith(ErrorEvent, 'someError');
         });
     });
 
     describe("pinMac", function () {
-
-        var testSubscription;
-        afterEach("pinMac afterEach", function () {
-            // unsubscribe to clean up after ourselves
-            if (testSubscription) {
-                return testSubscription.dispose();
-            }
-        });
-
         it("should subscribe and receive pinMac results", function () {
             var self = this,
                 testMac = "00:11:22:aa:bb:dd",
@@ -124,13 +92,6 @@ describe("DHCP protocol functions", function () {
                 return self.dhcp.pinMac(testMac);
             }).then(function (data) {
                 expect(data).to.equal(testResult);
-
-            }).then(function () {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function (resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -149,27 +110,11 @@ describe("DHCP protocol functions", function () {
 
                 testSubscription = subscription;
                 return self.dhcp.pinMac(testMac);
-            }).should.be.rejectedWith(ErrorEvent, 'someError')
-                .then(function () {
-                    // unsubscribe to clean up after ourselves
-                    return testSubscription.dispose();
-                }).then(function (resolvedUnsubscribe) {
-                    // verify we unsubscribed correctly
-                    expect(resolvedUnsubscribe).to.be.ok;
-                });
+            }).should.be.rejectedWith(ErrorEvent, 'someError');
         });
     });
 
     describe("unpinMac", function () {
-
-        var testSubscription;
-        afterEach("unpinMac afterEach", function () {
-            // unsubscribe to clean up after ourselves
-            if (testSubscription) {
-                return testSubscription.dispose();
-            }
-        });
-
         it("should subscribe and receive unpinMac results", function () {
             var self = this,
                 testMac = "00:11:22:aa:bb:ee",
@@ -185,13 +130,6 @@ describe("DHCP protocol functions", function () {
                 return self.dhcp.unpinMac(testMac);
             }).then(function (data) {
                 expect(data).to.equal(testResult);
-
-            }).then(function () {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function (resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -210,27 +148,11 @@ describe("DHCP protocol functions", function () {
 
                 testSubscription = subscription;
                 return self.dhcp.unpinMac(testMac);
-            }).should.be.rejectedWith(ErrorEvent, 'someError')
-                .then(function () {
-                    // unsubscribe to clean up after ourselves
-                    return testSubscription.dispose();
-                }).then(function (resolvedUnsubscribe) {
-                    // verify we unsubscribed correctly
-                    expect(resolvedUnsubscribe).to.be.ok;
-                });
+            }).should.be.rejectedWith(ErrorEvent, 'someError');
         });
     });
 
     describe("unpinIp", function () {
-
-        var testSubscription;
-        afterEach("unpinIp afterEach", function () {
-            // unsubscribe to clean up after ourselves
-            if (testSubscription) {
-                return testSubscription.dispose();
-            }
-        });
-
         it("should subscribe and receive unpinIp results", function () {
             var self = this,
                 testIp = "4.3.2.1",
@@ -246,13 +168,6 @@ describe("DHCP protocol functions", function () {
                 return self.dhcp.unpinIp(testIp);
             }).then(function (data) {
                 expect(data).to.equal(testResult);
-
-            }).then(function () {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function (resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -271,27 +186,11 @@ describe("DHCP protocol functions", function () {
 
                 testSubscription = subscription;
                 return self.dhcp.unpinIp(testIp);
-            }).should.be.rejectedWith(ErrorEvent, 'someError')
-                .then(function () {
-                    // unsubscribe to clean up after ourselves
-                    return testSubscription.dispose();
-                }).then(function (resolvedUnsubscribe) {
-                    // verify we unsubscribed correctly
-                    expect(resolvedUnsubscribe).to.be.ok;
-                });
+            }).should.be.rejectedWith(ErrorEvent, 'someError');
         });
     });
 
     describe("ipInRange", function () {
-
-        var testSubscription;
-        afterEach("ipInRange afterEach", function () {
-            // unsubscribe to clean up after ourselves
-            if (testSubscription) {
-                return testSubscription.dispose();
-            }
-        });
-
         it("should subscribe and receive ipInRange results", function () {
             var self = this,
                 testIp = "4.3.2.1",
@@ -307,13 +206,6 @@ describe("DHCP protocol functions", function () {
                 return self.dhcp.ipInRange(testIp);
             }).then(function (data) {
                 expect(data).to.equal(testResult);
-
-            }).then(function () {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function (resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -332,27 +224,11 @@ describe("DHCP protocol functions", function () {
 
                 testSubscription = subscription;
                 return self.dhcp.ipInRange(testIp);
-            }).should.be.rejectedWith(ErrorEvent, 'someError')
-                .then(function () {
-                    // unsubscribe to clean up after ourselves
-                    return testSubscription.dispose();
-                }).then(function (resolvedUnsubscribe) {
-                    // verify we unsubscribed correctly
-                    expect(resolvedUnsubscribe).to.be.ok;
-                });
+            }).should.be.rejectedWith(ErrorEvent, 'someError');
         });
     });
 
     describe("peekLeaseTable", function () {
-
-        var testSubscription;
-        afterEach("peekLeaseTable afterEach", function () {
-            // unsubscribe to clean up after ourselves
-            if (testSubscription) {
-                return testSubscription.dispose();
-            }
-        });
-
         it("should subscribe and receive peekLeaseTable results", function () {
             var self = this,
                 testResult = {leases: [1, 2, 3]};
@@ -366,13 +242,6 @@ describe("DHCP protocol functions", function () {
                 return self.dhcp.peekLeaseTable();
             }).then(function (data) {
                 expect(data).to.deep.equal(testResult);
-
-            }).then(function () {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function (resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -389,27 +258,11 @@ describe("DHCP protocol functions", function () {
 
                 testSubscription = subscription;
                 return self.dhcp.peekLeaseTable();
-            }).should.be.rejectedWith(ErrorEvent, 'someError')
-                .then(function () {
-                    // unsubscribe to clean up after ourselves
-                    return testSubscription.dispose();
-                }).then(function (resolvedUnsubscribe) {
-                    // verify we unsubscribed correctly
-                    expect(resolvedUnsubscribe).to.be.ok;
-                });
+            }).should.be.rejectedWith(ErrorEvent, 'someError');
         });
     });
 
     describe("removeLease", function () {
-
-        var testSubscription;
-        afterEach("unpinMac afterEach", function () {
-            // unsubscribe to clean up after ourselves
-            if (testSubscription) {
-                return testSubscription.dispose();
-            }
-        });
-
         it("should subscribe and receive removeLease results", function () {
             var self = this,
                 testMac = "00:11:22:aa:bb:ee",
@@ -425,13 +278,6 @@ describe("DHCP protocol functions", function () {
                 return self.dhcp.removeLease(testMac);
             }).then(function (data) {
                 expect(data).to.equal(testResult);
-
-            }).then(function () {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function (resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -450,27 +296,11 @@ describe("DHCP protocol functions", function () {
 
                 testSubscription = subscription;
                 return self.dhcp.removeLease(testMac);
-            }).should.be.rejectedWith(ErrorEvent, 'someError')
-                .then(function () {
-                    // unsubscribe to clean up after ourselves
-                    return testSubscription.dispose();
-                }).then(function (resolvedUnsubscribe) {
-                    // verify we unsubscribed correctly
-                    expect(resolvedUnsubscribe).to.be.ok;
-                });
+            }).should.be.rejectedWith(ErrorEvent, 'someError');
         });
     });
 
     describe("removeLeaseByIp", function () {
-
-        var testSubscription;
-        afterEach("removeLeaseByIp afterEach", function () {
-            // unsubscribe to clean up after ourselves
-            if (testSubscription) {
-                return testSubscription.dispose();
-            }
-        });
-
         it("should subscribe and receive removeLeaseByIp results", function () {
             var self = this,
                 testIp = "4.3.2.1",
@@ -486,13 +316,6 @@ describe("DHCP protocol functions", function () {
                 return self.dhcp.removeLeaseByIp(testIp);
             }).then(function (data) {
                 expect(data).to.equal(testResult);
-
-            }).then(function () {
-                // unsubscribe to clean up after ourselves
-                return testSubscription.dispose();
-            }).then(function (resolvedUnsubscribe) {
-                // verify we unsubscribed correctly
-                expect(resolvedUnsubscribe).to.be.ok;
             });
         });
 
@@ -511,14 +334,7 @@ describe("DHCP protocol functions", function () {
 
                 testSubscription = subscription;
                 return self.dhcp.removeLeaseByIp(testIp);
-            }).should.be.rejectedWith(ErrorEvent, 'someError')
-                .then(function () {
-                    // unsubscribe to clean up after ourselves
-                    return testSubscription.dispose();
-                }).then(function (resolvedUnsubscribe) {
-                    // verify we unsubscribed correctly
-                    expect(resolvedUnsubscribe).to.be.ok;
-                });
+            }).should.be.rejectedWith(ErrorEvent, 'someError');
         });
     });
 

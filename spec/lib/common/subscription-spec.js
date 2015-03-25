@@ -12,6 +12,7 @@ describe('Subscription', function () {
         Subscription = helper.injector.get('Subscription');
 
         this.queue = {
+            state: 'open',
             unsubscribe: sinon.spy(),
             destroy: sinon.spy(),
             close: sinon.spy()
@@ -40,7 +41,7 @@ describe('Subscription', function () {
     });
 
     describe('dispose', function () {
-        it('should call queue.unsubscribe and queue.destroy', function () {
+        it('should unsubscribe the queue when the state is open', function () {
             var self = this;
 
             return this.subject.dispose().then(function () {
@@ -48,6 +49,15 @@ describe('Subscription', function () {
                 self.queue.destroy.should.have.been.called;
                 self.queue.close.should.have.been.called;
             });
+        });
+
+        it('should reject with an error if the queue is already unsubscribed', function () {
+            this.subject.queue.state = 'closing';
+
+            return this.subject.dispose().should.be.rejectedWith(
+                Error,
+                'Subscription Already Disposed.'
+            );
         });
     });
 });
