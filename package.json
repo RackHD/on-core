@@ -40,6 +40,7 @@
     "rx": "^2.3.24",
     "sails-disk": "0.10.7",
     "sails-mongo": "^0.10.5",
+    "shortid": "^2.2.1",
     "stack-trace": "0.0.9",
     "validate.js": "^0.3.2",
     "validator": "^3.27.0",
