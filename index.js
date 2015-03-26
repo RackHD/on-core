@@ -31,7 +31,6 @@ module.exports = function (di, directory) {
                 helper.requireWrapper('colors/safe', 'colors'),
                 helper.requireWrapper('prettyjson', 'prettyjson'),
                 helper.requireWrapper('lru-cache', 'lru-cache'),
-                helper.requireWrapper('memwatch', 'memwatch'),
                 helper.requireWrapper('node-statsd', 'node-statsd'),
                 helper.requireWrapper('validate.js', 'validate'),
                 helper.requireWrapper('validator', 'validator'),
