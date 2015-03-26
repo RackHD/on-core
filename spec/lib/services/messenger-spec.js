@@ -4,7 +4,7 @@
 'use strict';
 
 describe('Messenger', function () {
-    var subscription, ErrorEvent, IpAddress, tracer;
+    var subscription, ErrorEvent, IpAddress, tracer, Constants;
 
     helper.before();
 
@@ -13,6 +13,7 @@ describe('Messenger', function () {
         ErrorEvent = helper.injector.get('ErrorEvent');
         IpAddress = helper.injector.get('IpAddress');
         tracer = helper.injector.get('Tracer');
+        Constants = helper.injector.get('Constants');
     });
 
     afterEach(function () {
@@ -30,7 +31,7 @@ describe('Messenger', function () {
     describe('publish/subscribe', function () {
         it('should resolve if the published data is an object', function () {
             return this.subject.publish(
-                'test',
+                Constants.Protocol.Exchanges.Test.Name,
                 'test',
                 { hello: 'world' }
             ).should.be.fulfilled;
@@ -38,7 +39,7 @@ describe('Messenger', function () {
 
         it('should reject if the published data is invalid', function () {
             return this.subject.publish(
-                'test',
+                Constants.Protocol.Exchanges.Test.Name,
                 'test',
                 new IpAddress({ value: 'invalid' })
             ).should.be.rejected;
@@ -46,7 +47,7 @@ describe('Messenger', function () {
 
         it('should resolve if the published data is valid', function () {
             return this.subject.publish(
-                'test',
+                Constants.Protocol.Exchanges.Test.Name,
                 'test',
                 new IpAddress({ value: '10.1.1.1' })
             ).should.be.fulfilled;
@@ -56,7 +57,7 @@ describe('Messenger', function () {
             var self = this;
 
             this.subject.subscribe(
-                'test',
+                Constants.Protocol.Exchanges.Test.Name,
                 '#',
                 function (data) {
                     data.should.deep.equal({ hello: 'world' });
@@ -67,7 +68,7 @@ describe('Messenger', function () {
                 subscription = sub;
 
                 return self.subject.publish(
-                    'test',
+                    Constants.Protocol.Exchanges.Test.Name,
                     'test',
                     { hello: 'world' }
                 );
@@ -80,7 +81,7 @@ describe('Messenger', function () {
             var self = this;
 
             return this.subject.subscribe(
-                'test',
+                Constants.Protocol.Exchanges.Test.Name,
                 'test',
                 function (data) {
                     data.should.deep.equal(
@@ -93,7 +94,7 @@ describe('Messenger', function () {
                 subscription = sub;
 
                 return self.subject.publish(
-                    'test',
+                    Constants.Protocol.Exchanges.Test.Name,
                     'test',
                     { hello: 'world' }
                 );
@@ -124,7 +125,7 @@ describe('Messenger', function () {
             var self = this;
 
             return this.subject.subscribe(
-                'test',
+                Constants.Protocol.Exchanges.Test.Name,
                 '#',
                 function (data, message) {
                     data.should.deep.equal({ hello: 'world' });
@@ -137,7 +138,7 @@ describe('Messenger', function () {
                 subscription = sub;
 
                 return self.subject.request(
-                    'test',
+                    Constants.Protocol.Exchanges.Test.Name,
                     'test',
                     { hello: 'world' }
                 ).should.eventually.deep.equal({ world: 'hello' });
@@ -148,7 +149,7 @@ describe('Messenger', function () {
             var self = this;
 
             return this.subject.subscribe(
-                'test',
+                Constants.Protocol.Exchanges.Test.Name,
                 '#',
                 function (data, message) {
                     data.should.deep.equal({ hello: 'world' });
@@ -161,7 +162,7 @@ describe('Messenger', function () {
                 subscription = sub;
 
                 return self.subject.request(
-                    'test',
+                    Constants.Protocol.Exchanges.Test.Name,
                     'test',
                     { hello: 'world' }
                 ).should.be.rejectedWith(ErrorEvent);
@@ -182,7 +183,7 @@ describe('Messenger', function () {
             var self = this;
 
             return this.subject.subscribe(
-                'test',
+                Constants.Protocol.Exchanges.Test.Name,
                 '#',
                 function () {
                     throw new Error('Should Never Get Here');
@@ -192,7 +193,7 @@ describe('Messenger', function () {
                 subscription = sub;
 
                 return self.subject.request(
-                    'test',
+                    Constants.Protocol.Exchanges.Test.Name,
                     'test',
                     { value: 'invalid' }
                 ).should.be.rejectedWith(ErrorEvent);
@@ -203,7 +204,7 @@ describe('Messenger', function () {
             var self = this;
 
             return this.subject.subscribe(
-                'test',
+                Constants.Protocol.Exchanges.Test.Name,
                 '#',
                 function (data, message) {
                     message.resolve({ hello: 'world' });
@@ -212,7 +213,7 @@ describe('Messenger', function () {
                 subscription = sub;
 
                 return self.subject.request(
-                    'test',
+                    Constants.Protocol.Exchanges.Test.Name,
                     'test',
                     { value: 'invalid' },
                     IpAddress
