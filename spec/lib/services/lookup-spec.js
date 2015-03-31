@@ -100,6 +100,11 @@ describe('Lookup Service', function () {
     });
 
     describe("ipAddressToMacAddress", function () {
+        it("should return null if there is no lease", function() {
+            leaseCache.getLeaseByIp.resolves([]);
+            return expect(lookupService.ipAddressToMacAddress('127.0.0.1')).to.become(null);
+        });
+
         it("should lookup a macaddress from an IP address", function () {
             leaseCache.getLeaseByIp.resolves({
                 macAddress: '11:22:33:44:55:66',
@@ -178,7 +183,7 @@ describe('Lookup Service', function () {
 
             return lookupService.ipAddressToNodeId(testIP)
                 .then(function (nodeId) {
-                    expect(nodeId).to.be.undefined;
+                    expect(nodeId).to.be.null;
                     expect(leaseCache.getLeaseByIp).to.have.been.calledWith(testIP);
                     expect(waterline.nodes.findByIdentifier).to.have.been.calledWith(testMac);
                 });
