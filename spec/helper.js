@@ -251,14 +251,14 @@ global.helper = {
         before("helper.before", function () {
             var self = this;
             this.timeout(10000);
-            var Q = require('bluebird-q');
-            if (_.isFunction(callback)) {
-                return Q.resolve().then(function() {
+
+            return Q.resolve()
+            .then(function() {
+                if (_.isFunction(callback)) {
                     return callback(self);
-                }).then(helper.start.bind(helper));
-            } else {
-                return helper.start();
-            }
+                }
+            })
+            .then(helper.start.bind(helper));
         });
     },
 
@@ -270,10 +270,15 @@ global.helper = {
      * Sets up a mocha "after" function for the describe block in a spec that
      * does the relevant shutdown of core services.
      */
-    after: function () {
+    after: function (callback) {
         after("helper.after", function () {
-            return helper.stop();
+            return Q.resolve()
+            .then(function() {
+                if (_.isFunction(callback)) {
+                    return callback();
+                }
+            })
+            .then(helper.stop.bind(helper));
         });
     }
 };
-

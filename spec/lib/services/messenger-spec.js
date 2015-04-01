@@ -4,12 +4,13 @@
 'use strict';
 
 describe('Messenger', function () {
-    var subscription, ErrorEvent, IpAddress, tracer, Constants;
+    var subscription, Errors, ErrorEvent, IpAddress, tracer, Constants;
 
     helper.before();
 
     before(function () {
         this.subject = helper.injector.get('Services.Messenger');
+        Errors = helper.injector.get('Errors');
         ErrorEvent = helper.injector.get('ErrorEvent');
         IpAddress = helper.injector.get('IpAddress');
         tracer = helper.injector.get('Tracer');
@@ -176,7 +177,7 @@ describe('Messenger', function () {
                     'test',
                     'test',
                     { hello: 'world' }
-                ).should.be.rejectedWith(Error);
+                ).should.be.rejectedWith(Errors.RequestTimedOutError);
         });
 
         it('should reject request messages which are not what the subscriber expects', function () {
