@@ -89,4 +89,31 @@ describe("DHCP Lease Cache", function() {
             });
         });
     });
+
+    describe("removeLeaseByMacAddress", function() {
+        var destroyIp = '105.105.105.105';
+        var destroyMac = '10:51:05:10:51:05';
+
+        before("removeLeaseByMacAddress before", function() {
+            return waterline.dhcpleases.create({ ip: destroyIp, macAddress: destroyMac })
+            .then(function() {
+                return waterline.dhcpleases.findOne({ macAddress: destroyMac });
+            })
+            .then(function(doc) {
+                expect(doc).to.have.property('ip').that.equals(destroyIp);
+                expect(doc).to.have.property('macAddress').that.equals(destroyMac);
+            });
+        });
+
+        it('should remove a lease by mac address', function() {
+            return leaseCache.removeLeaseByMacAddress(destroyMac)
+            .then(function() {
+                return waterline.dhcpleases.findOne({ macAddress: destroyMac });
+            })
+            .then(function(doc) {
+                expect(doc).to.be.empty;
+            });
+        });
+    });
+
 });
