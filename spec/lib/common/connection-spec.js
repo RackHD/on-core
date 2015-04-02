@@ -83,5 +83,47 @@ describe('Connection', function () {
                 return this.subject.stop().should.be.rejected;
             });
         });
+
+        describe('errors', function() {
+            it('should emit errors from the underlying connection', function(done) {
+                var self = this;
+
+                this.subject.once('error', function (error) {
+                    try {
+                        error.should.be.an.instanceof(Error);
+                        error.message.should.be.equal('Fake');
+                        done();
+                    } catch(e) {
+                        done(e);
+                    }
+                });
+
+                return this.subject.start().then(function () {
+                    self.subject.connection.emit('error', new Error('Fake'));
+                });
+            });
+
+            it('should not emit ECONNRESET errors from the underlying connection', function(done) {
+                var self = this;
+
+                this.subject.once('error', function (error) {
+                    try {
+                        error.should.be.an.instanceof(Error);
+                        error.message.should.be.equal('Fake');
+                        done();
+                    } catch(e) {
+                        done(e);
+                    }
+                });
+
+                return this.subject.start().then(function () {
+                    var error = new Error();
+                    error.code = 'ECONNRESET';
+
+                    self.subject.connection.emit('error', error);
+                    self.subject.connection.emit('error', new Error('Fake'));
+                });
+            });
+        });
     });
 });
