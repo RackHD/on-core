@@ -11,6 +11,7 @@ var path = require('path');
  */
 global._ = require('lodash');
 global.Q = require('bluebird-q');
+global.Promise = require('bluebird');
 
 /**
  *  set up global request mocking library supertest as request
@@ -22,7 +23,7 @@ global.request = require('supertest');
  *  invoking sinon-chai extension to chai.
  */
 global.sinon = require('sinon');
-global.sinonPromise = require('sinon-as-promised')(Q.promise);
+global.sinonPromise = require('sinon-as-promised')(Promise);
 
 /**
  *  set up global chai for testing
