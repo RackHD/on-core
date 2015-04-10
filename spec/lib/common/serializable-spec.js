@@ -98,4 +98,26 @@ describe('Serializable', function () {
             this.subject.rules.should.not.equal('overridden');
         });
     });
+
+    describe('serialize', function () {
+        before(function () {
+            this.subject = new Target({
+                one: 1
+            });
+        });
+
+        it('should use the base serialize method', function() {
+            return this.subject.serialize().should.eventually.have.property('one').that.equals(1);
+        });
+    });
+
+    describe('deserialize', function () {
+        it('should use the base deserialize method', function() {
+            this.subject = new Target();
+
+            return this.subject.deserialize({
+                one: 1
+            }).should.eventually.have.property('one').that.equals(1);
+        });
+    });
 });
