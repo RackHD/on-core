@@ -74,6 +74,7 @@
         "chai": false,
         "sinon": false,
         "_": false,
-        "Q": false
+        "Q": false,
+        "Promise": false
     }
 }
