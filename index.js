@@ -42,7 +42,7 @@ module.exports = function (di, directory) {
                 helper.requireWrapper('anchor', 'anchor'),
                 helper.requireWrapper('jsonschema', 'jsonschema'),
                 helper.simpleWrapper(console, 'console'),
-                helper.simpleWrapper(require('events').EventEmitter, 'EventEmitter'),
+                helper.simpleWrapper(require('eventemitter2').EventEmitter2, 'EventEmitter'),
                 helper.requireWrapper('shortid', 'shortid'),
 
                 // Glob Requirables
