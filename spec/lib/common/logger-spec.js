@@ -82,11 +82,15 @@ describe('Logger', function () {
             'silly'
         ].forEach(function (level) {
             describe(level, function () {
-                beforeEach(function () {
+                before(function () {
                     sinon.spy(events, 'emit');
                 });
 
                 afterEach(function () {
+                    events.emit.reset();
+                });
+
+                after(function () {
                     events.emit.restore();
                 });
 
