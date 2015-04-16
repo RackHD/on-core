@@ -42,6 +42,17 @@ describe('Services.Waterline', function () {
 
     helper.after();
 
+    describe('start', function () {
+        it('should resolve itself if already initialized', function() {
+            return waterline.start();
+        });
+
+        it('should reject if an error occurs when it is not initialized', function() {
+            waterline.initialized = false;
+            return waterline.start().should.be.rejected;
+        });
+    });
+
     describe('observe()', function () {
         function publish(event, record) {
             var waterlineProtocol = helper.injector.get('Protocol.Waterline');
