@@ -69,6 +69,32 @@ describe(require('path').basename(__filename), function () {
                     });
                 });
             });
+
+            describe('defaults', function () {
+                before(function () {
+                    sinon.stub(fs, 'existsSync').withArgs(
+                        Constants.Configuration.Files.Default
+                    ).returns(true);
+
+                    sinon.stub(nconf, 'file').returns();
+                });
+
+                after(function () {
+                    fs.existsSync.restore();
+
+                    nconf.file.restore();
+                });
+
+                it('applies defaults from config.json', function() {
+                    return this.subject.start().should.be.fulfilled.then(function () {
+                        nconf.file.should.have.been.calledWith(
+                            'config',
+                            Constants.Configuration.Files.Default
+                        );
+                    });
+                });
+            });
+
         });
     });
 });
