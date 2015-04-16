@@ -10,13 +10,12 @@ var assertPlus = require('assert-plus');
 var validator = require('validator');
 
 describe("AssertService", function() {
-    var assert, config;
+    var assert;
 
     helper.before();
 
     before(function () {
-        assert = helper.injector.get('Assert'),
-        config = helper.injector.get('Services.Configuration');
+        assert = helper.injector.get('Assert');
     });
 
     helper.after();

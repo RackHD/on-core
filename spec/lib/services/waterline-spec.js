@@ -5,12 +5,14 @@
 
 describe('Services.Waterline', function () {
     var waterline;
+
     function waterlineProtocolFactory(Rx) {
         return {
             observeCollection: sinon.stub().returns(new Rx.Subject()),
             publishRecord: sinon.stub()
         };
     }
+
     function testModelFactory(Model) {
         return Model.extend({
             connection: 'mongo',
@@ -23,22 +25,22 @@ describe('Services.Waterline', function () {
         });
     }
 
-    beforeEach("set up test dependencies", function() {
-        this.timeout(5000);
-        helper.setupInjector([
+    helper.before(function () {
+        return [
             helper.di.overrideInjection(waterlineProtocolFactory, 'Protocol.Waterline', ['Rx']),
             helper.di.overrideInjection(testModelFactory, 'Models.TestObject', ['Model'])
-        ]);
-        helper.setupTestConfig();
-        waterline = helper.injector.get('Services.Waterline');
+        ];
     });
 
-    it('should start and stop', function () {
-        this.timeout(5000);
-        return waterline.start().then(function () {
-            return waterline.stop();
-        });
+    before("set up test dependencies", function() {
+       waterline = helper.injector.get('Services.Waterline');
     });
+
+    beforeEach(function () {
+        return helper.reset();
+    });
+
+    helper.after();
 
     describe('observe()', function () {
         function publish(event, record) {
@@ -47,17 +49,6 @@ describe('Services.Waterline', function () {
             var subject = waterlineProtocol.observeCollection.returnValues[0];
             subject.onNext({ event: event, record: record });
         }
-
-        beforeEach("start waterline", function () {
-            this.timeout(5000);
-            return waterline.start().then(function () {
-                return helper.reset();
-            });
-        });
-
-        afterEach("stop waterline", function () {
-            return waterline.stop();
-        });
 
         it('should observe created events on a collection', function () {
             var callback = sinon.spy();
@@ -186,3 +177,4 @@ describe('Services.Waterline', function () {
         });
     });
 });
+

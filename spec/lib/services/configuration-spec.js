@@ -4,16 +4,20 @@
 'use strict';
 
 describe(require('path').basename(__filename), function () {
+    var Constants, fs, nconf;
+
     helper.before();
 
     before(function () {
+        Constants = helper.injector.get('Constants');
+        fs = helper.injector.get('fs');
+        nconf = helper.injector.get('nconf');
         this.subject = helper.injector.get('Services.Configuration');
     });
 
     helper.after();
 
     describe('Instance Methods', function () {
-
         describe('set', function() {
             it('should chain', function() {
                 this.subject.set('foo', 'bar').should.equal(this.subject);
@@ -37,6 +41,33 @@ describe(require('path').basename(__filename), function () {
         describe('getAll', function() {
             it('should return all configuration values', function() {
                 this.subject.getAll().should.be.an('object');
+            });
+        });
+
+        describe('start', function () {
+            describe('overrides', function () {
+                before(function () {
+                    sinon.stub(fs, 'existsSync').withArgs(
+                        Constants.Configuration.Files.Overrides
+                    ).returns(true);
+
+                    sinon.stub(nconf, 'file').returns();
+                });
+
+                after(function () {
+                    fs.existsSync.restore();
+
+                    nconf.file.restore();
+                });
+
+                it('applies overrides from overrides.json', function() {
+                    return this.subject.start().should.be.fulfilled.then(function () {
+                        nconf.file.should.have.been.calledWith(
+                            'overrides',
+                            Constants.Configuration.Files.Overrides
+                        );
+                    });
+                });
             });
         });
     });

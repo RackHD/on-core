@@ -16,14 +16,15 @@ describe('LogPublisher', function () {
     helper.after();
 
     describe('handleLogEvent', function() {
-        it('should not throw on errors', function() {
-            var self = this;
-
+        it('should not throw on errors', function(done) {
             sinon.stub(LogEvent, 'create').rejects(new Error('Test'));
 
-            expect(function () {
-                self.subject.handleLogEvent();
-            }).to.not.throw();
+            this.subject.on('error', function (error) {
+                error.message.should.equal('Test');
+                done();
+            });
+
+            this.subject.handleLogEvent();
         });
     });
 });
