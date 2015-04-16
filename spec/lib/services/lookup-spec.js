@@ -149,6 +149,11 @@ describe('Lookup Service', function () {
                     expect(waterline.nodes.findByIdentifier).to.have.been.calledWith(testMac);
                 });
         });
+
+        it('should return null if no node is found', function() {
+            leaseCache.getLeaseByIp.resolves(undefined);
+            return lookupService.ipAddressToNode('127.0.0.1').should.eventually.equal(null);
+        });
     });
 
     describe("ipAddressToNodeId", function () {
