@@ -6,18 +6,13 @@
 var di = require('di');
 
 describe('Logger', function () {
-    var Logger;
+    var Logger, events;
 
-    helper.before(function (context) {
-        context.protocol = {
-            publishLog: sinon.spy()
-        };
-
-        return helper.di.simpleWrapper(context.protocol, 'Protocol.Logging');
-    });
+    helper.before();
 
     before(function () {
         Logger = helper.injector.get('Logger');
+        events = helper.injector.get('Events');
     });
 
     helper.after();
@@ -87,6 +82,18 @@ describe('Logger', function () {
             'silly'
         ].forEach(function (level) {
             describe(level, function () {
+                before(function () {
+                    sinon.spy(events, 'emit');
+                });
+
+                afterEach(function () {
+                    events.emit.reset();
+                });
+
+                after(function () {
+                    events.emit.restore();
+                });
+
                 it('should be a function', function () {
                     expect(this.subject).to.respondTo(level);
                 });
@@ -95,15 +102,13 @@ describe('Logger', function () {
                     expect(this.subject).to.have.property(level).with.length(2);
                 });
 
-                it('should call the logging protocol publish log method', function (done) {
-                    var self = this;
-
+                it('should emit to the shared events object', function (done) {
                     this.subject[level]('message ' + level);
 
                     setImmediate(function () {
                         expect(
-                            self.protocol.publishLog.lastCall
-                        ).to.have.been.calledWith(level);
+                            events.emit
+                        ).to.have.been.calledWith('log');
 
                        done();
                     });
@@ -120,3 +125,4 @@ describe('Logger', function () {
         });
     });
 });
+

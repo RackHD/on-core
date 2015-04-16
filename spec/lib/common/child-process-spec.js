@@ -15,11 +15,8 @@ describe("ChildProcess", function () {
         context.childprocess = {
             execFile: sinon.stub()
         };
-        return [
-            helper.di.simpleWrapper(context.childprocess, 'child_process'),
-            helper.require('/spec/mocks/logger.js'),
-            helper.require('/lib/common/util')
-        ];
+
+        return helper.di.simpleWrapper(context.childprocess, 'child_process');
     });
 
     helper.after();
