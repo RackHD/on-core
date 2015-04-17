@@ -23,20 +23,19 @@ describe('Model', function () {
         });
     }
 
-    before('set up test dependencies', function () {
-        helper.setupInjector([
+    helper.before(function () {
+        return [
             helper.di.simpleWrapper(waterlineProtocol, 'Protocol.Waterline'),
             helper.di.overrideInjection(testModelFactory, 'Models.TestObject', ['Model'])
-        ]);
-        helper.setupTestConfig();
-        waterline = helper.injector.get('Services.Waterline');
-        Errors = helper.injector.get('Errors');
-        return waterline.start();
+        ];
     });
 
-    after('stop waterline', function () {
-        return waterline.stop();
+    before(function () {
+        waterline = helper.injector.get('Services.Waterline');
+        Errors = helper.injector.get('Errors');
     });
+
+    helper.after();
 
     describe('newly created record', function () {
         var record;

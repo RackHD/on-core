@@ -85,7 +85,7 @@ function prepareGrunt(grunt) {
                 // grunt watch:mochaTest
                 mochaTest: {
                     files: allFiles,
-                    tasks: ['coverage'],
+                    tasks: ['test'],
                     options:{
                         interrupt: true,
                         atBegin: true
@@ -148,3 +148,4 @@ function prepareGrunt(grunt) {
     // By default, lint and run all tests.
     grunt.registerTask('default', ['test']);
 }
+
