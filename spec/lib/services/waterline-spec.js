@@ -32,7 +32,7 @@ describe('Services.Waterline', function () {
         ];
     });
 
-    before("set up test dependencies", function() {
+    before(function() {
        waterline = helper.injector.get('Services.Waterline');
     });
 
@@ -73,7 +73,7 @@ describe('Services.Waterline', function () {
 
         it('should observe created events on a collection with query', function () {
             var callback = sinon.spy();
-            waterline.observe(waterline.testobjects, { id: 1 }).subscribe(callback);
+            waterline.observe(waterline.testobjects.find({ id: 1 })).subscribe(callback);
             publish('created', { id: 1 });
 
             expect(callback).to.have.been.calledOnce;
@@ -84,7 +84,7 @@ describe('Services.Waterline', function () {
         it('should filter out events on a collection with non-matching query',
            function () {
             var callback = sinon.spy();
-            waterline.observe(waterline.testobjects, { id: 2 }).subscribe(callback);
+            waterline.observe(waterline.testobjects.find({ id: 2 })).subscribe(callback);
             publish('created', { id: 1 });
 
             expect(callback).to.not.have.been.called;
