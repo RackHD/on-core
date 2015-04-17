@@ -100,7 +100,7 @@ describe('Services.Waterline', function () {
             expect(callback.firstCall.args[0]).to.have.deep.property('record.id', 1);
         });
 
-        it('should observe updated events', function () {
+        it.skip('should observe updated events', function () {
             var callback = sinon.spy();
             waterline.observe(waterline.testobjects.find({})).subscribe(callback);
             publish('created', { id: 1 });
@@ -114,7 +114,7 @@ describe('Services.Waterline', function () {
             expect(callback.secondCall.args[0]).to.have.deep.property('record.dummy', 'test');
         });
 
-        it('should marshal updated events into created events for newly matching records',
+        it.skip('should marshal updated events into created events for newly matching records',
           function () {
             var callback = sinon.spy();
             waterline.observe(waterline.testobjects.find({ dummy: 'test' })).subscribe(callback);
@@ -127,33 +127,39 @@ describe('Services.Waterline', function () {
             expect(callback.firstCall.args[0]).to.have.deep.property('record.dummy', 'test');
         });
 
-        it('should marshal updated events into destroyed events for newly non-matching records',
-          function () {
-            var callback = sinon.spy();
-            waterline.observe(waterline.testobjects.find({ dummy: 'test' })).subscribe(callback);
-            publish('created', { id: 1, dummy: 'test' });
-            publish('updated', { id: 1, dummy: 'asdf' });
+        it.skip(
+            'should marshal updated events into destroyed events for newly non-matching records',
+            function () {
+                var callback = sinon.spy();
+                waterline.observe(waterline.testobjects.find(
+                    { dummy: 'test' }
+               )).subscribe(callback);
+                publish('created', { id: 1, dummy: 'test' });
+                publish('updated', { id: 1, dummy: 'asdf' });
 
-            expect(callback).to.have.been.calledTwice;
-            expect(callback.firstCall.args[0]).to.have.property('event', 'created');
-            expect(callback.firstCall.args[0]).to.have.deep.property('record.id', 1);
-            expect(callback.firstCall.args[0]).to.have.deep.property('record.dummy', 'test');
-            expect(callback.secondCall.args[0]).to.have.property('event', 'destroyed');
-            expect(callback.secondCall.args[0]).to.have.deep.property('record.id', 1);
-            expect(callback.secondCall.args[0]).to.have.deep.property('record.dummy', 'asdf');
-        });
+                expect(callback).to.have.been.calledTwice;
+                expect(callback.firstCall.args[0]).to.have.property('event', 'created');
+                expect(callback.firstCall.args[0]).to.have.deep.property('record.id', 1);
+                expect(callback.firstCall.args[0]).to.have.deep.property('record.dummy', 'test');
+                expect(callback.secondCall.args[0]).to.have.property('event', 'destroyed');
+                expect(callback.secondCall.args[0]).to.have.deep.property('record.id', 1);
+                expect(callback.secondCall.args[0]).to.have.deep.property('record.dummy', 'asdf');
+            }
+        );
 
-        it('should marshal the first updated event for a record into a created event', function () {
-            var callback = sinon.spy();
-            waterline.observe(waterline.testobjects.find({})).subscribe(callback);
-            publish('updated', { id: 1 });
+        it.skip('should marshal the first updated event for a record into a created event',
+            function () {
+                var callback = sinon.spy();
+                waterline.observe(waterline.testobjects.find({})).subscribe(callback);
+                publish('updated', { id: 1 });
 
-            expect(callback).to.have.been.calledOnce;
-            expect(callback.firstCall.args[0]).to.have.property('event', 'created');
-            expect(callback.firstCall.args[0]).to.have.deep.property('record.id', 1);
-        });
+                expect(callback).to.have.been.calledOnce;
+                expect(callback.firstCall.args[0]).to.have.property('event', 'created');
+                expect(callback.firstCall.args[0]).to.have.deep.property('record.id', 1);
+            }
+        );
 
-        it('should filter out a destroyed event for a non-existent record', function () {
+        it.skip('should filter out a destroyed event for a non-existent record', function () {
             var callback = sinon.spy();
             waterline.observe(waterline.testobjects.find({})).subscribe(callback);
             publish('destroyed', { id: 1 });
