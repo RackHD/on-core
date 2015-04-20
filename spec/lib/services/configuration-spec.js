@@ -61,12 +61,11 @@ describe(require('path').basename(__filename), function () {
                 });
 
                 it('applies overrides from overrides.json', function() {
-                    return this.subject.start().should.be.fulfilled.then(function () {
-                        nconf.file.should.have.been.calledWith(
-                            'overrides',
-                            Constants.Configuration.Files.Overrides
-                        );
-                    });
+                    this.subject.load();
+                    nconf.file.should.have.been.calledWith(
+                        'overrides',
+                        Constants.Configuration.Files.Overrides
+                    );
                 });
             });
 
@@ -86,16 +85,13 @@ describe(require('path').basename(__filename), function () {
                 });
 
                 it('applies defaults from config.json', function() {
-                    return this.subject.start().should.be.fulfilled.then(function () {
-                        nconf.file.should.have.been.calledWith(
-                            'config',
-                            Constants.Configuration.Files.Default
-                        );
-                    });
+                    this.subject.load();
+                    nconf.file.should.have.been.calledWith(
+                        'config',
+                        Constants.Configuration.Files.Default
+                    );
                 });
             });
-
         });
     });
 });
-
