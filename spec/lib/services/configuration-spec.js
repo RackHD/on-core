@@ -45,9 +45,7 @@ describe(require('path').basename(__filename), function () {
         });
 
         describe('start', function () {
-            // TODO: Re-enable once deprecation warnings for ConfigurationService.start have
-            // been fixed.
-            describe.skip('overrides', function () {
+            describe('overrides', function () {
                 before(function () {
                     sinon.stub(fs, 'existsSync').withArgs(
                         Constants.Configuration.Files.Overrides
@@ -63,18 +61,15 @@ describe(require('path').basename(__filename), function () {
                 });
 
                 it('applies overrides from overrides.json', function() {
-                    return this.subject.start().should.be.fulfilled.then(function () {
-                        nconf.file.should.have.been.calledWith(
-                            'overrides',
-                            Constants.Configuration.Files.Overrides
-                        );
-                    });
+                    this.subject.load();
+                    nconf.file.should.have.been.calledWith(
+                        'overrides',
+                        Constants.Configuration.Files.Overrides
+                    );
                 });
             });
 
-            // TODO: Re-enable once deprecation warnings for ConfigurationService.start have
-            // been fixed.
-            describe.skip('defaults', function () {
+            describe('defaults', function () {
                 before(function () {
                     sinon.stub(fs, 'existsSync').withArgs(
                         Constants.Configuration.Files.Default
@@ -90,16 +85,13 @@ describe(require('path').basename(__filename), function () {
                 });
 
                 it('applies defaults from config.json', function() {
-                    return this.subject.start().should.be.fulfilled.then(function () {
-                        nconf.file.should.have.been.calledWith(
-                            'config',
-                            Constants.Configuration.Files.Default
-                        );
-                    });
+                    this.subject.load();
+                    nconf.file.should.have.been.calledWith(
+                        'config',
+                        Constants.Configuration.Files.Default
+                    );
                 });
             });
-
         });
     });
 });
-
