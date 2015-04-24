@@ -261,6 +261,14 @@ global.helper = {
             })
             .then(helper.start.bind(helper));
         });
+
+        beforeEach(function () {
+            this.sandbox = sinon.sandbox.create();
+        });
+
+        afterEach(function () {
+            this.sandbox.restore();
+        });
     },
 
     /**
