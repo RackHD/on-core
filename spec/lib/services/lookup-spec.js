@@ -41,8 +41,9 @@ describe('Lookup Service', function () {
         it('should reject with NotFoundError if no lookup record exists', function() {
             var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves();
 
-            return lookupService.macAddressToNodeId('00:11:22:33:44:55').catch(function (error) {
-                expect(error).to.be.an.instanceof(Errors.NotFoundError);
+            return expect(
+                lookupService.macAddressToNodeId('00:11:22:33:44:55')
+            ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
                 expect(findByTerm).to.have.been.calledWith('00:11:22:33:44:55');
             });
         });
@@ -63,8 +64,9 @@ describe('Lookup Service', function () {
         it('should reject with NotFoundError if no lookup record exists', function() {
             var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves();
 
-            return lookupService.macAddressToNode('00:11:22:33:44:55').catch(function (error) {
-                expect(error).to.be.an.instanceof(Errors.NotFoundError);
+            return expect(
+                lookupService.macAddressToNode('00:11:22:33:44:55')
+            ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
                 expect(findByTerm).to.have.been.calledWith('00:11:22:33:44:55');
             });
         });
@@ -72,8 +74,9 @@ describe('Lookup Service', function () {
         it('should reject with NotFoundError if no node association exists', function() {
             var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves({});
 
-            return lookupService.macAddressToNode('00:11:22:33:44:55').catch(function (error) {
-                expect(error).to.be.an.instanceof(Errors.NotFoundError);
+            return expect(
+                lookupService.macAddressToNode('00:11:22:33:44:55')
+            ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
                 expect(findByTerm).to.have.been.calledWith('00:11:22:33:44:55');
             });
         });
@@ -84,8 +87,9 @@ describe('Lookup Service', function () {
                     new Errors.NotFoundError()
                 );
 
-            return lookupService.macAddressToNode('00:11:22:33:44:55').catch(function (error) {
-                expect(error).to.be.an.instanceof(Errors.NotFoundError);
+            return expect(
+                lookupService.macAddressToNode('00:11:22:33:44:55')
+            ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
                 expect(findByTerm).to.have.been.calledWith('00:11:22:33:44:55');
                 expect(needOneById).to.have.been.calledWith('node');
             });
@@ -105,8 +109,9 @@ describe('Lookup Service', function () {
         it('should reject with NotFoundError if no lookup record exists', function() {
             var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves();
 
-            return lookupService.ipAddressToMacAddress('127.0.0.1').catch(function (error) {
-                expect(error).to.be.an.instanceof(Errors.NotFoundError);
+            return expect(
+                lookupService.ipAddressToMacAddress('127.0.0.1')
+            ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
                 expect(findByTerm).to.have.been.calledWith('127.0.0.1');
             });
         });
@@ -127,8 +132,9 @@ describe('Lookup Service', function () {
         it('should reject with NotFoundError if no lookup record exists', function() {
             var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves();
 
-            return lookupService.ipAddressToNode('127.0.0.1').catch(function (error) {
-                expect(error).to.be.an.instanceof(Errors.NotFoundError);
+            return expect(
+                lookupService.ipAddressToNode('127.0.0.1')
+            ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
                 expect(findByTerm).to.have.been.calledWith('127.0.0.1');
             });
         });
@@ -136,8 +142,9 @@ describe('Lookup Service', function () {
         it('should reject with NotFoundError if no node association exists', function() {
             var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves({});
 
-            return lookupService.ipAddressToNode('127.0.0.1').catch(function (error) {
-                expect(error).to.be.an.instanceof(Errors.NotFoundError);
+            return expect(
+                lookupService.ipAddressToNode('127.0.0.1')
+            ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
                 expect(findByTerm).to.have.been.calledWith('127.0.0.1');
             });
         });
@@ -148,8 +155,9 @@ describe('Lookup Service', function () {
                     new Errors.NotFoundError()
                 );
 
-            return lookupService.ipAddressToNode('127.0.0.1').catch(function (error) {
-                expect(error).to.be.an.instanceof(Errors.NotFoundError);
+            return expect(
+                lookupService.ipAddressToNode('127.0.0.1')
+            ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
                 expect(findByTerm).to.have.been.calledWith('127.0.0.1');
                 expect(needOneById).to.have.been.calledWith('node');
             });
@@ -169,8 +177,9 @@ describe('Lookup Service', function () {
         it('should reject with NotFoundError if no lookup record exists', function() {
             var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves();
 
-            return lookupService.ipAddressToNodeId('127.0.0.1').catch(function (error) {
-                expect(error).to.be.an.instanceof(Errors.NotFoundError);
+            return expect(
+                lookupService.ipAddressToNodeId('127.0.0.1')
+            ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
                 expect(findByTerm).to.have.been.calledWith('127.0.0.1');
             });
         });
