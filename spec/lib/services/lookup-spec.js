@@ -6,11 +6,11 @@
 describe('Lookup Service', function () {
     var lookupService, leaseCache, MacAddress, Errors, waterline;
 
-    var lookup = {
+    var lookup = [{
         ipAddress: '127.0.0.1',
         macAddress: '00:11:22:33:44:55',
         node: 'node'
-    };
+    }];
 
     var node = {
         id: 'node'
@@ -33,7 +33,7 @@ describe('Lookup Service', function () {
             var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(lookup);
 
             return lookupService.macAddressToNodeId('127.0.0.1').then(function (result) {
-                expect(result).to.equal(lookup.node);
+                expect(result).to.equal(lookup[0].node);
                 expect(findByTerm).to.have.been.calledWith('127.0.0.1');
             });
         });
@@ -72,7 +72,7 @@ describe('Lookup Service', function () {
         });
 
         it('should reject with NotFoundError if no node association exists', function() {
-            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves({});
+            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves([]);
 
             return expect(
                 lookupService.macAddressToNode('00:11:22:33:44:55')
@@ -101,7 +101,7 @@ describe('Lookup Service', function () {
             var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(lookup);
 
             return lookupService.ipAddressToMacAddress('127.0.0.1').then(function (result) {
-                expect(result).to.equal(lookup.macAddress);
+                expect(result).to.equal(lookup[0].macAddress);
                 expect(findByTerm).to.have.been.calledWith('127.0.0.1');
             });
         });
@@ -169,7 +169,7 @@ describe('Lookup Service', function () {
             var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(lookup);
 
             return lookupService.ipAddressToNodeId('127.0.0.1').then(function (result) {
-                expect(result).to.equal(lookup.node);
+                expect(result).to.equal(lookup[0].node);
                 expect(findByTerm).to.have.been.calledWith('127.0.0.1');
             });
         });
