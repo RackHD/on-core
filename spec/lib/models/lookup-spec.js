@@ -68,5 +68,118 @@ describe('Models.Lookup', function () {
             });
         });
     });
+
+    describe('Class Methods', function () {
+        var waterline, Errors;
+
+        before(function () {
+            waterline = helper.injector.get('Services.Waterline');
+            Errors = helper.injector.get('Errors');
+        });
+
+        describe('findByTerm', function () {
+            it('should call find with the proper criteria', function() {
+                var find = this.sandbox.stub(waterline.lookups, 'find').resolves([]);
+
+                return waterline.lookups.findByTerm('foo').then(function (records) {
+                    expect(records).to.deep.equal([]);
+                    expect(find).to.have.been.calledWith({
+                        or: [
+                            { node: 'foo' },
+                            { macAddress: 'foo' },
+                            { ipAddress: 'foo' }
+                        ]
+                    });
+                });
+            });
+        });
+
+        describe('findOneByTerm', function () {
+            it('should call findByTerm with the proper term', function() {
+                var findByTerm = this.sandbox.stub(
+                    waterline.lookups,
+                    'findByTerm'
+                ).resolves([{
+                    id: 'id',
+                    macAddress: 'macAddress',
+                    ipAddress: 'ipAddress',
+                    node: 'node'
+                }]);
+
+                return waterline.lookups.findOneByTerm('foo').then(function (record) {
+                    expect(findByTerm).to.have.been.calledWith('foo');
+                    expect(record.id).to.equal('id');
+                });
+            });
+
+            it('should reject with Errors.NotFoundError if no records are returned', function() {
+                var findByTerm = this.sandbox.stub(
+                    waterline.lookups,
+                    'findByTerm'
+                ).resolves([]);
+
+                return expect(
+                    waterline.lookups.findOneByTerm('foo')
+                ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
+                    expect(findByTerm).to.have.been.calledWith('foo');
+                });
+            });
+
+            it('should reject with Errors.NotFoundError if undefined is returned', function() {
+                var findByTerm = this.sandbox.stub(
+                    waterline.lookups,
+                    'findByTerm'
+                ).resolves();
+
+                return expect(
+                    waterline.lookups.findOneByTerm('foo')
+                ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
+                    expect(findByTerm).to.have.been.calledWith('foo');
+                });
+            });
+        });
+
+        describe('upsertNodeToMacAddress', function () {
+            it('should update an existing record by mac adddress', function() {
+                var record = {
+                    id: 'id',
+                    macAddress: 'macAddress',
+                    ipAddress: 'ipAddress',
+                    node: 'node'
+                },
+                update = this.sandbox.stub(waterline.lookups, 'update').resolves([record]),
+                findOne = this.sandbox.stub(waterline.lookups, 'findOne').resolves(record);
+
+                return waterline.lookups.upsertNodeToMacAddress(
+                    'node',
+                    'macAddress'
+                ).then(function () {
+                    expect(findOne).to.have.been.calledWith({ macAddress: 'macAddress' });
+                    expect(update).to.have.been.calledWith({ id: 'id' }, { node: 'node' });
+                });
+            });
+
+            it('should call create if no record is returned by find', function() {
+                var record = {
+                    id: 'id',
+                    macAddress: 'macAddress',
+                    ipAddress: 'ipAddress',
+                    node: 'node'
+                },
+                create = this.sandbox.stub(waterline.lookups, 'create').resolves(record),
+                findOne = this.sandbox.stub(waterline.lookups, 'findOne').resolves();
+
+                return waterline.lookups.upsertNodeToMacAddress(
+                    'node',
+                    'macAddress'
+                ).then(function () {
+                    expect(findOne).to.have.been.calledWith({ macAddress: 'macAddress' });
+                    expect(create).to.have.been.calledWith(
+                        { node: 'node', macAddress: 'macAddress' }
+                    );
+                });
+            });
+        });
+    });
 });
 

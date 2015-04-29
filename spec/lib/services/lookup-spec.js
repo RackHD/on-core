@@ -12,6 +12,13 @@ describe('Lookup Service', function () {
         node: 'node'
     }];
 
+    var noNode = [
+        {
+            ipAddress: '127.0.0.1',
+            macAddress: '00:11:22:33:44:55'
+        }
+    ];
+
     var node = {
         id: 'node'
     };
@@ -47,6 +54,16 @@ describe('Lookup Service', function () {
                 expect(findByTerm).to.have.been.calledWith('00:11:22:33:44:55');
             });
         });
+
+        it('should reject with NotFoundError if no node association exists', function() {
+            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(noNode);
+
+            return expect(
+                lookupService.macAddressToNodeId('00:11:22:33:44:55')
+            ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
+                expect(findByTerm).to.have.been.calledWith('00:11:22:33:44:55');
+            });
+        });
     });
 
     describe('macAddressToNode', function() {
@@ -72,7 +89,7 @@ describe('Lookup Service', function () {
         });
 
         it('should reject with NotFoundError if no node association exists', function() {
-            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves([]);
+            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(noNode);
 
             return expect(
                 lookupService.macAddressToNode('00:11:22:33:44:55')
@@ -140,7 +157,7 @@ describe('Lookup Service', function () {
         });
 
         it('should reject with NotFoundError if no node association exists', function() {
-            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves({});
+            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(noNode);
 
             return expect(
                 lookupService.ipAddressToNode('127.0.0.1')
@@ -176,6 +193,16 @@ describe('Lookup Service', function () {
 
         it('should reject with NotFoundError if no lookup record exists', function() {
             var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves();
+
+            return expect(
+                lookupService.ipAddressToNodeId('127.0.0.1')
+            ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
+                expect(findByTerm).to.have.been.calledWith('127.0.0.1');
+            });
+        });
+
+        it('should reject with NotFoundError if no node association exists', function() {
+            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(noNode);
 
             return expect(
                 lookupService.ipAddressToNodeId('127.0.0.1')
