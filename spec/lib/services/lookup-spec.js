@@ -258,5 +258,14 @@ describe('Lookup Service', function () {
             middleware(req, {}, next);
         });
     });
+
+    it('setIpAddress', function() {
+        this.sandbox.stub(waterline.lookups, 'setIp').resolves();
+        return lookupService.setIpAddress('ip', 'mac')
+        .then(function() {
+            expect(waterline.lookups.setIp).to.have.been.calledOnce;
+            expect(waterline.lookups.setIp).to.have.been.calledWith('ip', 'mac');
+        });
+    });
 });
 

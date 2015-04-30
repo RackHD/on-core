@@ -180,6 +180,71 @@ describe('Models.Lookup', function () {
                 });
             });
         });
+
+        describe('setIp', function() {
+            it('should noop if the ip is already set', function() {
+                var record = {
+                    ipAddress: '99.99.99.99',
+                    macAddress: '7a:c0:7a:c0:be:ef'
+                };
+                this.sandbox.stub(waterline.lookups, 'findOne').resolves(record);
+                this.sandbox.stub(waterline.lookups, 'create');
+                return waterline.lookups.setIp('99.99.99.99', '7a:c0:7a:c0:be:ef')
+                .then(function(out) {
+                    expect(out).to.equal(undefined);
+                    expect(waterline.lookups.findOne)
+                        .to.have.been.calledWith({ ipAddress: '99.99.99.99' });
+                    expect(waterline.lookups.findOne)
+                        .to.have.been.calledWith({ macAddress: '7a:c0:7a:c0:be:ef' });
+                    expect(waterline.lookups.create).to.not.have.been.called;
+                });
+            });
+
+            it('should remove a conflicting IP from a different lookup record', function() {
+                var ipRecord = {
+                    id: 'testid-1',
+                    ipAddress: '99.99.99.99',
+                    macAddress: '7a:c0:7a:c0:be:ef'
+                };
+                var macRecord = {
+                    id: 'testid-2',
+                    ipAddress: null,
+                    macAddress: 'be:ef:be:ef:be:ef'
+                };
+                this.sandbox.stub(waterline.lookups, 'update').resolves();
+                this.sandbox.stub(waterline.lookups, 'findOne');
+                waterline.lookups.findOne
+                    .withArgs({ ipAddress: '99.99.99.99' })
+                    .resolves(ipRecord);
+                waterline.lookups.findOne
+                    .withArgs({ macAddress: 'be:ef:be:ef:be:ef' })
+                    .resolves(macRecord);
+
+                return waterline.lookups.setIp('99.99.99.99', 'be:ef:be:ef:be:ef')
+                .then(function() {
+                    expect(waterline.lookups.update).to.have.been.calledTwice;
+                    expect(waterline.lookups.update).to.have.been.calledWith(
+                        { id: ipRecord.id }, { ipAddress: null }
+                    );
+                    expect(waterline.lookups.update).to.have.been.calledWith(
+                        { id: macRecord.id }, { ipAddress: '99.99.99.99' }
+                    );
+                });
+            });
+
+            it('should create a new lookup record if one does not exist for the mac', function() {
+                this.sandbox.stub(waterline.lookups, 'findOne').resolves(null);
+                this.sandbox.stub(waterline.lookups, 'create').resolves(null);
+
+                return waterline.lookups.setIp('99.99.99.99', 'be:ef:be:ef:be:ef')
+                .then(function() {
+                    expect(waterline.lookups.create).to.have.been.calledOnce;
+                    expect(waterline.lookups.create).to.have.been.calledWith(
+                        { ipAddress: '99.99.99.99', macAddress: 'be:ef:be:ef:be:ef' }
+                    );
+                });
+            });
+        });
     });
 });
 
