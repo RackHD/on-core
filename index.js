@@ -36,6 +36,7 @@ module.exports = function (di, directory) {
                 helper.requireWrapper('validator', 'validator'),
                 helper.requireWrapper('assert-plus', 'assert-plus'),
                 helper.requireWrapper('ejs', 'ejs'),
+                helper.requireWrapper('hogan.js', 'Hogan'),
                 helper.requireWrapper('fs', 'fs'),
                 helper.requireWrapper('path', 'path'),
                 helper.requireWrapper('child_process', 'child_process'),
