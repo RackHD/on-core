@@ -28,6 +28,7 @@
     "ejs": "^2.0.8",
     "eventemitter2": "^0.4.14",
     "glob": "^4.3.2",
+    "hogan.js": "^3.0.2",
     "jsonschema": "^1.0.0",
     "lodash": "^2.4.1",
     "lru-cache": "^2.5.0",
