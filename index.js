@@ -45,6 +45,7 @@ module.exports = function (di, directory) {
                 helper.simpleWrapper(console, 'console'),
                 helper.simpleWrapper(require('eventemitter2').EventEmitter2, 'EventEmitter'),
                 helper.requireWrapper('shortid', 'shortid'),
+                helper.requireWrapper('crypto', 'crypto'),
 
                 // Glob Requirables
                 helper.requireGlob(__dirname + '/lib/common/*.js'),
@@ -56,4 +57,3 @@ module.exports = function (di, directory) {
         )
     };
 };
-
