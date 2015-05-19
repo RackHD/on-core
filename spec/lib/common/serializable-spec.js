@@ -3,8 +3,7 @@
 
 'use strict';
 
-var di = require('di'),
-    util = require('util');
+var di = require('di');
 
 describe('Serializable', function () {
     var Serializable,
@@ -25,22 +24,22 @@ describe('Serializable', function () {
                     this,
 
                     // Schema
-                    {
-                        id: '/FactoryObject',
-                        type: 'object',
-                        properties: {
-                            name: {
-                                type: 'string'
-                            }
-                        }
-                    },
+                    FactoryObject.schema,
 
                     // Default Values
                     defaults
                 );
             }
 
-            util.inherits(FactoryObject, Serializable);
+            FactoryObject.schema = {
+                id: '/FactoryObject',
+                type: 'object',
+                properties: {
+                    name: {
+                        type: 'string'
+                    }
+                }
+            };
 
             Serializable.register(factory, FactoryObject);
 
