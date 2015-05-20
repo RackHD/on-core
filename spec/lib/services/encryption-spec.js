@@ -23,15 +23,26 @@ describe('Encryption Service', function () {
 
             encrypt.should.have.been.calledWith('Hello World');
         });
+
+        it('should return the data if already encrypted', function() {
+            var target = this.subject.encrypt('NOOP');
+
+            this.subject.encrypt(target).should.equal(target);
+        });
     });
 
     describe('decrypt', function () {
         it('should call Encryption.prototype.decrypt', function () {
-            var decrypt = this.sandbox.stub(Encryption.prototype, 'decrypt');
+            var decrypt = this.sandbox.stub(Encryption.prototype, 'decrypt'),
+                target = this.subject.encrypt('Hello World');
 
-            this.subject.decrypt('ENCRYPTEDLOL');
+            this.subject.decrypt(target);
 
-            decrypt.should.have.been.calledWith('ENCRYPTEDLOL');
+            decrypt.should.have.been.calledWith(target);
+        });
+
+        it('should return the data if already decrypted', function() {
+            this.subject.decrypt('NOOP').should.equal('NOOP');
         });
     });
 });
