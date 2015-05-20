@@ -63,5 +63,17 @@ describe('Encryption', function () {
                 }).to.throw(TypeError);
             });
         });
+
+        describe('isEncrypted', function () {
+            it('should return true if encrypted', function() {
+                var target = this.subject.encrypt('Hello World', key, iv);
+
+                this.subject.isEncrypted(target).should.equal(true);
+            });
+
+            it('should return false if not encrypted', function() {
+               this.subject.isEncrypted('Hello World').should.equal(false);
+            });
+        });
     });
 });
