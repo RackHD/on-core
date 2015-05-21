@@ -184,6 +184,41 @@ describe("Event protocol subscribers", function () {
         });
     });
 
+    describe("publish/subscribe GraphStarted", function () {
+
+        var testSubscription;
+        afterEach("GraphStarted afterEach", function () {
+            // unsubscribe to clean up after ourselves
+            if (testSubscription) {
+                return testSubscription.dispose();
+            }
+        });
+
+        it("should publish and subscribe to GraphStarted messages", function (done) {
+            //NOTE: no matching internal code to listen for these events
+            var self = this,
+                uuid = helper.injector.get('uuid'),
+                graphId = uuid.v4(),
+                data = { test: 'data' };
+
+            self.events.subscribeGraphStarted(graphId, function (_data) {
+                try {
+                    expect(_data).to.deep.equal(data);
+                    done();
+                } catch (err) {
+                    done(err);
+                }
+            }).then(function (subscription) {
+                expect(subscription).to.be.ok;
+                testSubscription = subscription;
+
+                return self.events.publishGraphStarted(graphId, data);
+            }).catch(function (err) {
+                done(err);
+            });
+        });
+    });
+
     describe("publish/subscribe GraphFinished", function () {
 
         var testSubscription;
@@ -218,6 +253,4 @@ describe("Event protocol subscribers", function () {
             });
         });
     });
-
-
 });
