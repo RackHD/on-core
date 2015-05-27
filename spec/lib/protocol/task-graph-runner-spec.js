@@ -113,7 +113,7 @@ describe("TaskGraph Runner protocol functions", function () {
             });
         });
 
-        it("should subscribe and receive getTaskGraphLibrary failures", function() {
+        it("should subscribe and receive getTaskLibrary failures", function() {
             var self = this,
                 testFilter = { foo: 'bar'},
                 sampleError = new Error('someError');
