@@ -42,6 +42,19 @@ global.expect = chai.expect; // jshint ignore:line
  */
 global.should = chai.should(); // jshint ignore:line
 
+chai.Assertion.addMethod('stringify', function (target) {
+    var left = JSON.stringify(this._obj),
+        right = JSON.stringify(target);
+
+    this.assert(
+        left === right,
+        "expected #{this} to equal #{exp} but got #{act}",
+        "expected #{this} to not equal #{act}",
+        right,
+        left
+    );
+});
+
 /**
  *  set up di for testing
  */
