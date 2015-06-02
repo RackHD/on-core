@@ -2,20 +2,16 @@
 
 'use strict';
 
-var di = require('di');
-
 module.exports = mockLoggerFactory;
 
-di.annotate(mockLoggerFactory, new di.Provide('Logger'));
-di.annotate(mockLoggerFactory,
-    new di.Inject(
-        'Constants',
-        'Assert',
-        'LogEvent',
-        '_',
-        'console'
-    )
-);
+mockLoggerFactory.$provide = 'Logger';
+mockLoggerFactory.$inject = [
+    'Constants',
+    'Assert',
+    'LogEvent',
+    '_',
+    'console'
+];
 
 function mockLoggerFactory(Constants, assert, LogEvent, _, console) {
 
