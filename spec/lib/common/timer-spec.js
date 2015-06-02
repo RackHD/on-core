@@ -1,5 +1,5 @@
 // Copyright (c) 2015, EMC Corporation
-/* jshint node:true */
+
 
 'use strict';
 

@@ -1,6 +1,6 @@
 // Copyright (c) 2015, EMC Corporation
-/* jshint node: true */
-/* jshint expr:true */
+
+
 
 'use strict';
 
