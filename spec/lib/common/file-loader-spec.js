@@ -34,7 +34,7 @@ describe('FileLoader', function () {
 
     describe('put', function () {
         it('should write the contents to the specified file', function () {
-            fs.writeFile.yields(undefined, 'put');
+            fs.writeFile.resolves('put');
 
             return this.subject.put('filename', 'contents').then(function (contents) {
                 fs.writeFile.should.have.been.calledWith('filename', 'contents');
@@ -46,7 +46,7 @@ describe('FileLoader', function () {
 
     describe('get', function () {
         it('should get the contents for the specified file', function () {
-            fs.readFile.yields(undefined, 'get');
+            fs.readFile.resolves('get');
 
             return this.subject.get('filename').then(function (contents) {
                 fs.readFile.should.have.been.calledWith('filename');
@@ -60,8 +60,8 @@ describe('FileLoader', function () {
         it(
             'should return a promise fulfilled with the file basename to contents in an object',
             function () {
-                fs.readFile.yields(undefined, 'getAll');
-                fs.readdir.yields(undefined, ['/tmp/foo.txt']);
+                fs.readFile.resolves('getAll');
+                fs.readdir.resolves(['/tmp/foo.txt']);
 
                 return this.subject.getAll('/tmp').then(function (files) {
                     fs.readdir.should.have.been.calledWith('/tmp');

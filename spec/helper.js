@@ -161,7 +161,7 @@ global.helper = {
      * Sets up values in the configuration service to testing - using AMQP and a test
      * MongoDB database
      *
-     * @returns {Q.promise}
+     * @returns {Promise}
      */
     setupTestConfig: function () {
         return this.injector.get(
@@ -190,7 +190,7 @@ global.helper = {
      *         })
      *     })
      *
-     * @returns {Q.promise}
+     * @returns {Promise}
      */
 
     reset: function () {
@@ -214,13 +214,13 @@ global.helper = {
     /**
      * Invokes core.stop() if this.core exists to shut down services
      *
-     * @returns {Q.promise}
+     * @returns {Promise}
      */
     stop: function () {
         if (this.core) {
             return this.core.stop();
         } else {
-            return Q.resolve();
+            return Promise.resolve();
         }
     },
 
@@ -266,13 +266,13 @@ global.helper = {
             var self = this;
             this.timeout(10000);
 
-            return Q.resolve()
-            .then(function() {
-                if (_.isFunction(callback)) {
-                    return callback(self);
-                }
-            })
-            .then(helper.start.bind(helper));
+            return Promise.resolve()
+                .then(function() {
+                    if (_.isFunction(callback)) {
+                        return callback(self);
+                    }
+                })
+                .then(helper.start.bind(helper));
         });
 
         beforeEach(function () {
@@ -294,13 +294,13 @@ global.helper = {
      */
     after: function (callback) {
         after("helper.after", function () {
-            return Q.resolve()
-            .then(function() {
-                if (_.isFunction(callback)) {
-                    return callback();
-                }
-            })
-            .then(helper.stop.bind(helper));
+            return Promise.resolve()
+                .then(function() {
+                    if (_.isFunction(callback)) {
+                        return callback();
+                    }
+                })
+                .then(helper.stop.bind(helper));
         });
     }
 };

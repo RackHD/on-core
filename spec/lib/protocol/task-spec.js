@@ -23,8 +23,8 @@ describe("Task protocol functions", function() {
         it("should subscribe to task.run and receive run events", function() {
             var self = this,
                 uuid = helper.injector.get('uuid'),
-                Q = helper.injector.get('Q'),
-                deferred = Q.defer(),
+                Promise = helper.injector.get('Promise'),
+                deferred = Promise.defer(),
                 taskId = uuid.v4(),
                 args = 'someArgs';
 
@@ -58,8 +58,8 @@ describe("Task protocol functions", function() {
         it("should subscribe to task.cancel and receive cancel events", function() {
             var self = this,
                 uuid = helper.injector.get('uuid'),
-                Q = helper.injector.get('Q'),
-                deferred = Q.defer(),
+                Promise =  helper.injector.get('Promise'),
+                deferred = Promise.defer(),
                 taskId = uuid.v4(),
                 args = 'someArgs';
 
@@ -256,8 +256,8 @@ describe("Task protocol functions", function() {
 
         it("should subscribe and receive respondCommands results", function() {
             var self = this,
-                Q = helper.injector.get('Q'),
-                deferred = Q.defer(),
+                Promise =  helper.injector.get('Promise'),
+                deferred = Promise.defer(),
                 uuid = helper.injector.get('uuid'),
                 taskId = uuid.v4(),
                 testData = { abc: '123' };
@@ -466,10 +466,10 @@ describe("Task protocol functions", function() {
         // in order to speed up execution.
         it("should not subscribe to a response for other identifiers", function() {
             var self = this,
-                Q = helper.injector.get('Q'),
+                Promise =  helper.injector.get('Promise'),
                 otherId = "5498a7632b9ef0a8b94307a9",
                 id = "5498a7632b9ef0a8b94307a8",
-                deferred = Q.defer();
+                deferred = Promise.defer();
 
             self.task.subscribeHttpResponse(otherId, function () {
                 setImmediate(function () {
@@ -504,8 +504,8 @@ describe("Task protocol functions", function() {
 
         it("should subscribe and receive runIpmiCommand results", function() {
             var self = this,
-                Q = helper.injector.get('Q'),
-                deferred = Q.defer(),
+                Promise =  helper.injector.get('Promise'),
+                deferred = Promise.defer(),
                 uuid = helper.injector.get('uuid'),
                 testUuid = uuid.v4(),
                 testCommand = "soSomething",
@@ -541,8 +541,8 @@ describe("Task protocol functions", function() {
 
         it("should subscribe and receive ipmiCommand results", function() {
             var self = this,
-                Q = helper.injector.get('Q'),
-                deferred = Q.defer(),
+                Promise =  helper.injector.get('Promise'),
+                deferred = Promise.defer(),
                 uuid = helper.injector.get('uuid'),
                 testUuid = uuid.v4(),
                 testCommand = "soSomething",
@@ -578,8 +578,8 @@ describe("Task protocol functions", function() {
 
         it("should subscribe and receive ipmiCommand results", function() {
             var self = this,
-                Q = helper.injector.get('Q'),
-                deferred = Q.defer(),
+                Promise =  helper.injector.get('Promise'),
+                deferred = Promise.defer(),
                 uuid = helper.injector.get('uuid'),
                 testUuid = uuid.v4(),
                 testData = { abc: '123' };
@@ -614,8 +614,8 @@ describe("Task protocol functions", function() {
 
         it("should subscribe and receive ipmiCommand results", function() {
             var self = this,
-                Q = helper.injector.get('Q'),
-                deferred = Q.defer(),
+                Promise =  helper.injector.get('Promise'),
+                deferred = Promise.defer(),
                 uuid = helper.injector.get('uuid'),
                 testUuid = uuid.v4(),
                 testData = { abc: '123' };
