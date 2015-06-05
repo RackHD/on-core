@@ -4,7 +4,7 @@
 'use strict';
 
 describe('Lookup Service', function () {
-    var lookupService, leaseCache, MacAddress, Errors, waterline;
+    var lookupService, MacAddress, Errors, waterline;
 
     var lookup = [{
         ipAddress: '127.0.0.1',
@@ -28,7 +28,6 @@ describe('Lookup Service', function () {
     before('Lookup Service before', function () {
         lookupService = helper.injector.get('Services.Lookup');
         waterline = helper.injector.get('Services.Waterline');
-        leaseCache = helper.injector.get('DhcpLeaseCache');
         MacAddress = helper.injector.get('MacAddress');
         Errors = helper.injector.get('Errors');
     });
