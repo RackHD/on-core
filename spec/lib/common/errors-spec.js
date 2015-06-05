@@ -164,4 +164,30 @@ describe("Errors", function() {
             this.subject.stack.split('\n')[1].should.contain(__filename);
         });
     });
+
+    describe('JobKilledError', function () {
+        before(function () {
+            this.subject = new Errors.JobKilledError();
+        });
+
+        it('should be an instance of Error', function () {
+            this.subject.should.be.an.instanceof(Error);
+        });
+
+        it('should be an instance of BaseError', function () {
+            this.subject.should.be.an.instanceof(Errors.BaseError);
+        });
+
+        it('should be an instance of BreakPromiseChainError', function () {
+            this.subject.should.be.an.instanceof(Errors.JobKilledError);
+        });
+
+        it('should have a name of BreakPromiseChainError', function () {
+            this.subject.name.should.be.equal('JobKilledError');
+        });
+
+        it('should provide the correct stack trace', function () {
+            this.subject.stack.split('\n')[1].should.contain(__filename);
+        });
+    });
 });
