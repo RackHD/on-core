@@ -1,5 +1,5 @@
-// Copyright 2014, Renasar Technologies Inc.
-/* jshint node: true */
+// Copyright (c) 2015, EMC Corporation
+
 /* global _: false */
 
 'use strict';
@@ -10,11 +10,11 @@ describe('Models.WorkItem', function () {
     helper.before();
 
     var workitems;
-    var Q;
+    var Promise;
     var uuid;
 
     base.before(function (context) {
-        Q = helper.injector.get('Q');
+        Promise = helper.injector.get('Promise');
         uuid = helper.injector.get('uuid');
         workitems = context.model = helper.injector.get('Services.Waterline').workitems;
         context.attributes = context.model._attributes;
@@ -129,7 +129,7 @@ describe('Models.WorkItem', function () {
 
         it('should properly queue two work items at the same time', function () {
             var otherWorkerId = uuid.v4();
-            return Q.all([
+            return Promise.all([
                 workitems.startNextScheduled(workerId, {}, 10 * 1000),
                 workitems.startNextScheduled(otherWorkerId, {}, 10 * 1000)
             ])
@@ -142,7 +142,7 @@ describe('Models.WorkItem', function () {
 
         it('should start two items and mark as succeded', function () {
             var otherWorkerId = uuid.v4();
-            return Q.all([
+            return Promise.all([
                 workitems.startNextScheduled(workerId, {}, 10 * 1000),
                 workitems.startNextScheduled(otherWorkerId, {}, 10 * 1000)
             ])
@@ -157,7 +157,7 @@ describe('Models.WorkItem', function () {
 
         it('should start two items and mark as failed', function () {
             var otherWorkerId = uuid.v4();
-            return Q.all([
+            return Promise.all([
                 workitems.startNextScheduled(workerId, {}, 10 * 1000),
                 workitems.startNextScheduled(otherWorkerId, {}, 10 * 1000)
             ])

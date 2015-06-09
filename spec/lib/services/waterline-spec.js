@@ -1,5 +1,4 @@
-// Copyright 2014, Renasar Technologies Inc.
-/* jshint node:true */
+// Copyright (c) 2015, EMC Corporation
 
 'use strict';
 
@@ -20,7 +19,7 @@ describe('Services.Waterline', function () {
         });
 
         it('should reject if an error occurs when it is not initialized', function() {
-            waterline.initialized = false;
+            this.sandbox.stub(waterline, 'isInitialized').returns(false);
             return waterline.start().should.be.rejected;
         });
     });

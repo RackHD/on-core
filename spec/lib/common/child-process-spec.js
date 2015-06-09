@@ -1,5 +1,5 @@
-// Copyright 2015, Renasar Technologies Inc.
-/* jshint node:true */
+// Copyright (c) 2015, EMC Corporation
+
 
 'use strict';
 var events = require('events');

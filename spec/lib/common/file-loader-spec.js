@@ -1,5 +1,5 @@
-// Copyright 2014, Renasar Technologies Inc.
-/* jshint node:true */
+// Copyright (c) 2015, EMC Corporation
+
 
 'use strict';
 
@@ -15,29 +15,29 @@ describe('FileLoader', function () {
 
         this.subject = new FileLoader();
 
-        sinon.stub(fs, 'writeFile');
-        sinon.stub(fs, 'readFile');
-        sinon.stub(fs, 'readdir');
+        sinon.stub(fs, 'writeFileAsync');
+        sinon.stub(fs, 'readFileAsync');
+        sinon.stub(fs, 'readdirAsync');
     });
 
     beforeEach(function() {
-        fs.writeFile.reset();
-        fs.readFile.reset();
-        fs.readdir.reset();
+        fs.writeFileAsync.reset();
+        fs.readFileAsync.reset();
+        fs.readdirAsync.reset();
     });
 
     helper.after(function () {
-        fs.writeFile.restore();
-        fs.readFile.restore();
-        fs.readdir.restore();
+        fs.writeFileAsync.restore();
+        fs.readFileAsync.restore();
+        fs.readdirAsync.restore();
     });
 
     describe('put', function () {
         it('should write the contents to the specified file', function () {
-            fs.writeFile.yields(undefined, 'put');
+            fs.writeFileAsync.resolves('put');
 
             return this.subject.put('filename', 'contents').then(function (contents) {
-                fs.writeFile.should.have.been.calledWith('filename', 'contents');
+                fs.writeFileAsync.should.have.been.calledWith('filename', 'contents');
 
                 contents.should.equal('put');
             });
@@ -46,10 +46,10 @@ describe('FileLoader', function () {
 
     describe('get', function () {
         it('should get the contents for the specified file', function () {
-            fs.readFile.yields(undefined, 'get');
+            fs.readFileAsync.resolves('get');
 
             return this.subject.get('filename').then(function (contents) {
-                fs.readFile.should.have.been.calledWith('filename');
+                fs.readFileAsync.should.have.been.calledWith('filename');
 
                 contents.should.equal('get');
             });
@@ -60,11 +60,11 @@ describe('FileLoader', function () {
         it(
             'should return a promise fulfilled with the file basename to contents in an object',
             function () {
-                fs.readFile.yields(undefined, 'getAll');
-                fs.readdir.yields(undefined, ['/tmp/foo.txt']);
+                fs.readFileAsync.resolves('getAll');
+                fs.readdirAsync.resolves(['/tmp/foo.txt']);
 
                 return this.subject.getAll('/tmp').then(function (files) {
-                    fs.readdir.should.have.been.calledWith('/tmp');
+                    fs.readdirAsync.should.have.been.calledWith('/tmp');
 
                     files['foo.txt'].should.equal('getAll');
                 });

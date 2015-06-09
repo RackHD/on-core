@@ -1,5 +1,5 @@
-// Copyright 2015, Renasar Technologies Inc.
-/* jshint node:true */
+// Copyright (c) 2015, EMC Corporation
+
 
 'use strict';
 
@@ -25,9 +25,9 @@ describe("Schedular protocol functions", function () {
         it("should publish and receive a schedule request", function () {
             //NOTE: no matching internal code to listen for these events
             var self = this,
-                Q = helper.injector.get('Q'),
+                Promise = helper.injector.get('Promise'),
                 uuid = helper.injector.get('uuid'),
-                deferred = Q.defer(),
+                deferred = Promise.defer(),
                 taskId = uuid.v4(),
                 taskName = "testTaskName",
                 overrides = {
@@ -55,5 +55,4 @@ describe("Schedular protocol functions", function () {
             return deferred.promise;
         });
     });
-
 });

@@ -1,5 +1,5 @@
-// Copyright 2014, Renasar Technologies Inc.
-/* jshint node:true */
+// Copyright (c) 2015, EMC Corporation
+
 
 'use strict';
 

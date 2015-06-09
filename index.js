@@ -1,5 +1,5 @@
-// Copyright 2014, Renasar Technologies Inc.
-/* jshint: node:true */
+// Copyright (c) 2015, EMC Corporation
+
 
 'use strict';
 
@@ -46,6 +46,8 @@ module.exports = function (di, directory) {
                 helper.simpleWrapper(require('eventemitter2').EventEmitter2, 'EventEmitter'),
                 helper.requireWrapper('shortid', 'shortid'),
                 helper.requireWrapper('crypto', 'crypto'),
+                helper.requireWrapper('util', 'util'),
+                helper.requireWrapper('pluralize', 'pluralize'),
 
                 // Glob Requirables
                 helper.requireGlob(__dirname + '/lib/common/*.js'),

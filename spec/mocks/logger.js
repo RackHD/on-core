@@ -1,21 +1,17 @@
-// Copyright 2014-2015, Renasar Technologies Inc.
-/* jshint node: true, newcap: false */
-'use strict';
+// Copyright (c) 2015, EMC Corporation
 
-var di = require('di');
+'use strict';
 
 module.exports = mockLoggerFactory;
 
-di.annotate(mockLoggerFactory, new di.Provide('Logger'));
-di.annotate(mockLoggerFactory,
-    new di.Inject(
-        'Constants',
-        'Assert',
-        'LogEvent',
-        '_',
-        'console'
-    )
-);
+mockLoggerFactory.$provide = 'Logger';
+mockLoggerFactory.$inject = [
+    'Constants',
+    'Assert',
+    'LogEvent',
+    '_',
+    'console'
+];
 
 function mockLoggerFactory(Constants, assert, LogEvent, _, console) {
 
