@@ -130,6 +130,7 @@ describe("ChildProcess", function () {
         });
 
         beforeEach('deferred beforeEach', function() {
+            child.createOwnDeferred();
             log.reset();
         });
 
@@ -138,7 +139,7 @@ describe("ChildProcess", function () {
         });
 
         it("should have a _deferred attribute", function() {
-            expect(child).to.have.property('_deferred').with.property('promise');
+            expect(child).to.have.property('_deferred').with.property('isPending');
         });
 
         it("should not resolve twice", function() {
@@ -176,7 +177,7 @@ describe("ChildProcess", function () {
 
         it("should work and call inner _run()", function() {
             child._run = function() {
-                child._deferred.resolve();
+                child._resolve();
             };
             var _runSpy = sinon.spy(child, '_run');
 
@@ -188,7 +189,7 @@ describe("ChildProcess", function () {
 
         it("should fail on max retries", function() {
             child._run = function() {
-                child._deferred.reject(new Error('test failure'));
+                child._reject(new Error('test failure'));
             };
             var _runSpy = sinon.spy(child, '_run');
 
@@ -201,7 +202,7 @@ describe("ChildProcess", function () {
 
         it("should not retry if retries is not set", function(done) {
             child._run = function() {
-                child._deferred.reject(new Error('test failure'));
+                child._reject(new Error('test failure'));
             };
             var _runSpy = sinon.spy(child, '_run');
 
@@ -219,10 +220,10 @@ describe("ChildProcess", function () {
             var retrycount = 0;
             child._run = function() {
                 if (retrycount === 2) {
-                    child._deferred.resolve();
+                    child._resolve();
                 } else {
                     retrycount += 1;
-                    child._deferred.reject(new Error('test failure'));
+                    child._reject(new Error('test failure'));
                 }
             };
             var _runSpy = sinon.spy(child, '_run');
@@ -237,7 +238,7 @@ describe("ChildProcess", function () {
             var retries = 5;
             var delay = 1;
             child._run = function() {
-                child._deferred.reject(new Error('test failure'));
+                child._reject(new Error('test failure'));
             };
             var _runSpy = sinon.spy(child, '_run');
             var _retrySpy = sinon.spy(child, '_runWithRetries');
