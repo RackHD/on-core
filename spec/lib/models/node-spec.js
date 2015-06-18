@@ -10,6 +10,8 @@ describe('Models.Node', function () {
 
     base.before(function (context) {
         context.model = helper.injector.get('Services.Waterline').nodes;
+        context.modelClass = helper.injector.get('Models.Node');
+        context.catalogModel = helper.injector.get('Services.Waterline').catalogs;
         context.attributes = context.model._attributes;
     });
 
@@ -78,6 +80,22 @@ describe('Models.Node', function () {
 
             it('should be a relation to the skus model', function () {
                 expect(this.subject.model).to.equal('skus');
+            });
+        });
+
+        describe('discovered', function () {
+            before(function () {
+                this.subject = this.modelClass.prototype.attributes.discovered;
+            });
+
+            it('should be true if catalogs exist', function() {
+                this.sandbox.stub(this.catalogModel, 'findOne').resolves([{}, {}]);
+                return expect(this.subject()).to.become(true);
+            });
+
+            it('should be false if catalogs do not exist', function() {
+                this.sandbox.stub(this.catalogModel, 'findOne').resolves(undefined);
+                return expect(this.subject()).to.become(false);
             });
         });
     });
