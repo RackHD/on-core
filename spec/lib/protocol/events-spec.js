@@ -253,4 +253,38 @@ describe("Event protocol subscribers", function () {
             });
         });
     });
+
+    describe("publish/subscribe SkuAssigned", function () {
+        var testSubscription;
+
+        afterEach("SkuAssigned afterEach", function () {
+            // unsubscribe to clean up after ourselves
+            if (testSubscription) {
+                return testSubscription.dispose();
+            }
+        });
+
+        it("should publish and subscribe to SkuAssigned messages", function (done) {
+            //NOTE: no matching internal code to listen for these events
+            var self = this,
+                nodeId = "507f191e810c19729de860ea", //mongoId format
+                skuId = "507f191e810c19729de860eb"; //mongoId format
+
+            self.events.subscribeSkuAssigned(nodeId, function (sku) {
+                try {
+                    expect(sku).to.equal(skuId);
+                    done();
+                } catch (err) {
+                    done(err);
+                }
+            }).then(function (subscription) {
+                expect(subscription).to.be.ok;
+                testSubscription = subscription;
+
+                return self.events.publishSkuAssigned(nodeId, skuId);
+            }).catch(function (err) {
+                done(err);
+            });
+        });
+    });
 });
