@@ -48,6 +48,7 @@ module.exports = function (di, directory) {
                 helper.requireWrapper('crypto', 'crypto'),
                 helper.requireWrapper('util', 'util'),
                 helper.requireWrapper('pluralize', 'pluralize'),
+                helper.requireWrapper('blocked', 'blocked'),
 
                 // Glob Requirables
                 helper.requireGlob(__dirname + '/lib/common/*.js'),
