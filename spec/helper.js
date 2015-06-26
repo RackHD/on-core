@@ -166,13 +166,9 @@ global.helper = {
     setupTestConfig: function () {
         return this.injector.get(
             'Services.Configuration'
-        ).set('mongo', {
-            host: 'localhost',
-            port: 27017,
-            database: 'on-rack-test',
-            user: '',
-            password: ''
-        }).set(
+        ).set(
+            'mongo', 'mongodb://localhost/monorail-test'
+        ).set(
             'amqp', 'amqp://localhost'
         );
     },
