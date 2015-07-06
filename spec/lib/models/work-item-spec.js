@@ -207,6 +207,21 @@ describe('Models.WorkItem', function () {
                 });
             });
         });
+
+        it('should not schedule paused work items', function (){
+            return workitems.updateOne({ name: 'First Past' }, { paused: true })
+            .then(function () {
+                return workitems.startNextScheduled(workerId, {}, 10 * 1000);
+            })
+            .then(function(scheduled) {
+                expect(scheduled.name).to.equal('Second Yesterday');
+                return workitems.startNextScheduled(workerId, {}, 10 * 1000);
+            })
+            .then(function(scheduled) {
+                // there should be none left that are schedulable
+                expect(scheduled).to.be.undefined;
+            });
+        });
     });
 
 
