@@ -184,7 +184,7 @@ describe('Models.WorkItem', function () {
         it('should create ipmi pollers for a node', function () {
             var nodeId = '47bd8fb80abc5a6b5e7b10de';
             return workitems.createIpmiPollers(nodeId).then(function (items) {
-                expect(items).to.have.length(3);
+                expect(items).to.have.length(4);
                 items.forEach(function (item) {
                     expect(item.name).to.equal('Pollers.IPMI');
                     expect(item.node).to.equal(nodeId);
@@ -198,7 +198,7 @@ describe('Models.WorkItem', function () {
                 items = _.sortBy(items, 'id');
                 return workitems.findPollers().then(function (pollers) {
                     pollers = _.sortBy(pollers, 'id');
-                    expect(pollers).to.have.length(3);
+                    expect(pollers).to.have.length(4);
                     pollers.forEach(function (poller, index) {
                         expect(poller.id).to.equal(items[index].id);
                         expect(poller.config.command).to.equal(items[index].config.command);
