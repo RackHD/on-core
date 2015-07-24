@@ -181,29 +181,21 @@ describe('Models.WorkItem', function () {
             });
         });
 
-        it('should create ipmi pollers for a node', function () {
-            var nodeId = '47bd8fb80abc5a6b5e7b10de';
-            return workitems.createIpmiPollers(nodeId).then(function (items) {
-                expect(items).to.have.length(4);
-                items.forEach(function (item) {
-                    expect(item.name).to.equal('Pollers.IPMI');
-                    expect(item.node).to.equal(nodeId);
-                });
-            });
-        });
-
-        it('should create ipmi pollers and then find them with findPollers', function () {
+        it('should create a poller and then find it with findPollers', function () {
             var nodeId = '47bd8fb80abc5a6b5e7b10df';
-            return workitems.createIpmiPollers(nodeId).then(function (items) {
-                items = _.sortBy(items, 'id');
+            var poller = {
+                "name": "Pollers.IPMI",
+                "node": nodeId,
+                "pollInterval": 60000,
+                "config": {
+                    "command": "sdr"
+                }
+            };
+            return workitems.create(poller).then(function () {
                 return workitems.findPollers().then(function (pollers) {
-                    pollers = _.sortBy(pollers, 'id');
-                    expect(pollers).to.have.length(4);
-                    pollers.forEach(function (poller, index) {
-                        expect(poller.id).to.equal(items[index].id);
-                        expect(poller.config.command).to.equal(items[index].config.command);
-                        expect(poller.node).to.equal(nodeId);
-                    });
+                    expect(pollers).to.have.length(1);
+                    expect(pollers[0].config.command).to.equal(poller.config.command);
+                    expect(pollers[0].node).to.equal(nodeId);
                 });
             });
         });
