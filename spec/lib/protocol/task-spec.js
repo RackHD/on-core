@@ -604,15 +604,15 @@ describe("Task protocol functions", function() {
 
         });
     });
-    describe("SNMPCommandResult", function() {
 
+    describe("SNMPCommandResult", function() {
         var testSubscription;
         afterEach("cancel afterEach", function() {
             // unsubscribe to clean up after ourselves
             return testSubscription.dispose();
         });
 
-        it("should subscribe and receive ipmiCommand results", function() {
+        it("should subscribe and receive snmpCommand results", function() {
             var self = this,
                 Promise =  helper.injector.get('Promise'),
                 deferred = Promise.defer(),
@@ -632,6 +632,41 @@ describe("Task protocol functions", function() {
 
                 testSubscription = subscription;
                 return self.task.publishSnmpCommandResult(testUuid, testData);
+            }).catch(function(err) {
+                deferred.reject(err);
+            });
+
+            return deferred.promise;
+        });
+    });
+
+    describe("MetricResult", function() {
+        var testSubscription;
+        afterEach("cancel afterEach", function() {
+            // unsubscribe to clean up after ourselves
+            return testSubscription.dispose();
+        });
+
+        it("should subscribe and receive metric results", function() {
+            var self = this,
+                Promise =  helper.injector.get('Promise'),
+                deferred = Promise.defer(),
+                uuid = helper.injector.get('uuid'),
+                testUuid = uuid.v4(),
+                testData = { abc: '123' };
+
+            self.task.subscribeMetricResult(testUuid, 'testmetric', function(_data) {
+                try {
+                    expect(_data).to.deep.equal(testData);
+                    deferred.resolve();
+                } catch(err) {
+                    deferred.reject(err);
+                }
+            }).then(function(subscription) {
+                expect(subscription).to.be.ok;
+
+                testSubscription = subscription;
+                return self.task.publishMetricResult(testUuid, 'testmetric', testData);
             }).catch(function(err) {
                 deferred.reject(err);
             });
