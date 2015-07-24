@@ -1,40 +1,21 @@
-# Renasar Core Library
+# Configuration
 
-## Directory Structure
+The following configuration values can be overridden via the environment, command line, or via the global configuration file located at /opt/onrack/etc/monorail.json.
 
-###lib/models
-Waterline Models
+The global configuration file location can be overridden by setting a new configuration file value in the environment using the MONORAIL_CONFIG environment variable.
 
-###lib/protocol
-Protocol Objects based on Messaging Service
+## amqp
 
-###lib/scheduler
-Scheduler Objects
+Defaults to `amqp://localhost`.
 
-###lib/services
-Standard Service Objects
+## mongo
 
-## Development Notes
+Defaults to `mongodb://localhost/pxe`.
 
-Run `grunt watch` to have grunt listen for file changes and run the specs and linter automatically.  Grunt is
-configured to use the grunt-notify plugin so it will also provide desktop notifications for test results.
+## statsd
 
-## installation
+Defaults to `localhost:8125`.
 
-    rm -rf node_modules
-    npm install
+## sharedKey
 
-## CI/testing
-
-To run tests from a developer console:
-
-    npm test
-
-To run tests and get coverage for CI:
-
-    # verify hint/style
-    ./node_modules/.bin/jshint -c .jshintrc --reporter=checkstyle lib index.js > checkstyle-result.xml || true
-    ./node_modules/.bin/istanbul cover -x "**/spec/**" _mocha -- $(find spec -name '*-spec.js') -R xunit-file --require spec/helper.js
-    ./node_modules/.bin/istanbul report cobertura
-    # if you want HTML reports locally
-    ./node_modules/.bin/istanbul report html
+A 32 bit base 64 encoded string, defaults to `qxfO2D3tIJsZACu7UA6Fbw0avowo8r79ALzn+WeuC8M=`.

@@ -45,34 +45,10 @@ describe(require('path').basename(__filename), function () {
         });
 
         describe('start', function () {
-            describe('overrides', function () {
-                before(function () {
-                    sinon.stub(fs, 'existsSync').withArgs(
-                        Constants.Configuration.Files.Overrides
-                    ).returns(true);
-
-                    sinon.stub(nconf, 'file').returns();
-                });
-
-                after(function () {
-                    fs.existsSync.restore();
-
-                    nconf.file.restore();
-                });
-
-                it('applies overrides from overrides.json', function() {
-                    this.subject.load();
-                    nconf.file.should.have.been.calledWith(
-                        'overrides',
-                        Constants.Configuration.Files.Overrides
-                    );
-                });
-            });
-
             describe('defaults', function () {
                 before(function () {
                     sinon.stub(fs, 'existsSync').withArgs(
-                        Constants.Configuration.Files.Default
+                        Constants.Configuration.Files.Global
                     ).returns(true);
 
                     sinon.stub(nconf, 'file').returns();
@@ -84,11 +60,11 @@ describe(require('path').basename(__filename), function () {
                     nconf.file.restore();
                 });
 
-                it('applies defaults from config.json', function() {
+                it('applies defaults from the global configuration file', function() {
                     this.subject.load();
                     nconf.file.should.have.been.calledWith(
-                        'config',
-                        Constants.Configuration.Files.Default
+                        'global',
+                        Constants.Configuration.Files.Global
                     );
                 });
             });
