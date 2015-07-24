@@ -98,5 +98,34 @@ describe('Models.Node', function () {
                 return expect(this.subject()).to.become(false);
             });
         });
+
+        describe('snmpSettings', function() {
+            before(function (){
+                this.subject = this.attributes.snmpSettings;
+            });
+
+            it('should be json', function () {
+                expect(this.subject.type).to.equal('json');
+                expect(this.subject.json).to.equal(true);
+            });
+
+            it('should not be required', function () {
+                expect(this.subject.required).to.equal(false);
+            });
+        });
+
+        describe('autoDiscover', function () {
+            before(function () {
+                this.subject = this.attributes.autoDiscover;
+            });
+
+            it('should be a boolean', function() {
+                expect(this.subject.type).to.equal('boolean');
+            });
+
+            it('should default to false', function () {
+                expect(this.subject.defaultsTo).to.equal(false);
+            });
+        });
     });
 });
