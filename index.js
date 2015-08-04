@@ -49,7 +49,7 @@ module.exports = function (di, directory) {
                 helper.requireWrapper('util', 'util'),
                 helper.requireWrapper('pluralize', 'pluralize'),
                 helper.requireWrapper('blocked', 'blocked'),
-                helper.simpleWrapper(require('tail').Tail, 'Tail'),
+                helper.requireWrapper('always-tail', 'Tail'),
 
                 // Glob Requirables
                 helper.requireGlob(__dirname + '/lib/common/*.js'),
