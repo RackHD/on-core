@@ -18,6 +18,7 @@
   },
   "homepage": "https://hwstashprd01.isus.emc.com:8443/projects/ONRACK/repos/on-core/",
   "dependencies": {
+    "always-tail": "^0.1.1",
     "amqp": "^0.2.3",
     "anchor": "^0.10.2",
     "assert-plus": "^0.1.5",
