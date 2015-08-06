@@ -224,7 +224,7 @@ describe('Models.Lookup', function () {
                 .then(function() {
                     expect(waterline.lookups.update).to.have.been.calledTwice;
                     expect(waterline.lookups.update).to.have.been.calledWith(
-                        { id: ipRecord.id }, { ipAddress: null }
+                        { id: ipRecord.id }, { ipAddress: undefined }
                     );
                     expect(waterline.lookups.update).to.have.been.calledWith(
                         { id: macRecord.id }, { ipAddress: '99.99.99.99' }
