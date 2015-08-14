@@ -40,12 +40,13 @@ describe('Model', function () {
     describe('newly created record', function () {
         var record;
 
-        before('set up mocks', function () {
-            waterlineProtocol.publishRecord = sinon.stub().returns(Q.resolve());
-        });
 
         before('reset DB collections', function () {
             return helper.reset();
+        });
+
+        before('set up mocks', function () {
+            waterlineProtocol.publishRecord = sinon.stub().returns(Q.resolve());
         });
 
         before('create the record with findOrCreateByIdentifier()', function () {
