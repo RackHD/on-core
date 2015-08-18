@@ -170,6 +170,8 @@ global.helper = {
             'mongo', 'mongodb://localhost/monorail-test'
         ).set(
             'amqp', 'amqp://localhost'
+        ).set(
+            'migrate', 'alter'
         );
     },
 
