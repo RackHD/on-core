@@ -198,8 +198,8 @@ global.helper = {
 
         return Q.all(
             _.map(waterline, function (collection) {
-                if (typeof collection.drop === 'function') {
-                    return Q.ninvoke(collection, 'drop').then(function () {
+                if (typeof collection.destroy === 'function') {
+                    return Q.ninvoke(collection, 'destroy', {}).then(function () {
                         if (collection.adapterDictionary.define !== 'mongo') {
                             return Q.ninvoke(collection.adapter, 'define');
                         }
