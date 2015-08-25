@@ -178,12 +178,38 @@ describe("Errors", function() {
             this.subject.should.be.an.instanceof(Errors.BaseError);
         });
 
-        it('should be an instance of BreakPromiseChainError', function () {
+        it('should be an instance of JobKilledError', function () {
             this.subject.should.be.an.instanceof(Errors.JobKilledError);
         });
 
-        it('should have a name of BreakPromiseChainError', function () {
+        it('should have a name of JobKilledError', function () {
             this.subject.name.should.be.equal('JobKilledError');
+        });
+
+        it('should provide the correct stack trace', function () {
+            this.subject.stack.split('\n')[1].should.contain(__filename);
+        });
+    });
+
+    describe('MaxGraphsRunningError', function () {
+        before(function () {
+            this.subject = new Errors.MaxGraphsRunningError();
+        });
+
+        it('should be an instance of Error', function () {
+            this.subject.should.be.an.instanceof(Error);
+        });
+
+        it('should be an instance of BaseError', function () {
+            this.subject.should.be.an.instanceof(Errors.BaseError);
+        });
+
+        it('should be an instance of MaxGraphsRunningError', function () {
+            this.subject.should.be.an.instanceof(Errors.MaxGraphsRunningError);
+        });
+
+        it('should have a name of MaxGraphsRunningError', function () {
+            this.subject.name.should.be.equal('MaxGraphsRunningError');
         });
 
         it('should provide the correct stack trace', function () {
