@@ -4,7 +4,7 @@
 'use strict';
 
 describe('Messenger', function () {
-    var subscription, Errors, ErrorEvent, IpAddress, tracer, Constants;
+    var subscription, Errors, ErrorEvent, IpAddress, Constants;
 
     helper.before();
 
@@ -13,7 +13,6 @@ describe('Messenger', function () {
         Errors = helper.injector.get('Errors');
         ErrorEvent = helper.injector.get('ErrorEvent');
         IpAddress = helper.injector.get('IpAddress');
-        tracer = helper.injector.get('Tracer');
         Constants = helper.injector.get('Constants');
     });
 
