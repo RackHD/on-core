@@ -254,27 +254,28 @@ describe('Models.Lookup', function () {
             it('should update entries appropriately instead of adding duplicate keys', function() {
                     return waterline.start()
                     .then(function() {
-                       return  waterline.lookups.setIp('99.99.99.99', 'be:ef:be:ef:be:ef')
+                       return  waterline.lookups.setIp('99.99.99.99', 'be:ef:be:ef:be:ef');
                     })
                     .then(function(){
-                       return  waterline.lookups.setIp('99.99.99.99', 'be:ef:be:ef:be:e7')
+                       return  waterline.lookups.setIp('99.99.99.99', 'be:ef:be:ef:be:e7');
                     })
                     .finally(function() {
                         helper.reset();
                     });
             });
 
-            it('should not create duplicate null keys when detaching an ip address from a record', function() {
+            it('should not create duplicate null keys when detaching an ip address' +
+                    'from a record', function() {
 
                     return waterline.start()
                     .then(function() {
-                       return  waterline.lookups.setIp('99.99.99.99', 'be:ef:be:ef:be:e1')
+                       return  waterline.lookups.setIp('99.99.99.99', 'be:ef:be:ef:be:e1');
                     })
                     .then(function(){
-                       return  waterline.lookups.setIp('99.99.99.99', 'be:ef:be:ef:be:e2')
+                       return  waterline.lookups.setIp('99.99.99.99', 'be:ef:be:ef:be:e2');
                     })
                     .then(function() {
-                       return  waterline.lookups.setIp('99.99.99.99', 'be:ef:be:ef:be:e3')
+                       return  waterline.lookups.setIp('99.99.99.99', 'be:ef:be:ef:be:e3');
                     })
                     .finally(function(){
                         return helper.reset();
