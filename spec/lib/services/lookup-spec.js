@@ -258,6 +258,28 @@ describe('Lookup Service', function () {
         });
     });
 
+    describe('nodeIdToIpAddresses', function () {
+        it('should return an empty array if no records exist', function() {
+            this.sandbox.stub(waterline.lookups, 'findByTerm').resolves([]);
+
+            return lookupService.nodeIdToIpAddresses(
+                '507f1f77bcf86cd799439011'
+            ).should.eventually.deep.equal([]);
+        });
+
+        it('should return an array with all assigned addresses', function() {
+            this.sandbox.stub(waterline.lookups, 'findByTerm').resolves([
+                { ipAddress: '1.1.1.1' },
+                {},
+                { ipAddress: '2.2.2.2'}
+            ]);
+
+            return lookupService.nodeIdToIpAddresses(
+                '507f1f77bcf86cd799439011'
+            ).should.eventually.deep.equal(['1.1.1.1', '2.2.2.2']);
+        });
+    });
+
     it('setIpAddress', function() {
         this.sandbox.stub(waterline.lookups, 'setIp').resolves();
         return lookupService.setIpAddress('ip', 'mac')
