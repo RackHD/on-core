@@ -29,6 +29,8 @@
     "di": "git+ssh://git@hwstashprd01.isus.emc.com:7999/onrack/di.js.git",
     "ejs": "^2.0.8",
     "eventemitter2": "^0.4.14",
+    "flat": "^1.6.0",
+    "gc-stats": "0.0.6",
     "glob": "^4.3.2",
     "hogan.js": "^3.0.2",
     "jsonschema": "^1.0.0",
