@@ -64,6 +64,14 @@ describe('Models.WorkItem', function () {
             });
         });
 
+        beforeEach(function() {
+            this.sandbox = sinon.sandbox.create();
+        });
+
+        afterEach(function() {
+            this.sandbox.restore();
+        });
+
         it('should start the next scheduled work item', function () {
             var now = new Date();
             return workitems.startNextScheduled(workerId, {}, 10 * 1000).then(function(scheduled) {
@@ -212,6 +220,70 @@ describe('Models.WorkItem', function () {
             .then(function(scheduled) {
                 // there should be none left that are schedulable
                 expect(scheduled).to.be.undefined;
+            });
+        });
+
+        it('should update the database document to increase wait time on  setFailed', function() {
+            this.sandbox.spy(workitems, 'update');
+            var workItem = {
+                "name": "Will.Fail",
+                "pollInterval": 1000,
+                "config": {
+                    "command": "sel"
+                }
+            };
+            return workitems.create(workItem)
+            .then(function(workitem) {
+                return workitems.setFailed(null, workitem);
+            })
+            .then(function() {
+                expect(workitems.update.firstCall.args[1].nextScheduled.valueOf())
+                .to.equal(workitems.update.firstCall.args[1].lastFinished.valueOf() +
+                        workItem.pollInterval * 2);
+            });
+        });
+
+        it('should reschedule using the poll interval on setSucceeded', function() {
+            this.sandbox.spy(workitems, 'update');
+            var nodeId = '47bd8fb80abc5a6b5e7b10df';
+            var workItem = {
+                "name": "Pollers.IPMI",
+                "node": nodeId,
+                "pollInterval": 60000,
+                "config": {
+                    "command": "sdr"
+                }
+            };
+            return workitems.create(workItem)
+            .then(function(workitem) {
+                return workitems.setSucceeded(null, workitem);
+            })
+            .then(function() {
+                expect(workitems.update.firstCall.args[1].nextScheduled.valueOf())
+                .to.equal(workitems.update.firstCall.args[1].lastFinished.valueOf() +
+                        workItem.pollInterval);
+            });
+        });
+
+        it('should reschedule with at most a one hour delay', function() {
+            this.sandbox.spy(workitems, 'update');
+            var nodeId = '47bd8fb80abc5a6b5e7b10df';
+            var workItem = {
+                "name": "Pollers.IPMI",
+                "node": nodeId,
+                "pollInterval": 60 * 60 * 1000 * 0.75,
+                "config": {
+                    "command": "sdr"
+                }
+            };
+            return workitems.create(workItem)
+            .then(function(workitem) {
+                return workitems.setFailed(null, workitem);
+            })
+            .then(function() {
+                expect(workitems.update.lastCall.args[1].nextScheduled.valueOf())
+                .to.equal(workitems.update.lastCall.args[1].lastFinished.valueOf() +
+                        60 * 60 * 1000);
             });
         });
     });
