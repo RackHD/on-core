@@ -17,14 +17,14 @@ describe("Task protocol functions", function() {
         var testSubscription;
         afterEach("cancel afterEach", function() {
             // unsubscribe to clean up after ourselves
-            return testSubscription.dispose();
+            if (testSubscription) {
+                testSubscription.dispose();
+            }
         });
 
-        it("should subscribe to task.run and receive run events", function() {
+        it("should subscribe to task.run and receive run events", function(done) {
             var self = this,
                 uuid = helper.injector.get('uuid'),
-                Promise = helper.injector.get('Promise'),
-                deferred = Promise.defer(),
                 taskId = uuid.v4(),
                 args = 'someArgs';
 
@@ -32,9 +32,9 @@ describe("Task protocol functions", function() {
                 try {
                     expect(_data).to.be.ok;
                     expect(_data).to.equal(args);
-                    deferred.resolve();
+                    done();
                 } catch(err) {
-                    deferred.reject(err);
+                    done(err);
                 }
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
@@ -42,24 +42,22 @@ describe("Task protocol functions", function() {
 
                 return self.task.run(taskId, args);
             }).catch(function(err) {
-                deferred.reject(err);
+                done(err);
             });
-
-            return deferred.promise;
         });
     });
 
     describe("Cancel", function() {
         var testSubscription;
         afterEach("cancel afterEach", function() {
-            return testSubscription.dispose();
+            if (testSubscription) {
+                testSubscription.dispose();
+            }
         });
 
-        it("should subscribe to task.cancel and receive cancel events", function() {
+        it("should subscribe to task.cancel and receive cancel events", function(done) {
             var self = this,
                 uuid = helper.injector.get('uuid'),
-                Promise =  helper.injector.get('Promise'),
-                deferred = Promise.defer(),
                 taskId = uuid.v4(),
                 args = 'someArgs';
 
@@ -67,9 +65,9 @@ describe("Task protocol functions", function() {
                 try {
                     expect(_data).to.be.ok;
                     expect(_data).to.equal(args);
-                    deferred.resolve();
+                    done();
                 } catch(err) {
-                    deferred.reject(err);
+                    done(err);
                 }
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
@@ -77,10 +75,8 @@ describe("Task protocol functions", function() {
 
                 return self.task.cancel(taskId, args);
             }).catch(function(err) {
-                deferred.reject(err);
+                done(err);
             });
-
-            return deferred.promise;
         });
     });
 
@@ -251,13 +247,13 @@ describe("Task protocol functions", function() {
         var testSubscription;
         afterEach("cancel afterEach", function() {
             // unsubscribe to clean up after ourselves
-            return testSubscription.dispose();
+            if (testSubscription) {
+                testSubscription.dispose();
+            }
         });
 
-        it("should subscribe and receive respondCommands results", function() {
+        it("should subscribe and receive respondCommands results", function(done) {
             var self = this,
-                Promise =  helper.injector.get('Promise'),
-                deferred = Promise.defer(),
                 uuid = helper.injector.get('uuid'),
                 taskId = uuid.v4(),
                 testData = { abc: '123' };
@@ -265,19 +261,17 @@ describe("Task protocol functions", function() {
             self.task.subscribeRespondCommands(taskId, function(data) {
                 try {
                     expect(data).to.deep.equal(testData);
-                    deferred.resolve();
+                    done();
                 } catch(err) {
-                    deferred.reject(err);
+                    done(err);
                 }
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
                 testSubscription = subscription;
                 return self.task.respondCommands(taskId, testData);
             }).catch(function(err) {
-                deferred.reject(err);
+                done(err);
             });
-
-            return deferred.promise;
         });
 
         it("should subscribe and receive respondCommands failure", function() {
@@ -464,33 +458,29 @@ describe("Task protocol functions", function() {
 
         // TODO: this test should subscribe to the catch all to know when to timeout
         // in order to speed up execution.
-        it("should not subscribe to a response for other identifiers", function() {
+        it("should not subscribe to a response for other identifiers", function(done) {
             var self = this,
-                Promise =  helper.injector.get('Promise'),
                 otherId = "5498a7632b9ef0a8b94307a9",
-                id = "5498a7632b9ef0a8b94307a8",
-                deferred = Promise.defer();
+                id = "5498a7632b9ef0a8b94307a8";
 
             self.task.subscribeHttpResponse(otherId, function () {
                 setImmediate(function () {
-                    deferred.resolve();
+                    done();
                 });
             }).then(function (sub) {
                 expect(sub).to.be.ok;
                 self.task.subscribeHttpResponse(id, function() {
                     var err = new Error("Did not expect to receive a message from " +
                     " routing keys not mapped to " + otherId);
-                    deferred.reject(err);
+                    done(err);
                 })
                 .then(function(sub) {
                     expect(sub).to.be.ok;
                     self.events.publishHttpResponse(otherId, {});
                 });
             }).catch(function(err) {
-                deferred.reject(err);
+                done(err);
             });
-
-            return deferred.promise;
         });
     });
 
@@ -499,13 +489,13 @@ describe("Task protocol functions", function() {
         var testSubscription;
         afterEach("cancel afterEach", function() {
             // unsubscribe to clean up after ourselves
-            return testSubscription.dispose();
+            if (testSubscription) {
+                testSubscription.dispose();
+            }
         });
 
-        it("should subscribe and receive runIpmiCommand results", function() {
+        it("should subscribe and receive runIpmiCommand results", function(done) {
             var self = this,
-                Promise =  helper.injector.get('Promise'),
-                deferred = Promise.defer(),
                 uuid = helper.injector.get('uuid'),
                 testUuid = uuid.v4(),
                 testCommand = "soSomething",
@@ -514,9 +504,9 @@ describe("Task protocol functions", function() {
             self.task.subscribeRunIpmiCommand(testUuid, testCommand, function(_data) {
                 try {
                     expect(_data).to.deep.equal(testData);
-                    deferred.resolve();
+                    done();
                 } catch (err) {
-                    deferred.reject(err);
+                    done(err);
                 }
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
@@ -524,10 +514,8 @@ describe("Task protocol functions", function() {
                 testSubscription = subscription;
                 return self.task.publishRunIpmiCommand(testUuid, testCommand, testData);
             }).catch(function(err) {
-                deferred.reject(err);
+                done(err);
             });
-
-            return deferred.promise;
         });
     });
 
@@ -536,13 +524,13 @@ describe("Task protocol functions", function() {
         var testSubscription;
         afterEach("cancel afterEach", function() {
             // unsubscribe to clean up after ourselves
-            return testSubscription.dispose();
+            if (testSubscription) {
+                testSubscription.dispose();
+            }
         });
 
-        it("should subscribe and receive ipmiCommand results", function() {
+        it("should subscribe and receive ipmiCommand results", function(done) {
             var self = this,
-                Promise =  helper.injector.get('Promise'),
-                deferred = Promise.defer(),
                 uuid = helper.injector.get('uuid'),
                 testUuid = uuid.v4(),
                 testCommand = "soSomething",
@@ -551,9 +539,9 @@ describe("Task protocol functions", function() {
             self.task.subscribeIpmiCommandResult(testUuid, testCommand, function(_data) {
                 try {
                     expect(_data).to.deep.equal(testData);
-                    deferred.resolve();
+                    done();
                 } catch (err) {
-                    deferred.reject(err);
+                    done(err);
                 }
 
             }).then(function(subscription) {
@@ -562,10 +550,8 @@ describe("Task protocol functions", function() {
                 testSubscription = subscription;
                 return self.task.publishIpmiCommandResult(testUuid, testCommand, testData);
             }).catch(function(err) {
-                deferred.reject(err);
+                done(err);
             });
-
-            return deferred.promise;
         });
     });
 
@@ -573,13 +559,13 @@ describe("Task protocol functions", function() {
         var testSubscription;
         afterEach("cancel afterEach", function() {
             // unsubscribe to clean up after ourselves
-            return testSubscription.dispose();
+            if (testSubscription) {
+                testSubscription.dispose();
+            }
         });
 
-        it("should subscribe and receive ipmiCommand results", function() {
+        it("should subscribe and receive ipmiCommand results", function(done) {
             var self = this,
-                Promise =  helper.injector.get('Promise'),
-                deferred = Promise.defer(),
                 uuid = helper.injector.get('uuid'),
                 testUuid = uuid.v4(),
                 testData = { abc: '123' };
@@ -587,9 +573,9 @@ describe("Task protocol functions", function() {
             self.task.subscribeRunSnmpCommand(testUuid, function(_data) {
                 try {
                     expect(_data).to.deep.equal(testData);
-                    deferred.resolve();
+                    done();
                 } catch(err) {
-                    deferred.reject(err);
+                    done(err);
                 }
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
@@ -597,11 +583,8 @@ describe("Task protocol functions", function() {
                 testSubscription = subscription;
                 return self.task.publishRunSnmpCommand(testUuid, testData);
             }).catch(function(err) {
-                deferred.reject(err);
+                done(err);
             });
-
-            return deferred.promise;
-
         });
     });
 
@@ -609,13 +592,13 @@ describe("Task protocol functions", function() {
         var testSubscription;
         afterEach("cancel afterEach", function() {
             // unsubscribe to clean up after ourselves
-            return testSubscription.dispose();
+            if (testSubscription) {
+                testSubscription.dispose();
+            }
         });
 
-        it("should subscribe and receive snmpCommand results", function() {
+        it("should subscribe and receive snmpCommand results", function(done) {
             var self = this,
-                Promise =  helper.injector.get('Promise'),
-                deferred = Promise.defer(),
                 uuid = helper.injector.get('uuid'),
                 testUuid = uuid.v4(),
                 testData = { abc: '123' };
@@ -623,9 +606,9 @@ describe("Task protocol functions", function() {
             self.task.subscribeSnmpCommandResult(testUuid, function(_data) {
                 try {
                     expect(_data).to.deep.equal(testData);
-                    deferred.resolve();
+                    done();
                 } catch(err) {
-                    deferred.reject(err);
+                    done(err);
                 }
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
@@ -633,10 +616,8 @@ describe("Task protocol functions", function() {
                 testSubscription = subscription;
                 return self.task.publishSnmpCommandResult(testUuid, testData);
             }).catch(function(err) {
-                deferred.reject(err);
+                done(err);
             });
-
-            return deferred.promise;
         });
     });
 
@@ -644,13 +625,13 @@ describe("Task protocol functions", function() {
         var testSubscription;
         afterEach("cancel afterEach", function() {
             // unsubscribe to clean up after ourselves
-            return testSubscription.dispose();
+            if (testSubscription) {
+                testSubscription.dispose();
+            }
         });
 
-        it("should subscribe and receive metric results", function() {
+        it("should subscribe and receive metric results", function(done) {
             var self = this,
-                Promise =  helper.injector.get('Promise'),
-                deferred = Promise.defer(),
                 uuid = helper.injector.get('uuid'),
                 testUuid = uuid.v4(),
                 testData = { abc: '123' };
@@ -658,9 +639,9 @@ describe("Task protocol functions", function() {
             self.task.subscribeMetricResult(testUuid, 'testmetric', function(_data) {
                 try {
                     expect(_data).to.deep.equal(testData);
-                    deferred.resolve();
+                    done();
                 } catch(err) {
-                    deferred.reject(err);
+                    done(err);
                 }
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
@@ -668,10 +649,8 @@ describe("Task protocol functions", function() {
                 testSubscription = subscription;
                 return self.task.publishMetricResult(testUuid, 'testmetric', testData);
             }).catch(function(err) {
-                deferred.reject(err);
+                done(err);
             });
-
-            return deferred.promise;
         });
     });
 
@@ -738,6 +717,39 @@ describe("Task protocol functions", function() {
                     // verify we unsubscribed correctly
                     expect(resolvedUnsubscribe).to.be.ok;
                 });
+        });
+    });
+
+    describe("AnsibleCommand", function() {
+        var testSubscription;
+        afterEach("cancel afterEach", function() {
+            // unsubscribe to clean up after ourselves
+            if (testSubscription) {
+                testSubscription.dispose();
+            }
+        });
+
+        it("should subscribe and receive ansible command results", function(done) {
+            var self = this,
+                uuid = helper.injector.get('uuid'),
+                testUuid = uuid.v4(),
+                testData = { abc: '123' };
+
+            self.task.subscribeAnsibleCommand(testUuid, function(_data) {
+                try {
+                    expect(_data).to.deep.equal(testData);
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            }).then(function(subscription) {
+                expect(subscription).to.be.ok;
+
+                testSubscription = subscription;
+                return self.task.publishAnsibleResult(testUuid, testData);
+            }).catch(function(err) {
+                done(err);
+            });
         });
     });
 
