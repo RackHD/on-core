@@ -6,7 +6,7 @@
 describe('Model', function () {
     var waterline;
     var waterlineProtocol = {
-        publishRecord: sinon.stub().returns(Q.resolve())
+        publishRecord: sinon.stub().returns(Promise.resolve())
     };
 
     var Errors;
@@ -46,7 +46,7 @@ describe('Model', function () {
         });
 
         before('set up mocks', function () {
-            waterlineProtocol.publishRecord = sinon.stub().returns(Q.resolve());
+            waterlineProtocol.publishRecord = sinon.stub().returns(Promise.resolve());
         });
 
         before('create the record with findOrCreateByIdentifier()', function () {
@@ -178,7 +178,7 @@ describe('Model', function () {
             var updated;
 
             before('set up mocks', function () {
-                waterlineProtocol.publishRecord = sinon.stub().returns(Q.resolve());
+                waterlineProtocol.publishRecord = sinon.stub().returns(Promise.resolve());
             });
 
             before('update the record', function () {
@@ -225,7 +225,7 @@ describe('Model', function () {
             var updated;
 
             before('set up mocks', function () {
-                waterlineProtocol.publishRecord = sinon.stub().returns(Q.resolve());
+                waterlineProtocol.publishRecord = sinon.stub().returns(Promise.resolve());
             });
 
             before('update the record', function () {
@@ -296,7 +296,7 @@ describe('Model', function () {
             var destroyed;
 
             before('set up mocks', function () {
-                waterlineProtocol.publishRecord = sinon.stub().returns(Q.resolve());
+                waterlineProtocol.publishRecord = sinon.stub().returns(Promise.resolve());
             });
 
             before('destroy the record', function () {
@@ -349,7 +349,7 @@ describe('Model', function () {
             var destroyed;
 
             before('set up mocks', function () {
-                waterlineProtocol.publishRecord = sinon.stub().returns(Q.resolve());
+                waterlineProtocol.publishRecord = sinon.stub().returns(Promise.resolve());
             });
 
             before('destroy the record', function () {
@@ -402,7 +402,7 @@ describe('Model', function () {
             var destroyed;
 
             before('set up mocks', function () {
-                waterlineProtocol.publishRecord = sinon.stub().returns(Q.resolve());
+                waterlineProtocol.publishRecord = sinon.stub().returns(Promise.resolve());
             });
 
             before('destroy the record', function () {
@@ -448,7 +448,7 @@ describe('Model', function () {
                 dummy: 'magic'
             }).then(function (record) {
                 records.push(record);
-                return Q.delay();
+                return Promise.delay();
             }).then(function () {
                 return waterline.testobjects.create({
                     dummy: 'magic'
@@ -523,12 +523,12 @@ describe('Model', function () {
 
     describe('publishRecord() failure', function () {
         beforeEach('set up mocks', function () {
-            waterlineProtocol.publishRecord = sinon.stub().returns(Q.resolve());
+            waterlineProtocol.publishRecord = sinon.stub().returns(Promise.resolve());
         });
 
         it('should cause rejection on create()', function () {
             var error = new Error();
-            waterlineProtocol.publishRecord = sinon.stub().returns(Q.reject(error));
+            waterlineProtocol.publishRecord = sinon.stub().returns(Promise.reject(error));
             return waterline.testobjects.create({})
             .should.be.rejected.and.eventually.have.property('originalError', error);
         });
@@ -536,7 +536,7 @@ describe('Model', function () {
         it('should cause rejection on update()', function () {
             var error = new Error();
             return waterline.testobjects.create({}).then(function (record) {
-                waterlineProtocol.publishRecord = sinon.stub().returns(Q.reject(error));
+                waterlineProtocol.publishRecord = sinon.stub().returns(Promise.reject(error));
                 return waterline.testobjects.update(record.id, { dummy: 'test' });
             }).should.be.rejected.and.eventually.have.property('originalError', error);
         });
@@ -544,7 +544,7 @@ describe('Model', function () {
         it('should cause rejection on destroy()', function () {
             var error = new Error();
             return waterline.testobjects.create({}).then(function (record) {
-                waterlineProtocol.publishRecord = sinon.stub().returns(Q.reject(error));
+                waterlineProtocol.publishRecord = sinon.stub().returns(Promise.reject(error));
                 return waterline.testobjects.destroy(record.id);
             }).should.be.rejected.and.eventually.have.property('originalError', error);
         });

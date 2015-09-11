@@ -13,18 +13,18 @@ describe('Message', function () {
 
         context.messenger = {
             start: sinon.stub().returns(
-                Q.resolve()
+                Promise.resolve()
             ),
             stop: sinon.stub().returns(
-                Q.resolve()
+                Promise.resolve()
             ),
             subscribe: sinon.stub().returns(
-                Q.resolve(
+                Promise.resolve(
                     new Subscription()
                 )
             ),
             publish: sinon.stub().returns(
-                Q.resolve()
+                Promise.resolve()
             )
         };
 

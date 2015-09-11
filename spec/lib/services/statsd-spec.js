@@ -46,16 +46,16 @@ describe("StatsD Service", function () {
 
     describe('Publishing', function () {
         before(function () {
-            var deferred = Q.defer();
+            var self = this;
 
-            this.server = dgram.createSocket('udp4');
-            this.server.bind(8125);
+            return new Promise(function (resolve) {
+                self.server = dgram.createSocket('udp4');
+                self.server.bind(8125);
 
-            this.server.once('listening', function () {
-                deferred.resolve();
+                self.server.once('listening', function () {
+                    resolve();
+                });
             });
-
-            return deferred.promise;
         });
 
         it('should publish metrics to localhost:8125', function (done) {
