@@ -1,3 +1,5 @@
+Copyright 2015, EMC, Inc.
+
 # Configuration
 
 The following configuration values can be overridden via the environment, command line, or via the global configuration file located at /opt/onrack/etc/monorail.json.
