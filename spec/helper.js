@@ -1,3 +1,5 @@
+// Copyright 2015, EMC, Inc.
+
 /*globals global,require,__dirname */
 'use strict';
 
