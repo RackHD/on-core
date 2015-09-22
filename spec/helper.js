@@ -12,7 +12,6 @@ var path = require('path');
  *  set up global lodash as _ for testing
  */
 global._ = require('lodash');
-global.Q = require('bluebird-q');
 global.Promise = require('bluebird');
 
 /**
@@ -194,16 +193,16 @@ global.helper = {
      */
 
     reset: function () {
-        var waterline = this.injector.get('Services.Waterline'),
-            Q = this.injector.get('Q'),
-            _ = this.injector.get('_');
+        var waterline = this.injector.get('Services.Waterline');
 
-        return Q.all(
+        return Promise.all(
             _.map(waterline, function (collection) {
                 if (typeof collection.destroy === 'function') {
-                    return Q.ninvoke(collection, 'destroy', {}).then(function () {
+                    return Promise.fromNode(collection.destroy.bind(collection)).then(function () {
                         if (collection.adapterDictionary.define !== 'mongo') {
-                            return Q.ninvoke(collection.adapter, 'define');
+                            return Promise.fromNode(
+                                collection.adapter.define.bind(collection.adapter)
+                            );
                         }
                     });
                 }
