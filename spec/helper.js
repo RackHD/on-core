@@ -6,13 +6,14 @@
 // Set a global test environment.
 process.env.NODE_ENV = 'test';
 
-var path = require('path');
+var path = require('path'),
+    bluebird = require('bluebird');
 
 /**
  *  set up global lodash as _ for testing
  */
 global._ = require('lodash');
-global.Promise = require('bluebird');
+global.Promise = bluebird;
 
 /**
  *  set up global request mocking library supertest as request
@@ -24,7 +25,7 @@ global.request = require('supertest');
  *  invoking sinon-chai extension to chai.
  */
 global.sinon = require('sinon');
-global.sinonPromise = require('sinon-as-promised')(Promise);
+global.sinonPromise = require('sinon-as-promised')(bluebird);
 
 /**
  *  set up global chai for testing
@@ -195,12 +196,12 @@ global.helper = {
     reset: function () {
         var waterline = this.injector.get('Services.Waterline');
 
-        return Promise.all(
+        return bluebird.all(
             _.map(waterline, function (collection) {
                 if (typeof collection.destroy === 'function') {
-                    return Promise.fromNode(collection.destroy.bind(collection)).then(function () {
+                    return bluebird.fromNode(collection.destroy.bind(collection)).then(function () {
                         if (collection.adapterDictionary.define !== 'mongo') {
-                            return Promise.fromNode(
+                            return bluebird.fromNode(
                                 collection.adapter.define.bind(collection.adapter)
                             );
                         }
@@ -219,7 +220,7 @@ global.helper = {
         if (this.core) {
             return this.core.stop();
         } else {
-            return Promise.resolve();
+            return bluebird.resolve();
         }
     },
 
@@ -265,7 +266,7 @@ global.helper = {
             var self = this;
             this.timeout(10000);
 
-            return Promise.resolve()
+            return bluebird.resolve()
                 .then(function() {
                     if (_.isFunction(callback)) {
                         return callback(self);
@@ -293,7 +294,7 @@ global.helper = {
      */
     after: function (callback) {
         after("helper.after", function () {
-            return Promise.resolve()
+            return bluebird.resolve()
                 .then(function() {
                     if (_.isFunction(callback)) {
                         return callback();
