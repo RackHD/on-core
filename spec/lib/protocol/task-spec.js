@@ -753,4 +753,35 @@ describe("Task protocol functions", function() {
         });
     });
 
+    describe("Trigger", function() {
+        var testSubscription;
+
+        afterEach("cancel afterEach", function() {
+            // unsubscribe to clean up after ourselves
+            return testSubscription.dispose();
+        });
+
+        it("should subscribe and receive triggers", function(done) {
+            var self = this,
+                uuid = helper.injector.get('uuid'),
+                triggerGroup = 'testGroup',
+                triggerType = 'testType',
+                testUuid = uuid.v4();
+
+            self.task.subscribeTrigger(testUuid, triggerType, triggerGroup, function() {
+                try {
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            }).then(function(subscription) {
+                expect(subscription).to.be.ok;
+
+                testSubscription = subscription;
+                return self.task.publishTrigger(testUuid, triggerType, triggerGroup);
+            }).catch(function(err) {
+                done(err);
+            });
+        });
+    });
 });
