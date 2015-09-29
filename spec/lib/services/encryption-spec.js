@@ -45,4 +45,14 @@ describe('Encryption Service', function () {
             this.subject.decrypt('NOOP').should.equal('NOOP');
         });
     });
+
+    describe('createHash', function () {
+        it('should call Encryption.prototype.createHash', function () {
+            var hash = this.sandbox.stub(Encryption.prototype, 'createHash');
+
+            this.subject.createHash('Hello World');
+
+            hash.should.have.been.calledWith('Hello World');
+        });
+    });
 });

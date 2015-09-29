@@ -75,5 +75,23 @@ describe('Encryption', function () {
                this.subject.isEncrypted('Hello World').should.equal(false);
             });
         });
+
+        describe('createHash', function () {
+            it('should generate correct hash header', function() {
+                expect(this.subject.createHash('123ABCDEFG__zyz', 'sha512')).to.match(/^\$6\$*/);
+                expect(this.subject.createHash('pbefEFGA_98012-', 'sha256')).to.match(/^\$5\$*/);
+                expect(this.subject.createHash('1fj14LJA1Lk-?!k', 'md5')).to.match(/^\$1\$*/);
+            });
+
+            it('should generate correct hash data', function() {
+                var data = "rackhd.github.com";
+                this.subject.createHash(data, 'sha512', '$6$WeJknBPkDab')
+                    .should.equal('$6$WeJknBPkDab$yRRWg5Kr1MCAbKkBtKyKtldb9DFDXidKHj.wQwOKO1TSHUKCvIi7x9QubOenwGfYXoBK0vvwKvNgIlW9Oc6O4.'); //jshint ignore:line
+                this.subject.createHash(data, 'sha256', '$5$WeJknBPkDab')
+                    .should.equal('$5$WeJknBPkDab$t4J3IF.tD9H/2HFDjV.CpFN1ay5rmwa7maVkstEiyv9');
+                this.subject.createHash(data, 'md5', '$1$WeJknBPkDab')
+                    .should.equal('$1$WeJknBPk$t3LdooA1UatyI0C7pGX5F/');
+            });
+        });
     });
 });
