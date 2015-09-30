@@ -127,5 +127,21 @@ describe('Models.Node', function () {
                 expect(this.subject.defaultsTo).to.equal(false);
             });
         });
+
+        describe('relations', function () {
+            before(function () {
+                this.subject = this.attributes.relations;
+            });
+
+            it('should be json', function () {
+                expect(this.subject.type).to.equal('json');
+                expect(this.subject.json).to.equal(true);
+            });
+
+            it('should not be required', function () {
+                expect(this.subject.required).to.equal(false);
+            });
+        });
+
     });
 });
