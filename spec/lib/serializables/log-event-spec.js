@@ -60,6 +60,14 @@ describe('LogEvent', function () {
                     { array: [ { password: 'bar' } ] }
                 ).should.deep.equal({ array: [ { password: '[REDACTED]' } ] });
             });
+
+            it('should not modify the original object', function () {
+                var target = { password: 'bar' };
+
+                LogEvent.redact(target);
+
+                target.should.deep.equal({ password: 'bar' });
+            });
         });
     });
 });
