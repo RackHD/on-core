@@ -12,6 +12,8 @@ describe('Models.WorkItem', function () {
     var workitems;
     var Promise;
     var uuid;
+    var _nodeId;
+    var snmpPoller;
 
     base.before(function (context) {
         Promise = helper.injector.get('Promise');
@@ -66,6 +68,24 @@ describe('Models.WorkItem', function () {
 
         beforeEach(function() {
             this.sandbox = sinon.sandbox.create();
+            _nodeId = '47bd8fb80abc5a6b5e7b10df';
+            snmpPoller = {
+                "name": "Pollers.SNMP",
+                "node": _nodeId,
+                "pollInterval": 60 * 60 * 1000 * 0.75,
+                "config": {
+                    "alerts": [
+                        {
+                            '.1.3.6.1.2.1.1.5': "testAlert",
+                            '.1.3.6.1.2.1.1.1': "/testAlert/"
+                        }
+                    ],
+                    "oids": [
+                        '.1.3.6.1.2.1.1.1',
+                        '.1.3.6.1.2.1.1.5'
+                    ]
+                }
+            };
         });
 
         afterEach(function() {
@@ -285,6 +305,57 @@ describe('Models.WorkItem', function () {
                 .to.equal(workitems.update.lastCall.args[1].lastFinished.valueOf() +
                         60 * 60 * 1000);
             });
+        });
+
+        it('should deserialize workitems containing numeric oids', function() {
+            this.sandbox.spy(workitems, 'deserialize');
+            var workItem = snmpPoller;
+
+            var deserialized = workitems.deserialize(workItem);
+            expect(deserialized.config.alerts[0]).to.deep.equal(
+                {
+                    '.1.3.6.1.2.1.1.5': "testAlert",
+                    '.1.3.6.1.2.1.1.1': "/testAlert/"
+                }
+            );
+            expect(deserialized.config.oids).to.deep.equal(
+                [
+                    '.1.3.6.1.2.1.1.1',
+                    '.1.3.6.1.2.1.1.5'
+                ]
+            );
+
+        });
+
+        it('should sanitize created workitems', function() {
+            var workItem = snmpPoller;
+
+            return workitems.create(workItem)
+            .then(function(workItem) {
+                expect(workItem.config.alerts[0]).to.deep.equal({
+                        '_1_3_6_1_2_1_1_5': "testAlert",
+                        '_1_3_6_1_2_1_1_1': "/testAlert/"
+                });
+                expect(workItem.config.oids).to.deep.equal([
+                     '_1_3_6_1_2_1_1_1',
+                     '_1_3_6_1_2_1_1_5'
+                ]);
+            });
+        });
+
+        it('should sanitize updated workitems', function() {
+            var workItem = snmpPoller;
+
+            workitems.beforeUpdate(workItem, function(){});
+
+            expect(workItem.config.alerts[0]).to.deep.equal({
+                    '_1_3_6_1_2_1_1_5': "testAlert",
+                    '_1_3_6_1_2_1_1_1': "/testAlert/"
+            });
+            expect(workItem.config.oids).to.deep.equal([
+                 '_1_3_6_1_2_1_1_1',
+                 '_1_3_6_1_2_1_1_5'
+            ]);
         });
     });
 
