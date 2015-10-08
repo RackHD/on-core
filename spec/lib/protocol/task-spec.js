@@ -661,7 +661,7 @@ describe("Task protocol functions", function() {
                 data = { foo: 'bar' },
                 uuid = helper.injector.get('uuid'),
                 testUuid = uuid.v4(),
-		pollerName = 'sdr';
+                pollerName = 'sdr';
 
             return self.task.publishPollerAlert(testUuid, pollerName, data);
         });
