@@ -621,6 +621,78 @@ describe("Task protocol functions", function() {
         });
     });
 
+    describe("runCommonCommand", function() {
+
+        var testSubscription;
+        afterEach("cancel afterEach", function() {
+            // unsubscribe to clean up after ourselves
+            if (testSubscription) {
+                testSubscription.dispose();
+            }
+        });
+
+        it("should subscribe and receive runCommonCommand results", function(done) {
+            var self = this,
+                uuid = helper.injector.get('uuid'),
+                testUuid = uuid.v4(),
+                testCommand = "soSomething",
+                testData = { abc: '123' };
+
+            self.task.subscribeRunCommonCommand(testUuid, testCommand, function(_data) {
+                try {
+                    expect(_data).to.deep.equal(testData);
+                    done();
+                } catch (err) {
+                    done(err);
+                }
+            }).then(function(subscription) {
+                expect(subscription).to.be.ok;
+
+                testSubscription = subscription;
+                return self.task.publishRunCommonCommand(testUuid, testCommand, testData);
+            }).catch(function(err) {
+                done(err);
+            });
+        });
+    });
+
+    describe("commonCommandResult", function() {
+
+        var testSubscription;
+        afterEach("cancel afterEach", function() {
+            // unsubscribe to clean up after ourselves
+            if (testSubscription) {
+                testSubscription.dispose();
+            }
+        });
+
+        it("should subscribe and receive common command results", function(done) {
+            var self = this,
+                uuid = helper.injector.get('uuid'),
+                testUuid = uuid.v4(),
+                testCommand = "soSomething",
+                testData = { abc: '123' };
+
+            self.task.subscribeCommonCommandResult(testUuid, testCommand, function(_data) {
+                try {
+                    expect(_data).to.deep.equal(testData);
+                    done();
+                } catch (err) {
+                    done(err);
+                }
+
+            }).then(function(subscription) {
+                expect(subscription).to.be.ok;
+
+                testSubscription = subscription;
+                return self.task.publishCommonCommandResult(testUuid, testCommand, testData);
+            }).catch(function(err) {
+                done(err);
+            });
+        });
+    });
+
+
     describe("MetricResult", function() {
         var testSubscription;
         afterEach("cancel afterEach", function() {
