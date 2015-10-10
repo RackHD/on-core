@@ -133,13 +133,12 @@ describe('Models.Node', function () {
                 this.subject = this.attributes.relations;
             });
 
-            it('should be json', function () {
-                expect(this.subject.type).to.equal('json');
-                expect(this.subject.json).to.equal(true);
+            it('should be array', function () {
+                expect(this.subject.type).to.equal('array');
             });
 
-            it('should not be required', function () {
-                expect(this.subject.required).to.equal(false);
+            it('should default to empty', function () {
+                expect(this.subject.defaultsTo).to.deep.equal([]);
             });
         });
 
