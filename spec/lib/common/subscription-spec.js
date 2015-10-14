@@ -11,17 +11,18 @@ describe('Subscription', function () {
     before(function () {
         Subscription = helper.injector.get('Subscription');
 
-        this.queue = {
-            state: 'open',
-            unsubscribe: sinon.spy(),
-            destroy: sinon.spy(),
-            close: sinon.spy()
-        };
-
         this.options = {
             consumerTag: 'fake'
         };
+    });
 
+    beforeEach(function() {
+        this.queue = {
+            state: 'open',
+            unsubscribe: sinon.stub().resolves(),
+            destroy: sinon.stub().resolves(),
+            close: sinon.stub().resolves()
+        };
         this.subject = new Subscription(
             this.queue,
             this.options
@@ -51,12 +52,49 @@ describe('Subscription', function () {
             });
         });
 
+        it('should prevent closing the queue multiple times', function() {
+            var self = this;
+
+            return self.subject.dispose()
+            .then(function() {
+                return self.subject.dispose();
+            })
+            .then(function() {
+                self.queue.unsubscribe.should.have.been.calledOnce;
+                self.queue.destroy.should.have.been.calledOnce;
+                self.queue.close.should.have.been.calledOnce;
+            });
+        });
+
+        it('should retry closing the queue silently if it fails for the caller', function(done) {
+            var self = this;
+            sinon.spy(self.subject, 'dispose');
+            self.subject.retryDelay = 0;
+            self.subject.MAX_DISPOSE_RETRIES = 1;
+            self.queue.unsubscribe.rejects(new Error('test error'));
+
+            return expect(self.subject.dispose()).to.be.rejectedWith(/test error/)
+            .then(function() {
+                setImmediate(function() {
+                    try {
+                        expect(self.subject.dispose).to.have.been.calledTwice;
+                        done();
+                    } catch (e) {
+                        done(e);
+                    }
+                });
+            })
+            .catch(function(err) {
+                done(err);
+            });
+        });
+
         it('should reject with an error if the queue is already unsubscribed', function () {
             this.subject.queue.state = 'closing';
 
             return this.subject.dispose().should.be.rejectedWith(
                 Error,
-                'Subscription Already Disposed.'
+                'Attempted to dispose a subscription whose queue state is not open'
             );
         });
     });
