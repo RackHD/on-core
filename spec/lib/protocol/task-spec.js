@@ -48,23 +48,29 @@ describe("Task protocol functions", function() {
     });
 
     describe("Cancel", function() {
+        var Errors;
         var testSubscription;
+        before("cancel before", function() {
+            Errors = helper.injector.get('Errors');
+        });
+
         afterEach("cancel afterEach", function() {
             if (testSubscription) {
                 testSubscription.dispose();
             }
         });
 
-        it("should subscribe to task.cancel and receive cancel events", function(done) {
+        it("should subscribe and receive task.cancel events and error data", function(done) {
             var self = this,
                 uuid = helper.injector.get('uuid'),
                 taskId = uuid.v4(),
-                args = 'someArgs';
+                errName = 'testerrname',
+                errMessage = 'test message';
 
             self.task.subscribeCancel(taskId, function(_data) {
                 try {
-                    expect(_data).to.be.ok;
-                    expect(_data).to.equal(args);
+                    expect(_data).to.be.an.instanceof(Error);
+                    expect(_data).to.have.property('message').that.equals(errMessage);
                     done();
                 } catch(err) {
                     done(err);
@@ -73,7 +79,32 @@ describe("Task protocol functions", function() {
                 expect(subscription).to.be.ok;
                 testSubscription = subscription;
 
-                return self.task.cancel(taskId, args);
+                return self.task.cancel(taskId, errName, errMessage);
+            }).catch(function(err) {
+                done(err);
+            });
+        });
+
+        it("should subscribe to and receive task.cancel events and typed errors", function(done) {
+            var self = this,
+                uuid = helper.injector.get('uuid'),
+                taskId = uuid.v4(),
+                errName = Errors.TaskTimeoutError.name,
+                errMessage = 'test message';
+
+            self.task.subscribeCancel(taskId, function(_data) {
+                try {
+                    expect(_data).to.be.an.instanceof(Errors.TaskTimeoutError);
+                    expect(_data).to.have.property('message').that.equals(errMessage);
+                    done();
+                } catch(err) {
+                    done(err);
+                }
+            }).then(function(subscription) {
+                expect(subscription).to.be.ok;
+                testSubscription = subscription;
+
+                return self.task.cancel(taskId, errName, errMessage);
             }).catch(function(err) {
                 done(err);
             });
