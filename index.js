@@ -44,7 +44,7 @@ module.exports = function (di, directory) {
                 helper.simpleWrapper(require('eventemitter2').EventEmitter2, 'EventEmitter'),
                 helper.requireWrapper('shortid', 'shortid'),
                 helper.requireWrapper('crypto', 'crypto'),
-                helper.requireWrapper('crypt3', 'crypt3'),
+                helper.requireWrapper('apache-crypt', 'apache-crypt'),
                 helper.requireWrapper('util', 'util'),
                 helper.requireWrapper('pluralize', 'pluralize'),
                 helper.requireWrapper('blocked', 'blocked'),
