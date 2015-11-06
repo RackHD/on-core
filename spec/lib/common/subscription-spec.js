@@ -75,14 +75,14 @@ describe('Subscription', function () {
 
             return expect(self.subject.dispose()).to.be.rejectedWith(/test error/)
             .then(function() {
-                setImmediate(function() {
+                setTimeout(function() {
                     try {
                         expect(self.subject.dispose).to.have.been.calledTwice;
                         done();
                     } catch (e) {
                         done(e);
                     }
-                });
+                }, 50);
             })
             .catch(function(err) {
                 done(err);
