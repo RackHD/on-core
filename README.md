@@ -1,4 +1,4 @@
-# on-core [![Build Status](http://travis-ci.org/RackHD/on-core.svg?branch=master)](https://travis-ci.org/RackHD/on-core)
+# on-core [![Build Status](http://travis-ci.org/RackHD/on-core.svg?branch=master)](https://travis-ci.org/RackHD/on-core) [![Code Climate](https://codeclimate.com/github/RackHD/on-core/badges/gpa.svg)](https://codeclimate.com/github/RackHD/on-core)
 
 `on-core` provides common node.js libraries for applications in the RackHD project.
 
