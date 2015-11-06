@@ -93,5 +93,13 @@ describe('Encryption', function () {
                     .should.equal('$1$WeJknBPk$t3LdooA1UatyI0C7pGX5F/');
             });
         });
+
+        describe('createSalt', function () {
+            it('should generate a password salt for crypt', function () {
+                expect(this.subject.createSalt('md5', 'HlloWrld')).to.equal('$1$HlloWrld');
+                expect(this.subject.createSalt('sha256', 'HlloWrld')).to.equal('$5$HlloWrld');
+                expect(this.subject.createSalt('sha512', 'HlloWrld')).to.equal('$6$HlloWrld');
+            });
+        });
     });
 });

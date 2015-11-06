@@ -55,12 +55,4 @@ describe('Encryption Service', function () {
             hash.should.have.been.calledWith('Hello World');
         });
     });
-
-    describe('createSalt', function () {
-        it('should call Encryption.prototype.createSalt', function () {
-            var hash = this.sandbox.stub(Encryption.prototype, 'createSalt');
-            this.subject.createSalt('sha512', 'HlloWrld');
-            hash.should.have.been.calledWith('sha512', 'HlloWrld');
-        });
-    });
 });
