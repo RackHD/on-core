@@ -18,3 +18,8 @@ install:
 - sudo apt-get install -qq g++-4.8
 - export CXX="g++-4.8"
 - npm install
+
+notifications:
+  slack:
+    rooms:
+    - secure: "WirgcLJEEnA6/qV1atNwgAhUqTx+24izgJq04vsC8u/uhz/umckIWD5LBUu62TFAnx/Yt1Pohs1PmIy6C8hFcje7c1sdCwD+P8bHVDI2tLBkoUeOjebY6zrWiEqtWxPw70pz+UuP5GgVylN99zWbZ9jUkj7zHJVuq5sGwcaW/7oGFEmi1k3guE4LxkAuA50BEpuLztoVqW0lAqa7IVFQwTwE7YHxpV/1UfsWrgJlg8/J/vZtFiXPq2ZOp/csDpdyi3QdpAiVSNJVt/6XgSlMJqABIfpG6A4BPFQiqCjSjaLixHV2Qsq0jpc1HJ+kL31VXCpLa52t1KCyX6gwVRliKJQONzf3cDr8yQjij6SsxiyARxdKAStAejyC6YpgEKz2ZK9Wgi8NH0rWhQQOWKokhtG4FX7IGXFt8V4IvHSQ3XqMLZCfYWgUGhzlp9SrG9g8z9P9nZ3Ddt343wUjk3HkN5iWPidunSeWs5d+8hV07nKydnkDCxksGnZgpbjKviRaLjDQ/GkZpL2hydj46VoA4KVjbyE/V/x9h41mklrTZFrBmtzQwKXOyt9ew6x5uFE0v3mo8xgvhto+heQ6BFnjMxt0io+sJu5UMnGTDA3zjM5b58TqlJkmBZ4xl3sNU8xgYQg685QFwYFamYZ0VZ6Jx5oIE+xDL8kuBlUlbUuS0es="
