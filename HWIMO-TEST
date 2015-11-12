@@ -15,7 +15,7 @@ npm install
 # run the tests without redirected output for debugging
 ./node_modules/.bin/_mocha $(find spec -name '*-spec.js') --require spec/helper.js
 
-# Runs the mocha tests and reports the code coerage.
+# Runs the mocha tests and reports the code coverage.
 ./node_modules/.bin/istanbul cover -x "**/spec/**" ./node_modules/.bin/_mocha -- $(find spec -name '*-spec.js') -R xunit-file --require spec/helper.js
 ./node_modules/.bin/istanbul report cobertura
 
