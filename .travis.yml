@@ -6,6 +6,10 @@ node_js:
   - "0.10"
   - "4"
 
+matrix:
+  allow_failures:
+   - node_js: "4"
+
 services:
  - mongodb
  - rabbitmq
