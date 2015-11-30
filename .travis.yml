@@ -1,6 +1,4 @@
-sudo: required
 language: node_js
-compiler: g++
 
 node_js:
   - "0.10"
@@ -13,15 +11,6 @@ matrix:
 services:
  - mongodb
  - rabbitmq
-
-before_install:
- - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
- - sudo apt-get update -qq
-
-install:
-- sudo apt-get install -qq g++-4.8
-- export CXX="g++-4.8"
-- npm install
 
 after_success:
  - ./node_modules/.bin/istanbul cover -x "**/spec/**" ./node_modules/.bin/_mocha --report lcovonly -- $(find spec -name '*-spec.js') -R spec --require spec/helper.js
