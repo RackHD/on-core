@@ -77,23 +77,80 @@ describe('Templates', function () {
         });
 
         it('should get a template', function() {
-            waterline.templates.findOne.resolves('test contents');
+            waterline.templates.find.resolves(['test contents']);
             return this.subject.get('test template')
             .then(function(out) {
                 expect(out).to.equal('test contents');
-                expect(waterline.templates.findOne)
-                    .to.have.been.calledWith({ name: 'test template' });
+                expect(waterline.templates.find)
+                    .to.have.been.calledWith({ name: 'test template', scope: ['global'] });
             });
         });
 
-        it('should create a new template', function() {
+        it('should get the template in the right scope', function() {
+            var templates = [
+                { name: 'template', contents: 'global scope', scope: 'global'},
+                { name: 'template', contents: 'a scope', scope: 'a'},
+                { name: 'template', contents: 'b scope', scope: 'b'}
+            ];
+            var scope = ['b', 'a', 'global'];
+            waterline.templates.find.resolves(templates);
+            return this.subject.get('template', scope)
+            .then(function(out) {
+                expect(out.contents).to.equal('b scope');
+                expect(waterline.templates.find)
+                    .to.have.been.calledWith({ name: 'template', scope: scope });
+            });
+        });
+
+        it('should be empty when the scope does not exist', function() {
+            var templates = [];
+            var scope = ['b'];
+            waterline.templates.find.resolves(templates);
+            return this.subject.get('template', scope)
+            .then(function(out) {
+                expect(out).to.equal(undefined);
+                expect(waterline.templates.find)
+                    .to.have.been.calledWith({ name: 'template', scope: scope });
+            });
+        });
+
+        it('should get the next template when the scope does not exist', function() {
+            var templates = [
+                { name: 'template', contents: 'global scope', scope: 'global'},
+                { name: 'template', contents: 'a scope', scope: 'a'}
+            ];
+            var scope = ['b', 'a', 'global'];
+            waterline.templates.find.resolves(templates);
+            return this.subject.get('template', scope)
+            .then(function(out) {
+                expect(out.contents).to.equal('a scope');
+                expect(waterline.templates.find)
+                    .to.have.been.calledWith({ name: 'template', scope: scope });
+            });
+        });
+
+        it('should create a new template in global scope', function() {
             var self = this;
             waterline.templates.findOne.resolves(null);
             return self.subject.put('test template', 'test contents')
             .then(function() {
                 expect(waterline.templates.create).to.have.been.calledWith({
                     name: 'test template',
-                    contents: 'test contents'
+                    contents: 'test contents',
+                    scope: 'global'
+                });
+            });
+        });
+
+        it('should create a new template in the specified scope', function() {
+            var self = this;
+            waterline.templates.findOne.resolves(null);
+            return self.subject.put('test template', 'test contents', 'sku')
+            .then(function() {
+                expect(waterline.templates.create).to.have.been.calledWith({
+                    name: 'test template',
+                    contents: 'test contents',
+                    scope: 'sku'
                 });
             });
         });
