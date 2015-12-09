@@ -18,18 +18,21 @@ describe('FileLoader', function () {
         sinon.stub(fs, 'writeFileAsync');
         sinon.stub(fs, 'readFileAsync');
         sinon.stub(fs, 'readdirAsync');
+        sinon.stub(fs, 'statAsync');
     });
 
     beforeEach(function() {
         fs.writeFileAsync.reset();
         fs.readFileAsync.reset();
         fs.readdirAsync.reset();
+        fs.statAsync.reset();
     });
 
     helper.after(function () {
         fs.writeFileAsync.restore();
         fs.readFileAsync.restore();
         fs.readdirAsync.restore();
+        fs.statAsync.restore();
     });
 
     describe('put', function () {
@@ -62,11 +65,23 @@ describe('FileLoader', function () {
             function () {
                 fs.readFileAsync.resolves('getAll');
                 fs.readdirAsync.resolves(['/tmp/foo.txt']);
-
+                fs.statAsync.resolves({ isDirectory: function() { return false; } });
                 return this.subject.getAll('/tmp').then(function (files) {
                     fs.readdirAsync.should.have.been.calledWith('/tmp');
 
                     files['foo.txt'].should.equal('getAll');
+                });
+            }
+        );
+        it(
+            'should skip directories',
+            function () {
+                fs.readFileAsync.resolves('getAll');
+                fs.readdirAsync.resolves(['/tmp/foo']);
+                fs.statAsync.resolves({ isDirectory: function() { return true; } });
+                return this.subject.getAll('/tmp').then(function (files) {
+                    fs.readdirAsync.should.have.been.calledWith('/tmp');
+                    fs.readFileAsync.should.not.have.been.called;
                 });
             }
         );
