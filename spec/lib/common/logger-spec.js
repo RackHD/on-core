@@ -108,11 +108,15 @@ describe('Logger', function () {
                     this.subject[level]('message ' + level);
 
                     setImmediate(function () {
-                        expect(
-                            events.emit
-                        ).to.have.been.calledWith('log');
-
-                        done();
+                        try {
+                            expect(
+                                events.emit
+                            ).to.have.been.calledWith('log');
+                            done();
+                        }
+                        catch(e) {
+                            done(e);
+                        }
                     });
                 });
 
@@ -121,11 +125,15 @@ describe('Logger', function () {
                     this.subject[level]('message ' + level);
 
                     setImmediate(function () {
-                        expect(
-                            events.emit
-                        ).to.not.have.been.calledWith('log');
-
-                        done();
+                        try {
+                            expect(
+                                events.emit
+                            ).to.not.have.been.calledWith('log');
+                            done();
+                        }
+                        catch(e) {
+                            done(e);
+                        }
                     });
                 });
 
@@ -134,11 +142,15 @@ describe('Logger', function () {
                     this.subject[level]('message ' + level);
 
                     setImmediate(function () {
-                        expect(
-                            events.emit
-                        ).to.have.been.calledWith('log');
-
-                        done();
+                        try {
+                            expect(
+                                events.emit
+                            ).to.have.been.calledWith('log');
+                            done();
+                        }
+                        catch (e) {
+                            done(e);
+                        }
                     });
                 });
             });
