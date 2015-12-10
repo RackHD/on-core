@@ -6,13 +6,14 @@
 var di = require('di');
 
 describe('Logger', function () {
-    var Logger, events;
+    var Logger, events, configuration;
 
     helper.before();
 
     before(function () {
         Logger = helper.injector.get('Logger');
         events = helper.injector.get('Events');
+        configuration = helper.injector.get('Services.Configuration');
     });
 
     helper.after();
@@ -88,6 +89,7 @@ describe('Logger', function () {
 
                 afterEach(function () {
                     events.emit.reset();
+                    configuration.set('minLogLevel', undefined);
                 });
 
                 after(function () {
@@ -106,11 +108,49 @@ describe('Logger', function () {
                     this.subject[level]('message ' + level);
 
                     setImmediate(function () {
-                        expect(
-                            events.emit
-                        ).to.have.been.calledWith('log');
+                        try {
+                            expect(
+                                events.emit
+                            ).to.have.been.calledWith('log');
+                            done();
+                        }
+                        catch(e) {
+                            done(e);
+                        }
+                    });
+                });
 
-                       done();
+                it('should not emit message with level < minimum log level', function (done) {
+                    configuration.set('minLogLevel', 10);
+                    this.subject[level]('message ' + level);
+
+                    setImmediate(function () {
+                        try {
+                            expect(
+                                events.emit
+                            ).to.not.have.been.calledWith('log');
+                            done();
+                        }
+                        catch(e) {
+                            done(e);
+                        }
+                    });
+                });
+
+                it('should emit message if minimum log level is not number', function (done) {
+                    configuration.set('minLogLevel', '10');
+                    this.subject[level]('message ' + level);
+
+                    setImmediate(function () {
+                        try {
+                            expect(
+                                events.emit
+                            ).to.have.been.calledWith('log');
+                            done();
+                        }
+                        catch (e) {
+                            done(e);
+                        }
                     });
                 });
             });
