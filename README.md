@@ -38,4 +38,4 @@ Defaults to `localhost:8125`.
 
 ## sharedKey
 
-A 32 bit base 64 encoded string, defaults to `qxfO2D3tIJsZACu7UA6Fbw0avowo8r79ALzn+WeuC8M=`.
+A 32 bit base64 encoded string, defaults to `qxfO2D3tIJsZACu7UA6Fbw0avowo8r79ALzn+WeuC8M=`.
