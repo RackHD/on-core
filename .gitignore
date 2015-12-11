@@ -38,3 +38,4 @@ node_modules
 # IDE
 .idea
 .tmp/
+.DS_Store
