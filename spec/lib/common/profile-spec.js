@@ -55,17 +55,17 @@ describe('Profiles', function () {
         it('should load profiles', function() {
             var self = this;
             var profiles = [
-                { name: 'profile 1', contents: 'profile 1 contents'},
-                { name: 'profile 2', contents: 'profile 2 contents'},
-                { name: 'profile 3', contents: 'profile 3 contents'}
+                { name: 'profile 1', contents: new Buffer('profile 1 contents') },
+                { name: 'profile 2', contents: new Buffer('profile 2 contents') },
+                { name: 'profile 3', contents: new Buffer('profile 3 contents') }
             ];
             loader.prototype.getAll.resolves(profiles);
 
             return this.subject.load()
             .then(function() {
-                expect(self.subject.put.firstCall.args[1]).to.deep.equal(profiles[0]);
-                expect(self.subject.put.secondCall.args[1]).to.deep.equal(profiles[1]);
-                expect(self.subject.put.thirdCall.args[1]).to.deep.equal(profiles[2]);
+                expect(self.subject.put.firstCall.args[1]).to.deep.equal(profiles[0].toString());
+                expect(self.subject.put.secondCall.args[1]).to.deep.equal(profiles[1].toString());
+                expect(self.subject.put.thirdCall.args[1]).to.deep.equal(profiles[2].toString());
             });
         });
     });
