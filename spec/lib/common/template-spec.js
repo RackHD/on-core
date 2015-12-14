@@ -55,17 +55,17 @@ describe('Templates', function () {
         it('should load templates', function() {
             var self = this;
             var templates = [
-                { name: 'template 1', contents: 'template 1 contents'},
-                { name: 'template 2', contents: 'template 2 contents'},
-                { name: 'template 3', contents: 'template 3 contents'}
+                { name: 'template 1', contents: new Buffer('template 1 contents') },
+                { name: 'template 2', contents: new Buffer('template 2 contents') },
+                { name: 'template 3', contents: new Buffer('template 3 contents') }
             ];
             loader.prototype.getAll.resolves(templates);
 
             return this.subject.load()
             .then(function() {
-                expect(self.subject.put.firstCall.args[1]).to.deep.equal(templates[0]);
-                expect(self.subject.put.secondCall.args[1]).to.deep.equal(templates[1]);
-                expect(self.subject.put.thirdCall.args[1]).to.deep.equal(templates[2]);
+                expect(self.subject.put.firstCall.args[1]).to.deep.equal(templates[0].toString());
+                expect(self.subject.put.secondCall.args[1]).to.deep.equal(templates[1].toString());
+                expect(self.subject.put.thirdCall.args[1]).to.deep.equal(templates[2].toString());
             });
         });
     });
