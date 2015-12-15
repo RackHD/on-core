@@ -158,10 +158,10 @@ describe('Templates', function () {
         it('should update an existing template', function() {
             var self = this;
             waterline.templates.findOne.resolves('not empty');
-            return self.subject.put('test template', 'test contents')
+            return self.subject.put('test template', 'test contents', 'sku')
             .then(function() {
                 expect(waterline.templates.update).to.have.been.calledWith(
-                    { name: 'test template' },
+                    { name: 'test template', scope: 'sku' },
                     { contents: 'test contents' }
                 );
             });
