@@ -8,7 +8,7 @@ describe("Event protocol subscribers", function () {
         testMessage,
         messenger,
         events;
-        
+
     helper.before();
 
     before(function () {
@@ -16,7 +16,7 @@ describe("Event protocol subscribers", function () {
         messenger = helper.injector.get('Services.Messenger');
         var Message = helper.injector.get('Message');
         var Subscription = helper.injector.get('Subscription');
-        
+
         testSubscription = new Subscription({},{});
         testMessage = new Message({},{},{});
         sinon.stub(testMessage);
@@ -110,25 +110,27 @@ describe("Event protocol subscribers", function () {
     });
 
     describe("publish/subscribe TaskFinished", function () {
-
         it("should publish and subscribe to TaskFinished messages", function () {
-            //NOTE: no matching internal code to listen for these events
             var uuid = helper.injector.get('uuid'),
-                taskId = uuid.v4(),
-                data = {foo: 'bar'};
+                domain = 'default',
+                data = {
+                    taskId: uuid.v4(),
+                    graphId: uuid.v4(),
+                    state: 'succeeded',
+                    terminalOnStates: ['failed', 'timeout']
+                };
             messenger.subscribe = sinon.spy(function(a,b,callback) {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
             messenger.publish.resolves();
-            return events.subscribeTaskFinished(taskId, function (_data) {
-                expect(_data).to.equal(data);
-                return data;
+
+            return events.subscribeTaskFinished(domain, function (_data) {
+                expect(_data).to.deep.equal(data);
             }).then(function (subscription) {
                 expect(subscription).to.be.ok;
-                return events.publishTaskFinished(taskId, data);
-            }).then(function () {
-                return events.publishTaskFinished(taskId, undefined);
+                return events.publishTaskFinished(
+                    domain, data.taskId, data.graphId, data.state, data.terminalOnStates);
             });
         });
     });
@@ -200,7 +202,7 @@ describe("Event protocol subscribers", function () {
             });
         });
     });
-    
+
     describe("publish various errors/event", function () {
         it("should publish an ignored error", function () {
             var testError = Error('ignore');

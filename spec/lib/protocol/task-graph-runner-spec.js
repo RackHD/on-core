@@ -8,6 +8,8 @@ describe("TaskGraph Runner protocol functions", function () {
         testMessage,
         messenger,
         taskgraphrunner,
+        uuid,
+        Constants,
         sampleError = new Error('someError');
 
     helper.before();
@@ -15,9 +17,11 @@ describe("TaskGraph Runner protocol functions", function () {
     before(function () {
         taskgraphrunner = helper.injector.get('Protocol.TaskGraphRunner');
         messenger = helper.injector.get('Services.Messenger');
+        uuid = helper.injector.get('uuid');
+        Constants = helper.injector.get('Constants');
         var Message = helper.injector.get('Message');
         var Subscription = helper.injector.get('Subscription');
-        
+
         testSubscription = new Subscription({},{});
         testMessage = new Message({},{},{});
         sinon.stub(testMessage);
@@ -26,496 +30,67 @@ describe("TaskGraph Runner protocol functions", function () {
 
     helper.after();
 
-    describe("getTaskGraphLibrary", function() {
-        it("should subscribe and receive getTaskGraphLibrary results", function() {
-            var self = this,
-                testFilter = { foo: 'bar'},
-                testData = { abc: '123' };
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback({filter:testFilter},testMessage);
-                return Promise.resolve(testSubscription);
-            });
-            messenger.request.resolves({value:testData});   
-            return taskgraphrunner.subscribeGetTaskGraphLibrary(function(filter) {
-                expect(filter).to.deep.equal(testFilter);
-                return testData;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.getTaskGraphLibrary(testFilter);
-            }).then(function(data) {
-                expect(data).to.deep.equal(testData);
-            });
-        });
-
-        it("should subscribe and receive getTaskGraphLibrary results without a filter", function() {
-            var self = this,
-                testData = { abc: '123' };
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback({filter:{}},testMessage);
-                return Promise.resolve(testSubscription);
-            });
-            messenger.request.resolves({value:testData});
-            return taskgraphrunner.subscribeGetTaskGraphLibrary(function(filter) {
-                expect(filter).to.be.undefined;
-                return testData;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.getTaskGraphLibrary();
-            }).then(function(data) {
-                expect(data).to.deep.equal(testData);
-            });
-        });
-
-        it("should subscribe and receive getTaskGraphLibrary failures", function() {
-            var self = this,
-                testFilter = { foo: 'bar'};
-            messenger.request.rejects(sampleError); 
-            return taskgraphrunner.subscribeGetTaskGraphLibrary(function(filter) {
-                expect(filter).to.deep.equal(testFilter);
-                throw sampleError;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.getTaskGraphLibrary(testFilter);
-            }).should.be.rejectedWith(sampleError);
-        });
-    });
-
-    describe("getTaskLibrary", function() {
-        it("should subscribe and receive getTaskLibrary results", function() {
-            var self = this,
-                testFilter = { foo: 'bar'},
-                testData = { abc: '123' };
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback({filter:testFilter},testMessage);
-                return Promise.resolve(testSubscription);
-            });
-            messenger.request.resolves({value:testData});
-            return taskgraphrunner.subscribeGetTaskLibrary(function(filter) {
-                expect(filter).to.deep.equal(testFilter);
-                return testData;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.getTaskLibrary(testFilter);
-            }).then(function(data) {
-                expect(data).to.deep.equal(testData);
-            });
-        });
-
-        it("should subscribe and receive getTaskLibrary results without a filter", function() {
-            var self = this,
-                testData = { abc: '123' };
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback({filter:{}},testMessage);
-                return Promise.resolve(testSubscription);
-            });
-            messenger.request.resolves({value:testData});
-            return taskgraphrunner.subscribeGetTaskLibrary(function(filter) {
-                expect(filter).to.be.undefined;
-                return testData;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.getTaskLibrary();
-            }).then(function(data) {
-                expect(data).to.deep.equal(testData);
-
-            });
-        });
-
-        it("should subscribe and receive getTaskLibrary failures", function() {
-            var self = this,
-                testFilter = { foo: 'bar'};
-            messenger.request.rejects(sampleError); 
-            return taskgraphrunner.subscribeGetTaskLibrary(function(filter) {
-                expect(filter).to.deep.equal(testFilter);
-                throw sampleError;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.getTaskLibrary(testFilter);
-            }).should.be.rejectedWith(sampleError);
-        });
-    });
-
-    describe("getActiveTaskGraph", function() {
-        it("should subscribe and receive getActiveTaskGraph results", function() {
-            var self = this,
-                testFilter = { foo: 'bar'},
-                testData = { abc: '123' };
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback({filter:testFilter},testMessage);
-                return Promise.resolve(testSubscription);
-            });
-            messenger.request.resolves({value:testData});
-            return taskgraphrunner.subscribeGetActiveTaskGraph(function(filter) {
-                expect(filter).to.deep.equal(testFilter);
-                return testData;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.getActiveTaskGraph(testFilter);
-            }).then(function(data) {
-                expect(data).to.deep.equal(testData);
-            });
-        });
-
-        it("should subscribe and receive getActiveTaskGraph results without a filter", function() {
-            var self = this,
-                testData = { abc: '123' };
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback({filter:{}},testMessage);
-                return Promise.resolve(testSubscription);
-            });
-            messenger.request.resolves({value:testData});
-            return taskgraphrunner.subscribeGetActiveTaskGraph(function(filter) {
-                expect(filter).to.be.undefined;
-                return testData;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.getActiveTaskGraph();
-            }).then(function(data) {
-                expect(data).to.deep.equal(testData);
-
-            });
-        });
-
-        it("should subscribe and receive getActiveTaskGraph failures", function() {
-            var self = this,
-                testFilter = { foo: 'bar'};
-            messenger.request.rejects(sampleError); 
-            return taskgraphrunner.subscribeGetActiveTaskGraph(function(filter) {
-                expect(filter).to.deep.equal(testFilter);
-                throw sampleError;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.getActiveTaskGraph(testFilter);
-            }).should.be.rejectedWith(sampleError);
-        });
-    });
-
-    describe("getActiveTaskGraphs", function() {
-        it("should subscribe and receive getActiveTaskGraphs results", function() {
-            var self = this,
-                testFilter = { foo: 'bar'},
-                testData = { abc: '123' };
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback({filter:testFilter},testMessage);
-                return Promise.resolve(testSubscription);
-            });
-            messenger.request.resolves({value:testData});
-            return taskgraphrunner.subscribeGetActiveTaskGraphs(function(filter) {
-                expect(filter).to.deep.equal(testFilter);
-                return testData;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.getActiveTaskGraphs(testFilter);
-            }).then(function(data) {
-                expect(data).to.deep.equal(testData);
-            });
-        });
-
-        it("should subscribe and receive getActiveTaskGraphs results without a filter", function() {
-            var self = this,
-                testData = { abc: '123' };
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback({filter:{}},testMessage);
-                return Promise.resolve(testSubscription);
-            });
-            messenger.request.resolves({value:testData});
-            return taskgraphrunner.subscribeGetActiveTaskGraphs(function(filter) {
-                expect(filter).to.be.undefined;
-                return testData;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.getActiveTaskGraphs();
-            }).then(function(data) {
-                expect(data).to.deep.equal(testData);
-            });
-        });
-
-        it("should subscribe and receive getActiveTaskGraphs failures", function() {
-            var self = this,
-                testFilter = { foo: 'bar'};
-            messenger.request.rejects(sampleError); 
-            return taskgraphrunner.subscribeGetActiveTaskGraphs(function(filter) {
-                expect(filter).to.deep.equal(testFilter);
-                throw sampleError;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.getActiveTaskGraphs(testFilter);
-            }).should.be.rejectedWith(sampleError);
-        });
-    });
-
-    describe("defineTaskGraph", function() {
-        it("should subscribe and receive defineTaskGraph results", function() {
-            var self = this,
-                testFilter = { foo: 'bar'},
-                testData = { abc: '123' };
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback({definition:{}},testMessage);
-                return Promise.resolve(testSubscription);
-            });
-            messenger.request.resolves({value:testData});
-            return taskgraphrunner.subscribeDefineTaskGraph(function(filter) {
-                expect(filter).to.deep.equal(testFilter);
-                return testData;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.defineTaskGraph(testFilter);
-            }).then(function(data) {
-                expect(data).to.deep.equal(testData);
-            });
-        });
-
-        it("should subscribe and receive defineTaskGraph results without a filter", function() {
-            var self = this,
-                testData = { abc: '123' },
-                testDef = { definition: 'abc' };
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback({value:testDef},testMessage);
-                return Promise.resolve(testSubscription);
-            });
-            messenger.request.resolves({value:testData});
-            return taskgraphrunner.subscribeDefineTaskGraph(function(filter) {
-                expect(filter).to.be.undefined;
-                return testData;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.defineTaskGraph(testDef);
-            }).then(function(data) {
-                expect(data).to.deep.equal(testData);
-            });
-        });
-
-        it("should subscribe and receive defineTaskGraph failures", function() {
-            var self = this,
-                testFilter = { foo: 'bar'};
-            messenger.request.rejects(sampleError); 
-            return taskgraphrunner.subscribeDefineTaskGraph(function(filter) {
-                expect(filter).to.deep.equal(testFilter);
-                throw sampleError;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                testSubscription = subscription;
-
-                return taskgraphrunner.defineTaskGraph(testFilter);
-            }).should.be.rejectedWith(sampleError);
-        });
-    });
-
-    describe("defineTask", function() {
-        it("should subscribe and receive defineTask results", function() {
-            var self = this,
-                testFilter = { foo: 'bar'},
-                testData = { abc: '123' };
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback({definition:{}},testMessage);
-                return Promise.resolve(testSubscription);
-            });
-            messenger.request.resolves({value:testData});
-            return taskgraphrunner.subscribeDefineTask(function(filter) {
-                expect(filter).to.deep.equal(testFilter);
-                return testData;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.defineTask(testFilter);
-            }).then(function(data) {
-                expect(data).to.deep.equal(testData);
-            });
-        });
-
-        it("should subscribe and receive defineTask results without a filter", function() {
-            var self = this,
-                testData = { abc: '123' },
-                testDef = { definition: 'abc' };
-            messenger.request.resolves({value:testData});
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback({value:testDef},testMessage);
-                return Promise.resolve(testSubscription);
-            });
-            return taskgraphrunner.subscribeDefineTask(function(filter) {
-                expect(filter).to.be.undefined;
-                return testData;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.defineTask(testDef);
-            }).then(function(data) {
-                expect(data).to.deep.equal(testData);
-            });
-        });
-
-        it("should subscribe and receive defineTask failures", function() {
-            var self = this,
-                testFilter = { foo: 'bar'};
-            messenger.request.rejects(sampleError); 
-            return taskgraphrunner.subscribeDefineTask(function(filter) {
-                expect(filter).to.deep.equal(testFilter);
-                throw sampleError;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.defineTask(testFilter);
-            }).should.be.rejectedWith(sampleError);
-        });
-    });
-
     describe("runTaskGraph", function() {
-        it("should subscribe and receive runTaskGraph results", function() {
-            var self = this,
-                testFilter = { foo: 'bar'},
-                testData = { abc: '123' };
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback({filter:testFilter},testMessage);
-                return Promise.resolve(testSubscription);
-            });
-            messenger.request.resolves({value:testData});
-            return taskgraphrunner.subscribeRunTaskGraph(function(filter) {
-                expect(filter).to.deep.equal(testFilter);
-                return testData;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.runTaskGraph(testFilter);
-            }).then(function(data) {
-                expect(data).to.deep.equal(testData);
+        it("should publish to runTaskGraph", function() {
+            var graphId = uuid.v4();
+            messenger.publish.resolves();
+
+            return taskgraphrunner.runTaskGraph('default', graphId)
+            .then(function() {
+                expect(messenger.publish).to.have.been.calledOnce;
+                expect(messenger.publish).to.have.been.calledWith(
+                    Constants.Protocol.Exchanges.TaskGraphRunner.Name,
+                    'methods.runTaskGraph.default',
+                    { graphId: graphId }
+                );
             });
         });
 
-        it("should subscribe and receive runTaskGraph results without a filter", function() {
-            var self = this,
-                testData = { abc: '123' },
-                testOpts = { 
-                    name: 'abc',
-                    options: {},
-                    target: '' 
-                };
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback({value:testOpts},testMessage);
-                return Promise.resolve(testSubscription);
-            });
-            messenger.request.resolves({value:testData});
-            return taskgraphrunner.subscribeRunTaskGraph(function(filter) {
-                expect(filter).to.be.undefined;
-                return testData;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.runTaskGraph(testOpts);
-            }).then(function(data) {
-                expect(data).to.deep.equal(testData);
-            });
-        });
+        it("should receive runTaskGraph results", function() {
+            messenger.subscribe = sinon.stub.resolves();
 
-        it("should subscribe and receive runTaskGraph failures", function() {
-            var self = this,
-                testFilter = { foo: 'bar'};
-            messenger.request.rejects(sampleError); 
-            return taskgraphrunner.subscribeRunTaskGraph(function(filter) {
-                expect(filter).to.deep.equal(testFilter);
-                throw sampleError;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.runTaskGraph(testFilter);
-            }).should.be.rejectedWith(sampleError);
+            return taskgraphrunner.subscribeRunTaskGraph(
+                'default', function() { }
+            ).then(function() {
+                expect(messenger.subscribe).to.have.been.calledOnce;
+                expect(messenger.subscribe).to.have.been.calledWith(
+                    Constants.Protocol.Exchanges.TaskGraphRunner.Name,
+                    'methods.runTaskGraph.default',
+                    function() {}
+                );
+            });
         });
     });
 
     describe("cancelTaskGraph", function() {
         it("should subscribe and receive cancelTaskGraph results", function() {
-            var self = this,
-                testFilter = { foo: 'bar'},
-                testData = { abc: '123' };
+            var graphId = uuid.v4();
+
             messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback(testFilter,testMessage);
+                callback(graphId,testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.request.resolves({value:testData});
-            return taskgraphrunner.subscribeCancelTaskGraph(function(filter) {
-                expect(filter).to.deep.equal(testFilter);
-                return testData;
+
+            messenger.request.resolves({value:graphId});
+            return taskgraphrunner.subscribeCancelTaskGraph(function() {
+                return graphId;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-                return taskgraphrunner.cancelTaskGraph(testFilter);
+                return taskgraphrunner.cancelTaskGraph(graphId);
             }).then(function(data) {
-                expect(data).to.deep.equal(testData);
+                expect(data).to.deep.equal(graphId);
             });
         });
 
         it("should subscribe and receive cancelTaskGraph failures", function() {
-            var self = this,
-                testFilter = { foo: 'bar'};
-            messenger.request.rejects(sampleError); 
-            return taskgraphrunner.subscribeCancelTaskGraph(function(filter) {
-                expect(filter).to.deep.equal(testFilter);
-                throw sampleError;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.cancelTaskGraph(testFilter);
-            }).should.be.rejectedWith(sampleError);
-        });
-    });
-
-    describe("pauseTaskGraph", function() {
-        it("should subscribe and receive pauseTaskGraph results", function() {
-            var self = this,
-                testFilter = { foo: 'bar'},
-                testData = { abc: '123' };
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback(testFilter,testMessage);
-                return Promise.resolve(testSubscription);
-            });
-            messenger.request.resolves({value:testData});
-            return taskgraphrunner.subscribePauseTaskGraph(function(filter) {
-                expect(filter).to.deep.equal(testFilter);
-                return testData;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.pauseTaskGraph(testFilter);
-            }).then(function(data) {
-                expect(data).to.deep.equal(testData);
-            });
-        });
-
-        it("should subscribe and receive pauseTaskGraph failures", function() {
-            var self = this,
-                testFilter = { foo: 'bar'};
-            messenger.request.rejects(sampleError); 
-            return taskgraphrunner.subscribePauseTaskGraph(function(filter) {
-                expect(filter).to.deep.equal(testFilter);
-                throw sampleError;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.pauseTaskGraph(testFilter);
-            }).should.be.rejectedWith(sampleError);
-        });
-    });
-
-    describe("resumeTaskGraph", function() {
-        it("should subscribe and receive resumeTaskGraph results", function() {
-            var self = this,
-                testFilter = { foo: 'bar'},
-                testData = { abc: '123' };
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback(testFilter,testMessage);
-                return Promise.resolve(testSubscription);
-            });
-            messenger.request.resolves({value:testData});
-            return taskgraphrunner.subscribeResumeTaskGraph(function(filter) {
-                expect(filter).to.deep.equal(testFilter);
-                return testData;
-            }).then(function(subscription) {
-                expect(subscription).to.be.ok;
-                return taskgraphrunner.resumeTaskGraph(testFilter);
-            }).then(function(data) {
-                expect(data).to.deep.equal(testData);
-            });
-        });
-
-        it("should subscribe and receive resumeTaskGraph failures", function() {
-            var self = this,
-                testFilter = { foo: 'bar'};
+            var graphId = uuid.v4();
             messenger.request.rejects(sampleError);
-            return taskgraphrunner.subscribeResumeTaskGraph(function(filter) {
-                expect(filter).to.deep.equal(testFilter);
+            return taskgraphrunner.subscribeCancelTaskGraph(function(_graphId) {
+                expect(_graphId).to.deep.equal(graphId);
                 throw sampleError;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-                return taskgraphrunner.resumeTaskGraph(testFilter);
+                return taskgraphrunner.cancelTaskGraph(graphId);
             }).should.be.rejectedWith(sampleError);
         });
     });

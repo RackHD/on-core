@@ -9,7 +9,7 @@ describe("Task protocol functions", function() {
         events,
         task,
         Errors;
-        
+
     helper.before();
 
     before(function () {
@@ -551,7 +551,7 @@ describe("Task protocol functions", function() {
     });
 
     describe("SNMPCommandResult", function() {
-        
+
         it("should subscribe and receive snmpCommand results", function() {
             var uuid = helper.injector.get('uuid'),
                 testUuid = uuid.v4(),
