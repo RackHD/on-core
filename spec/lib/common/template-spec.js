@@ -188,7 +188,7 @@ describe('Templates', function () {
             return this.subject.load()
             .then(function() {
                 expect(Logger.prototype.log).to.have.been.calledWithMatch(
-                    'warning', /Unable to load templates/, { error: new Error() });
+                    'error', /Unable to load templates/, { error: new Error() });
             });
         });
 
@@ -197,7 +197,7 @@ describe('Templates', function () {
             return this.subject.load()
             .then(function() {
                 expect(Logger.prototype.log).to.not.have.been.calledWithMatch(
-                    'warning', /Unable to load templates/, { error: new Error() });
+                    'error', /Unable to load templates/, { error: new Error() });
             });
         });
     });

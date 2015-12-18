@@ -147,7 +147,7 @@ describe("ChildProcess", function () {
             child.resolve();
             expect(log).to.have.been.calledOnce;
             expect(log).to.have.been.calledWith(
-                "warning", "ChildProcess promise has already been resolved");
+                "error", "ChildProcess promise has already been resolved");
         });
 
         it("should not reject twice", function() {
@@ -155,7 +155,7 @@ describe("ChildProcess", function () {
             child.reject();
             expect(log).to.have.been.calledOnce;
             expect(log).to.have.been.calledWith(
-                "warning", "ChildProcess promise has already been rejected");
+                "error", "ChildProcess promise has already been rejected");
         });
     });
 
