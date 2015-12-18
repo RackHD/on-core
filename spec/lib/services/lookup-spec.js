@@ -39,41 +39,41 @@ describe('Lookup Service', function () {
             spy2 = sinon.spy();
 
         function assertEmptyNodeIdCacheObject() {
-          expect(lookupService.nodeIdCache).to.be.ok;
-          expect(Object.keys(lookupService.nodeIdCache).length).to.equal(0);
+            expect(lookupService.nodeIdCache).to.be.ok;
+            expect(lookupService.nodeIdCache.length).to.equal(0);
         }
 
         it('should start with an empty nodeCache', function () {
-          assertEmptyNodeIdCacheObject();
+            assertEmptyNodeIdCacheObject();
         });
 
         it('should allow multple simultaneous cache checks', function () {
-          expect(lookupService.checkNodeIdCache('testAddress')).to.be.null;
-          lookupService.checkNodeIdCache('testAddress').then(spy1, spy1);
-          lookupService.checkNodeIdCache('testAddress').then(spy2, spy2);
+            expect(lookupService.checkNodeIdCache('testAddress')).to.be.null;
+            lookupService.checkNodeIdCache('testAddress').then(spy1, spy1);
+            lookupService.checkNodeIdCache('testAddress').then(spy2, spy2);
         });
 
         it('should resolve pending cache checks once a value is assigned', function (done) {
-          lookupService.assignNodeIdCache('testAddress', 'nodeId');
-          setTimeout(function () {
-            expect(spy1.called).to.be.ok;
-            expect(spy2.called).to.be.ok;
-            done();
-          }, 0);
+            lookupService.assignNodeIdCache('testAddress', 'nodeId');
+            setTimeout(function () {
+                expect(spy1.called).to.be.ok;
+                expect(spy2.called).to.be.ok;
+                done();
+            }, 0);
         });
 
         it('should immediately resolve from cache', function (done) {
-          lookupService.checkNodeIdCache('testAddress').then(function (nodeId) {
-            expect(nodeId).to.equal('nodeId');
-            done();
-          });
+            lookupService.checkNodeIdCache('testAddress').then(function (nodeId) {
+                expect(nodeId).to.equal('nodeId');
+                done();
+            }, done);
         });
 
         it('should be able to be cleared and reset', function () {
-          lookupService.clearNodeIdCache('testAddress');
-          expect(lookupService.nodeIdCache.testAddress).to.equal(null);
-          lookupService.resetNodeIdCache();
-          assertEmptyNodeIdCacheObject();
+            lookupService.clearNodeIdCache('testAddress');
+            expect(lookupService.nodeIdCache.has('testAddress')).to.be.false;
+            lookupService.resetNodeIdCache();
+            assertEmptyNodeIdCacheObject();
         });
     });
 
