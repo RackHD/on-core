@@ -53,7 +53,7 @@ describe('Lookup Service', function () {
           lookupService.checkNodeIdCache('testAddress').then(spy2, spy2);
         });
 
-        it('should resolve pending cache checks once a value is assigned', function () {
+        it('should resolve pending cache checks once a value is assigned', function (done) {
           lookupService.assignNodeIdCache('testAddress', 'nodeId');
           setTimeout(function () {
             expect(spy1.called).to.be.ok;
