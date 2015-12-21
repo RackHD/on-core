@@ -143,7 +143,7 @@ describe('Profiles', function () {
             return this.subject.load()
             .then(function() {
                 expect(Logger.prototype.log).to.have.been.calledWithMatch(
-                    'warning', /Unable to load profiles/, { error: new Error() });
+                    'error', /Unable to load profiles/, { error: new Error() });
             });
         });
 
@@ -152,7 +152,7 @@ describe('Profiles', function () {
             return this.subject.load()
             .then(function() {
                 expect(Logger.prototype.log).to.not.have.been.calledWithMatch(
-                    'warning', /Unable to load profiles/, { error: new Error() });
+                    'error', /Unable to load profiles/, { error: new Error() });
             });
         });
     });
