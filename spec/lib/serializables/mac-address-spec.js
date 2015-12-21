@@ -37,8 +37,16 @@ describe('MacAddress', function () {
 
     describe('validation', function () {
         describe('resolved', function () {
-            it('should resolve if valid', function () {
-                return this.subject.validate();
+            it('should resolve if it is six groups of two hexadecimal digits, separated by colons', function () {
+                return new MacAddress({ value: '00:11:22:33:44:55' }).validate();
+            });
+            
+            it('should resolve if it is six groups of two hexadecimal digits, separated by hyphens', function () {
+                return new MacAddress({ value: '00-11-22-33-44-55' }).validate();
+            });
+            
+            it('should resolve if it is three groups of four hexadecimal digits separated by dots', function () {
+                return new MacAddress({ value: '0011.2233.4455' }).validate();
             });
         });
 
