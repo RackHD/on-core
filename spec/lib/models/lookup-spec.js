@@ -92,6 +92,24 @@ describe('Models.Lookup', function () {
                     });
                 });
             });
+
+            it('should call with empty criteria for empty term', function() {
+                var find = this.sandbox.stub(waterline.lookups, 'find').resolves([]);
+
+                return waterline.lookups.findByTerm('').then(function (records) {
+                    expect(records).to.deep.equal([]);
+                    expect(find).to.have.been.calledWith({});
+                });
+            });
+
+            it('should call with empty criteria if no term', function() {
+                var find = this.sandbox.stub(waterline.lookups, 'find').resolves([]);
+
+                return waterline.lookups.findByTerm().then(function (records) {
+                    expect(records).to.deep.equal([]);
+                    expect(find).to.have.been.calledWith({});
+                });
+            });
         });
 
         describe('findOneByTerm', function () {
