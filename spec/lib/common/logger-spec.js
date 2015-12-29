@@ -72,15 +72,11 @@ describe('Logger', function () {
         });
 
         [
-            'emerg',
-            'alert',
-            'crit',
+            'critical',
             'error',
             'warning',
-            'notice',
             'info',
-            'debug',
-            'silly'
+            'debug'
         ].forEach(function (level) {
             describe(level, function () {
                 before(function () {
@@ -165,4 +161,3 @@ describe('Logger', function () {
         });
     });
 });
-
