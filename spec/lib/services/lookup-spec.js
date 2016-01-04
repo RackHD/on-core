@@ -34,7 +34,54 @@ describe('Lookup Service', function () {
 
     helper.after();
 
+    describe('Node ID Cache', function () {
+        var spy1 = sinon.spy(),
+            spy2 = sinon.spy();
+
+        function assertEmptyNodeIdCacheObject() {
+            expect(lookupService.nodeIdCache).to.be.ok;
+            expect(lookupService.nodeIdCache.length).to.equal(0);
+        }
+
+        it('should start with an empty nodeCache', function () {
+            assertEmptyNodeIdCacheObject();
+        });
+
+        it('should allow multple simultaneous cache checks', function () {
+            expect(lookupService.checkNodeIdCache('testAddress')).to.be.null;
+            lookupService.checkNodeIdCache('testAddress').then(spy1, spy1);
+            lookupService.checkNodeIdCache('testAddress').then(spy2, spy2);
+        });
+
+        it('should resolve pending cache checks once a value is assigned', function (done) {
+            lookupService.assignNodeIdCache('testAddress', 'nodeId');
+            setTimeout(function () {
+                expect(spy1.called).to.be.ok;
+                expect(spy2.called).to.be.ok;
+                done();
+            }, 0);
+        });
+
+        it('should immediately resolve from cache', function (done) {
+            lookupService.checkNodeIdCache('testAddress').then(function (nodeId) {
+                expect(nodeId).to.equal('nodeId');
+                done();
+            }, done);
+        });
+
+        it('should be able to be cleared and reset', function () {
+            lookupService.clearNodeIdCache('testAddress');
+            expect(lookupService.nodeIdCache.has('testAddress')).to.be.false;
+            lookupService.resetNodeIdCache();
+            assertEmptyNodeIdCacheObject();
+        });
+    });
+
     describe('macAddressToNodeId', function () {
+        beforeEach(function () {
+          lookupService.resetNodeIdCache();
+        });
+
         it('should call findByTerm with macAddress', function() {
             var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(lookup);
 
@@ -181,6 +228,10 @@ describe('Lookup Service', function () {
     });
 
     describe('ipAddressToNodeId', function () {
+        beforeEach(function () {
+          lookupService.resetNodeIdCache();
+        });
+
         it('should call findByTerm with ipAddress', function() {
             var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(lookup);
 
@@ -289,4 +340,3 @@ describe('Lookup Service', function () {
         });
     });
 });
-
