@@ -128,7 +128,7 @@ global.helper = {
         if (overrides !== undefined) {
             // Overrids could be a single or an array so treat them
             // as equivalents by flattening.
-            _.flatten([overrides]).forEach(function (override) {
+            _.flattenDeep([overrides]).forEach(function (override) {
                 // Get the provider string for the current override.
                 var provides = provider(override);
 

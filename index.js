@@ -11,7 +11,7 @@ module.exports = function (di, directory) {
 
     return {
         helper: helper,
-        injectables: _.flatten(
+        injectables: _.flattenDeep(
             [
                 // NPM Packages
                 helper.simpleWrapper(_, '_'),
