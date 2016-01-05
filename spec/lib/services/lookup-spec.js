@@ -71,7 +71,7 @@ describe('Lookup Service', function () {
 
         it('should be able to be cleared and reset', function () {
             lookupService.clearNodeIdCache('testAddress');
-            expect(lookupService.nodeIdCache.has('testAddress')).to.be.false;
+            expect(lookupService.nodeIdCache.peek('testAddress')).to.be.null;
             lookupService.resetNodeIdCache();
             assertEmptyNodeIdCacheObject();
         });
