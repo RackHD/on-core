@@ -15,8 +15,8 @@ describe('Connection', function () {
 
     beforeEach(function () {
         this.subject = new Connection({
-            uri: this.uri
-        });
+            url: this.uri
+        }, {}, 'test');
     });
 
     afterEach(function () {
@@ -39,6 +39,36 @@ describe('Connection', function () {
                 return this.subject.start().then(function () {
                     return self.subject.start().should.be.rejected;
                 });
+            });
+
+            it('should reject on max retry attempts', function() {
+                this.subject.maxConnectionRetries = 3;
+                var startPromise = this.subject.start();
+                this.subject.connection.removeAllListeners('ready');
+                this.subject.connection.emit('error', new Error('test'));
+                this.subject.connection.emit('error', new Error('test'));
+                this.subject.connection.emit('error', new Error('test'));
+                this.subject.connection.emit('error', new Error('test'));
+                return expect(startPromise).to.be.rejectedWith(/Exceeded max retries/);
+            });
+
+            it('should increment retry attempts if initial connection fails', function() {
+                this.subject.initialConnection = false;
+                this.subject.start();
+                this.subject.connection.removeAllListeners('ready');
+                this.subject.connection.emit('error', new Error('test'));
+                this.subject.connection.emit('error', new Error('test'));
+                this.subject.connection.emit('error', new Error('test'));
+                expect(this.subject.initialConnectionRetries).to.equal(3);
+            });
+
+            it('should not increment retry attempts if initial connection succeeded', function() {
+                this.subject.initialConnection = true;
+                this.subject.start();
+                this.subject.connection.removeAllListeners('ready');
+                this.subject.connection.emit('error', new Error('test'));
+                this.subject.connection.emit('error', new Error('test'));
+                expect(this.subject.initialConnectionRetries).to.equal(0);
             });
         });
 
@@ -81,48 +111,6 @@ describe('Connection', function () {
 
             it('should reject if not running', function () {
                 return this.subject.stop().should.be.rejected;
-            });
-        });
-
-        describe('errors', function() {
-            it('should emit errors from the underlying connection', function(done) {
-                var self = this;
-
-                this.subject.once('error', function (error) {
-                    try {
-                        error.should.be.an.instanceof(Error);
-                        error.message.should.be.equal('Fake');
-                        done();
-                    } catch(e) {
-                        done(e);
-                    }
-                });
-
-                return this.subject.start().then(function () {
-                    self.subject.connection.emit('error', new Error('Fake'));
-                });
-            });
-
-            it('should not emit ECONNRESET errors from the underlying connection', function(done) {
-                var self = this;
-
-                this.subject.once('error', function (error) {
-                    try {
-                        error.should.be.an.instanceof(Error);
-                        error.message.should.be.equal('Fake');
-                        done();
-                    } catch(e) {
-                        done(e);
-                    }
-                });
-
-                return this.subject.start().then(function () {
-                    var error = new Error();
-                    error.code = 'ECONNRESET';
-
-                    self.subject.connection.emit('error', error);
-                    self.subject.connection.emit('error', new Error('Fake'));
-                });
             });
         });
     });
