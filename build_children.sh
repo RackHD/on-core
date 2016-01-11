@@ -5,7 +5,7 @@
 if [ "$AUTH_TOKEN" == "XXXXXXXX" ]; then
 	echo "You have access!"
 else
-	echo "ACCESS DENIED!"
+	echo "ACCESS DENIED"
 fi
 
 
