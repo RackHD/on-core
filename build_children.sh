@@ -2,10 +2,6 @@
 
 # Copyright 2015, EMC, Inc.
 
-set -e
-set -x
-
-
 if [ "$AUTH_TOKEN" == "XXXXXXXX" ]; then
 	echo "You have access!"
 else
