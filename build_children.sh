@@ -10,10 +10,10 @@ fi
 
 
 # Get last child project build number
-BUILD_NUM_DHCP=$(curl -s 'https://api.travis-ci.org/repos/RackHD/on-dhcp-proxy/builds' | grep -o '^\[{"id":[0-9]*,' | grep -o '[0-9]' | tr -d '\n')
+BUILD_NUM_DHCP=$(curl -s 'https://api.travis-ci.org/repos/tldavies/on-dhcp-proxy/builds' | grep -o '^\[{"id":[0-9]*,' | grep -o '[0-9]' | tr -d '\n')
 BUILD_NUM_HTTP=$(curl -s 'https://api.travis-ci.org/repos/tldavies/on-http/builds' | grep -o '^\[{"id":[0-9]*,' | grep -o '[0-9]' | tr -d '\n')
-BUILD_NUM_TFP=$(curl -s 'https://api.travis-ci.org/repos/RackHD/on-core/builds' | grep -o '^\[{"id":[0-9]*,' | grep -o '[0-9]' | tr -d '\n')
-BUILD_NUM_TASKS=$(curl -s 'https://api.travis-ci.org/repos/RackHD/on-core/builds' | grep -o '^\[{"id":[0-9]*,' | grep -o '[0-9]' | tr -d '\n')
+BUILD_NUM_TFP=$(curl -s 'https://api.travis-ci.org/repos/RackHD/on-tftp/builds' | grep -o '^\[{"id":[0-9]*,' | grep -o '[0-9]' | tr -d '\n')
+BUILD_NUM_TASKS=$(curl -s 'https://api.travis-ci.org/repos/RackHD/on-tasks/builds' | grep -o '^\[{"id":[0-9]*,' | grep -o '[0-9]' | tr -d '\n')
 
 
 # Restart last child project build
