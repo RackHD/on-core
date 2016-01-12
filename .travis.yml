@@ -15,7 +15,7 @@ services:
 env:
   global:
     - secure: "jBZOhu9/PoM4WQnXwtTiRauK41mNrSNBc4UIgBAq+cm2wHzMMokORNoeTzo5+Gbb+Kt5LAbv5+SioAWBEh8hoDSozYOjwqCkS+4mB7+68JsnnL4/GdU3XCO52qIhOtGEoipsoeEn1buhU+CS4iW8jbuJYT98WIcj0wY7o9JzS6ks/IoSeSF2P8/6nH8KoDAyXMmtadcEHIpkNo/uUafrsaWLGxdFxDyeT+k0nH0MTW/rVV0jyx4Kl+XeUpaQ4kOPlTN91c25qKoJvSSKlK8RbqAJ8y/IONg3+M1MiePJGsX9YJLtfDLBvHg3bgsgsd66aAYVmX9Q5lRu70HnzIAetnIfCiltqtWJ1/lJHwURwF6UjUoqKHow3EeCZvI5dbIfdEoe3eCCUIF5Ba2rRjuohyd+f209vyhjgqeRYr7r6KDhJxTqXrauEMzzyskL/4+cXZu5cNzMIgeiz4hR88oS6R+jpIZjWbyECz13/s273JeVxwLGc2jNhWjkr0tHeZ5rjfryx/U299RCi5jtBp7KSV2hA0hUA0oT+5QgmQduvvRPYwcV2F4PMVSPTal3CJ4HUmd7VQ6fk6grwqXur3odgwQPenS5bIQMrPmIeKGtEmUcXnHW2zbRlvbkn2QkqPFmOh1+snFPMhMTvXg7oTTK59Fb7h0nL0CDP9wKzEM0d+0="
-    
+
 after_success:
  - ./node_modules/.bin/istanbul cover -x "**/spec/**" ./node_modules/.bin/_mocha --report lcovonly -- $(find spec -name '*-spec.js') -R spec --require spec/helper.js
  - cat ./coverage/lcov.info | node_modules/.bin/coveralls
