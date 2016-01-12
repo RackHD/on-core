@@ -14,8 +14,8 @@ services:
 
 env:
   global:
-    - secure: "imPTCBFxwMBl3Op8Ynk9MMA6ynLZhB+EfKKviXI/QxiWm2tFNpAM6OcfW5j7Qbu2+L+c31em/sCoXY2LHcDfJu6XS5AeZp+5YF+al6cz5EQWT85Z7O9+mFsh7HCYmGXbExDuWdV5AyHFR/VcUX6y5ZByyUIzU4qe3fYHTXXCpRmWh94sXJ9PcqrFpu4yyOscSpHI2KS5fsManibHs8UvR7WfjUoiEIVZP1rzSs1cpYIM5iqGRlXLZ+YXmdNqYVLIuBx/avNX0qdGBs3LhR93obyOxTwdzONROn7BzfpuIAQFV94tp7FkJwk8faoFO/3GqkD4uLMrDTOsNvasPsAee/09chiYTvc9AaJ8iBTQ+D7ufcOhuoUA2gux98DDmAH0mw9ggt1bBDhEG0n8OMCT4xMCHzKNgZi8vYk1QUmzoy6Zvm+9S7zZdLDt6iRHCbI75m5+qeso/Qq2ryZxv7aq8vSg79jC8q8h5z40sSPpbxRi1GcMrY8PB0L2uAS9I0mkUEGWk5+WSn2umYUoJ3P470W70kTKVNMvVdM7z2NtpDaDF3V6Iu51gackP20mCXbrl/xIM2E/Tc/VH5LtmsDod5dRut5pqodahHDfAI3uscxE7Y9FBMZvgtQFWRIAKDhm15W0ZBuIEtKlHNCdxaqhNqhCQN6HmDX94n7IY4zIFxY="
-
+    - secure: "jBZOhu9/PoM4WQnXwtTiRauK41mNrSNBc4UIgBAq+cm2wHzMMokORNoeTzo5+Gbb+Kt5LAbv5+SioAWBEh8hoDSozYOjwqCkS+4mB7+68JsnnL4/GdU3XCO52qIhOtGEoipsoeEn1buhU+CS4iW8jbuJYT98WIcj0wY7o9JzS6ks/IoSeSF2P8/6nH8KoDAyXMmtadcEHIpkNo/uUafrsaWLGxdFxDyeT+k0nH0MTW/rVV0jyx4Kl+XeUpaQ4kOPlTN91c25qKoJvSSKlK8RbqAJ8y/IONg3+M1MiePJGsX9YJLtfDLBvHg3bgsgsd66aAYVmX9Q5lRu70HnzIAetnIfCiltqtWJ1/lJHwURwF6UjUoqKHow3EeCZvI5dbIfdEoe3eCCUIF5Ba2rRjuohyd+f209vyhjgqeRYr7r6KDhJxTqXrauEMzzyskL/4+cXZu5cNzMIgeiz4hR88oS6R+jpIZjWbyECz13/s273JeVxwLGc2jNhWjkr0tHeZ5rjfryx/U299RCi5jtBp7KSV2hA0hUA0oT+5QgmQduvvRPYwcV2F4PMVSPTal3CJ4HUmd7VQ6fk6grwqXur3odgwQPenS5bIQMrPmIeKGtEmUcXnHW2zbRlvbkn2QkqPFmOh1+snFPMhMTvXg7oTTK59Fb7h0nL0CDP9wKzEM0d+0="
+    
 after_success:
  - ./node_modules/.bin/istanbul cover -x "**/spec/**" ./node_modules/.bin/_mocha --report lcovonly -- $(find spec -name '*-spec.js') -R spec --require spec/helper.js
  - cat ./coverage/lcov.info | node_modules/.bin/coveralls
