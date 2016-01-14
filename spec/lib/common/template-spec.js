@@ -24,7 +24,8 @@ describe('Templates', function () {
             findOne: sinon.stub().resolves(),
             find: sinon.stub().resolves(),
             create: sinon.stub().resolves(),
-            update: sinon.stub().resolves()
+            update: sinon.stub().resolves(),
+            destroy: sinon.stub().resolves()
         };
 
         loader.prototype.getAll = sinon.stub();
@@ -163,6 +164,28 @@ describe('Templates', function () {
                 expect(waterline.templates.update).to.have.been.calledWith(
                     { name: 'test template', scope: 'sku' },
                     { contents: 'test contents' }
+                );
+            });
+        });
+
+        it('should delete a template in the global scope', function() {
+            var self = this;
+            waterline.templates.destroy.resolves();
+            return self.subject.unlink('it')
+            .then(function() {
+                expect(waterline.templates.destroy).to.have.been.calledWith(
+                    { name: 'it', scope: 'global' }
+                );
+            });
+        });
+
+        it('should delete a template in the specified scope', function() {
+            var self = this;
+            waterline.templates.destroy.resolves();
+            return self.subject.unlink('it', 'scope')
+            .then(function() {
+                expect(waterline.templates.destroy).to.have.been.calledWith(
+                    { name: 'it', scope: 'scope' }
                 );
             });
         });
