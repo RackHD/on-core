@@ -79,6 +79,7 @@ describe('Messenger', function () {
         ];
     });
     
+
     before(function () {
         this.subject = helper.injector.get('Services.Messenger');
         Errors = helper.injector.get('Errors');
@@ -287,6 +288,45 @@ describe('Messenger', function () {
                     IpAddress
                 ).should.be.rejectedWith(Error);
             });
+        });
+    
+        it('should only call subscription.dispose once', function (done) {
+            var self = this;
+            var mockOptions = {};
+            var Timer = helper.injector.get('Timer');
+            var Subscription = helper.injector.get('Subscription');
+            var mockContext = {
+                subscription: null,
+                timeout: null,
+                name: Constants.Protocol.Exchanges.Test.Name,
+                routingKey: 'test',
+                data: {hello: 'world'},
+                type: null,
+                timer: new Timer(),
+                queue: {name: 'qname'},
+                resolve: function() {},
+                reject: function() {}
+            };
+
+            self.subject.timeout = 0;
+            var stub = sinon.spy(function() {this._disposed = true;});
+            Subscription.create = function () {
+                return {    
+                    dispose: stub, 
+                   _disposed: false
+                };
+            };
+            self.subject.subscribeCallback(mockContext, mockOptions);
+            setTimeout(function() {
+                try {
+                    stub;
+                    self.subject.subscribeTimeout(mockContext, mockContext.data, {}, {});
+                    expect(mockContext.subscription.dispose).to.have.been.calledOnce;
+                    done();
+                } catch (e) {
+                    done(e);
+                }
+            }, 10);
         });
     });
 });
