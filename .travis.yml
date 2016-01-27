@@ -12,9 +12,16 @@ services:
  - mongodb
  - rabbitmq
 
+env:
+  global:
+    - secure: "sZxSeXt9D7v4Rer4DZ7Npa42KBenZWwNIRuNnRNHpJV99HUps+YlUpARmnViXKFmIHLDA5XhKkiCdzeZWsy3oBvp9DkuMf6l4Ib19I83LojEQY5BZb2pWXQh4tDrPpm6q/gHuo9K6cUNMP2dSUQDLGch+vkAGDn33ruHrYLq4d8QSYL/b1zDbNoo4J0wgVnfwDvtCYZDQv3eIuVSGLb64EJeRuYyhoB2oGmMApGL9zaxtic/XVB1tqmB/vmQWiQ8wPOenMbc9MRD9mtTFygywYo//0uNPR5kgsony56h+pfGCvmMW+ea8YPCyCl0oZVb9/zdjfg9ZyHsqCzSiJx2QNKVJkjx8KTZ/E+xwdXXgLqNQgPy3bXjdbalHeTFUPKd3ZS5i1pWkhNl7qScKGASbzBCT8oKNqiFE79bgBPBOXDoGjlFisiU/zRu5kbXgVQICSTkb8FLk8jwV5LHZ5Vzm+sQ7rXZUxIoMmW/lCQPs0LtR8zMc6/kM+k6ARN/ld88ox6QcjcRpYFPS+tmv6EdcrJLR+m3Xx0GsbwA7oPXkgs+M8rO8Ry+lidUv26BeD5MV18ilVs9Upx+37/qfn7TO5xENJsJazuxcLGW0fN0TarcgQDLhpAf7x0ZB2eSKmqrlNBlAPmlKFqEZ1nmRjJJl2IURmUbdhgb2nVICAr+js4="
+
+
 after_success:
- - ./node_modules/.bin/istanbul cover -x "**/spec/**" ./node_modules/.bin/_mocha --report lcovonly -- $(find spec -name '*-spec.js') -R spec --require spec/helper.js
- - cat ./coverage/lcov.info | node_modules/.bin/coveralls
+  - ./node_modules/.bin/istanbul cover -x "**/spec/**" ./node_modules/.bin/_mocha --report lcovonly -- $(find spec -name '*-spec.js') -R spec --require spec/helper.js
+  - cat ./coverage/lcov.info | node_modules/.bin/coveralls
+  - chmod 755 ./build_children.sh
+  - ./build_children.sh
 
 notifications:
   slack:
