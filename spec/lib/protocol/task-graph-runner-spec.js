@@ -4,54 +4,63 @@
 'use strict';
 
 describe("TaskGraph Runner protocol functions", function () {
-    var testSubscription;
+    var testSubscription,
+        testMessage,
+        messenger,
+        taskgraphrunner,
+        sampleError = new Error('someError');
 
     helper.before();
 
     before(function () {
-        this.taskgraphrunner = helper.injector.get('Protocol.TaskGraphRunner');
+        taskgraphrunner = helper.injector.get('Protocol.TaskGraphRunner');
+        messenger = helper.injector.get('Services.Messenger');
+        var Message = helper.injector.get('Message');
+        var Subscription = helper.injector.get('Subscription');
+        
+        testSubscription = new Subscription({},{});
+        testMessage = new Message({},{},{});
+        sinon.stub(testMessage);
+        sinon.stub(messenger);
     });
 
     helper.after();
-
-    afterEach(function() {
-        if (testSubscription) {
-            return testSubscription.dispose();
-        }
-    });
 
     describe("getTaskGraphLibrary", function() {
         it("should subscribe and receive getTaskGraphLibrary results", function() {
             var self = this,
                 testFilter = { foo: 'bar'},
                 testData = { abc: '123' };
-
-            return self.taskgraphrunner.subscribeGetTaskGraphLibrary(function(filter) {
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback({filter:testFilter},testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.request.resolves({value:testData});   
+            return taskgraphrunner.subscribeGetTaskGraphLibrary(function(filter) {
                 expect(filter).to.deep.equal(testFilter);
                 return testData;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-
-                testSubscription = subscription;
-                return self.taskgraphrunner.getTaskGraphLibrary(testFilter);
+                return taskgraphrunner.getTaskGraphLibrary(testFilter);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
-
             });
         });
 
         it("should subscribe and receive getTaskGraphLibrary results without a filter", function() {
             var self = this,
                 testData = { abc: '123' };
-
-            return self.taskgraphrunner.subscribeGetTaskGraphLibrary(function(filter) {
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback({filter:{}},testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.request.resolves({value:testData});
+            return taskgraphrunner.subscribeGetTaskGraphLibrary(function(filter) {
                 expect(filter).to.be.undefined;
                 return testData;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-
-                testSubscription = subscription;
-                return self.taskgraphrunner.getTaskGraphLibrary();
+                return taskgraphrunner.getTaskGraphLibrary();
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
             });
@@ -59,20 +68,15 @@ describe("TaskGraph Runner protocol functions", function () {
 
         it("should subscribe and receive getTaskGraphLibrary failures", function() {
             var self = this,
-                testFilter = { foo: 'bar'},
-                sampleError = new Error('someError');
-
-            var ErrorEvent = helper.injector.get('ErrorEvent');
-
-            return self.taskgraphrunner.subscribeGetTaskGraphLibrary(function(filter) {
+                testFilter = { foo: 'bar'};
+            messenger.request.rejects(sampleError); 
+            return taskgraphrunner.subscribeGetTaskGraphLibrary(function(filter) {
                 expect(filter).to.deep.equal(testFilter);
                 throw sampleError;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-                testSubscription = subscription;
-
-                return self.taskgraphrunner.getTaskGraphLibrary(testFilter);
-            }).should.be.rejectedWith(ErrorEvent, 'someError');
+                return taskgraphrunner.getTaskGraphLibrary(testFilter);
+            }).should.be.rejectedWith(sampleError);
         });
     });
 
@@ -81,15 +85,17 @@ describe("TaskGraph Runner protocol functions", function () {
             var self = this,
                 testFilter = { foo: 'bar'},
                 testData = { abc: '123' };
-
-            return self.taskgraphrunner.subscribeGetTaskLibrary(function(filter) {
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback({filter:testFilter},testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.request.resolves({value:testData});
+            return taskgraphrunner.subscribeGetTaskLibrary(function(filter) {
                 expect(filter).to.deep.equal(testFilter);
                 return testData;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-
-                testSubscription = subscription;
-                return self.taskgraphrunner.getTaskLibrary(testFilter);
+                return taskgraphrunner.getTaskLibrary(testFilter);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
             });
@@ -98,15 +104,17 @@ describe("TaskGraph Runner protocol functions", function () {
         it("should subscribe and receive getTaskLibrary results without a filter", function() {
             var self = this,
                 testData = { abc: '123' };
-
-            return self.taskgraphrunner.subscribeGetTaskLibrary(function(filter) {
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback({filter:{}},testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.request.resolves({value:testData});
+            return taskgraphrunner.subscribeGetTaskLibrary(function(filter) {
                 expect(filter).to.be.undefined;
                 return testData;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-
-                testSubscription = subscription;
-                return self.taskgraphrunner.getTaskLibrary();
+                return taskgraphrunner.getTaskLibrary();
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
 
@@ -115,20 +123,15 @@ describe("TaskGraph Runner protocol functions", function () {
 
         it("should subscribe and receive getTaskLibrary failures", function() {
             var self = this,
-                testFilter = { foo: 'bar'},
-                sampleError = new Error('someError');
-
-            var ErrorEvent = helper.injector.get('ErrorEvent');
-
-            return self.taskgraphrunner.subscribeGetTaskLibrary(function(filter) {
+                testFilter = { foo: 'bar'};
+            messenger.request.rejects(sampleError); 
+            return taskgraphrunner.subscribeGetTaskLibrary(function(filter) {
                 expect(filter).to.deep.equal(testFilter);
                 throw sampleError;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-                testSubscription = subscription;
-
-                return self.taskgraphrunner.getTaskLibrary(testFilter);
-            }).should.be.rejectedWith(ErrorEvent, 'someError');
+                return taskgraphrunner.getTaskLibrary(testFilter);
+            }).should.be.rejectedWith(sampleError);
         });
     });
 
@@ -137,15 +140,17 @@ describe("TaskGraph Runner protocol functions", function () {
             var self = this,
                 testFilter = { foo: 'bar'},
                 testData = { abc: '123' };
-
-            return self.taskgraphrunner.subscribeGetActiveTaskGraph(function(filter) {
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback({filter:testFilter},testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.request.resolves({value:testData});
+            return taskgraphrunner.subscribeGetActiveTaskGraph(function(filter) {
                 expect(filter).to.deep.equal(testFilter);
                 return testData;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-
-                testSubscription = subscription;
-                return self.taskgraphrunner.getActiveTaskGraph(testFilter);
+                return taskgraphrunner.getActiveTaskGraph(testFilter);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
             });
@@ -154,15 +159,17 @@ describe("TaskGraph Runner protocol functions", function () {
         it("should subscribe and receive getActiveTaskGraph results without a filter", function() {
             var self = this,
                 testData = { abc: '123' };
-
-            return self.taskgraphrunner.subscribeGetActiveTaskGraph(function(filter) {
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback({filter:{}},testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.request.resolves({value:testData});
+            return taskgraphrunner.subscribeGetActiveTaskGraph(function(filter) {
                 expect(filter).to.be.undefined;
                 return testData;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-
-                testSubscription = subscription;
-                return self.taskgraphrunner.getActiveTaskGraph();
+                return taskgraphrunner.getActiveTaskGraph();
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
 
@@ -171,20 +178,15 @@ describe("TaskGraph Runner protocol functions", function () {
 
         it("should subscribe and receive getActiveTaskGraph failures", function() {
             var self = this,
-                testFilter = { foo: 'bar'},
-                sampleError = new Error('someError');
-
-            var ErrorEvent = helper.injector.get('ErrorEvent');
-
-            return self.taskgraphrunner.subscribeGetActiveTaskGraph(function(filter) {
+                testFilter = { foo: 'bar'};
+            messenger.request.rejects(sampleError); 
+            return taskgraphrunner.subscribeGetActiveTaskGraph(function(filter) {
                 expect(filter).to.deep.equal(testFilter);
                 throw sampleError;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-                testSubscription = subscription;
-
-                return self.taskgraphrunner.getActiveTaskGraph(testFilter);
-            }).should.be.rejectedWith(ErrorEvent, 'someError');
+                return taskgraphrunner.getActiveTaskGraph(testFilter);
+            }).should.be.rejectedWith(sampleError);
         });
     });
 
@@ -193,15 +195,17 @@ describe("TaskGraph Runner protocol functions", function () {
             var self = this,
                 testFilter = { foo: 'bar'},
                 testData = { abc: '123' };
-
-            return self.taskgraphrunner.subscribeGetActiveTaskGraphs(function(filter) {
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback({filter:testFilter},testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.request.resolves({value:testData});
+            return taskgraphrunner.subscribeGetActiveTaskGraphs(function(filter) {
                 expect(filter).to.deep.equal(testFilter);
                 return testData;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-
-                testSubscription = subscription;
-                return self.taskgraphrunner.getActiveTaskGraphs(testFilter);
+                return taskgraphrunner.getActiveTaskGraphs(testFilter);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
             });
@@ -210,15 +214,17 @@ describe("TaskGraph Runner protocol functions", function () {
         it("should subscribe and receive getActiveTaskGraphs results without a filter", function() {
             var self = this,
                 testData = { abc: '123' };
-
-            return self.taskgraphrunner.subscribeGetActiveTaskGraphs(function(filter) {
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback({filter:{}},testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.request.resolves({value:testData});
+            return taskgraphrunner.subscribeGetActiveTaskGraphs(function(filter) {
                 expect(filter).to.be.undefined;
                 return testData;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-
-                testSubscription = subscription;
-                return self.taskgraphrunner.getActiveTaskGraphs();
+                return taskgraphrunner.getActiveTaskGraphs();
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
             });
@@ -226,20 +232,15 @@ describe("TaskGraph Runner protocol functions", function () {
 
         it("should subscribe and receive getActiveTaskGraphs failures", function() {
             var self = this,
-                testFilter = { foo: 'bar'},
-                sampleError = new Error('someError');
-
-            var ErrorEvent = helper.injector.get('ErrorEvent');
-
-            return self.taskgraphrunner.subscribeGetActiveTaskGraphs(function(filter) {
+                testFilter = { foo: 'bar'};
+            messenger.request.rejects(sampleError); 
+            return taskgraphrunner.subscribeGetActiveTaskGraphs(function(filter) {
                 expect(filter).to.deep.equal(testFilter);
                 throw sampleError;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-                testSubscription = subscription;
-
-                return self.taskgraphrunner.getActiveTaskGraphs(testFilter);
-            }).should.be.rejectedWith(ErrorEvent, 'someError');
+                return taskgraphrunner.getActiveTaskGraphs(testFilter);
+            }).should.be.rejectedWith(sampleError);
         });
     });
 
@@ -248,15 +249,17 @@ describe("TaskGraph Runner protocol functions", function () {
             var self = this,
                 testFilter = { foo: 'bar'},
                 testData = { abc: '123' };
-
-            return self.taskgraphrunner.subscribeDefineTaskGraph(function(filter) {
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback({definition:{}},testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.request.resolves({value:testData});
+            return taskgraphrunner.subscribeDefineTaskGraph(function(filter) {
                 expect(filter).to.deep.equal(testFilter);
                 return testData;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-
-                testSubscription = subscription;
-                return self.taskgraphrunner.defineTaskGraph(testFilter);
+                return taskgraphrunner.defineTaskGraph(testFilter);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
             });
@@ -264,16 +267,19 @@ describe("TaskGraph Runner protocol functions", function () {
 
         it("should subscribe and receive defineTaskGraph results without a filter", function() {
             var self = this,
-                testData = { abc: '123' };
-
-            return self.taskgraphrunner.subscribeDefineTaskGraph(function(filter) {
+                testData = { abc: '123' },
+                testDef = { definition: 'abc' };
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback({value:testDef},testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.request.resolves({value:testData});
+            return taskgraphrunner.subscribeDefineTaskGraph(function(filter) {
                 expect(filter).to.be.undefined;
                 return testData;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-
-                testSubscription = subscription;
-                return self.taskgraphrunner.defineTaskGraph();
+                return taskgraphrunner.defineTaskGraph(testDef);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
             });
@@ -281,20 +287,17 @@ describe("TaskGraph Runner protocol functions", function () {
 
         it("should subscribe and receive defineTaskGraph failures", function() {
             var self = this,
-                testFilter = { foo: 'bar'},
-                sampleError = new Error('someError');
-
-            var ErrorEvent = helper.injector.get('ErrorEvent');
-
-            return self.taskgraphrunner.subscribeDefineTaskGraph(function(filter) {
+                testFilter = { foo: 'bar'};
+            messenger.request.rejects(sampleError); 
+            return taskgraphrunner.subscribeDefineTaskGraph(function(filter) {
                 expect(filter).to.deep.equal(testFilter);
                 throw sampleError;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
                 testSubscription = subscription;
 
-                return self.taskgraphrunner.defineTaskGraph(testFilter);
-            }).should.be.rejectedWith(ErrorEvent, 'someError');
+                return taskgraphrunner.defineTaskGraph(testFilter);
+            }).should.be.rejectedWith(sampleError);
         });
     });
 
@@ -303,15 +306,17 @@ describe("TaskGraph Runner protocol functions", function () {
             var self = this,
                 testFilter = { foo: 'bar'},
                 testData = { abc: '123' };
-
-            return self.taskgraphrunner.subscribeDefineTask(function(filter) {
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback({definition:{}},testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.request.resolves({value:testData});
+            return taskgraphrunner.subscribeDefineTask(function(filter) {
                 expect(filter).to.deep.equal(testFilter);
                 return testData;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-
-                testSubscription = subscription;
-                return self.taskgraphrunner.defineTask(testFilter);
+                return taskgraphrunner.defineTask(testFilter);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
             });
@@ -319,16 +324,19 @@ describe("TaskGraph Runner protocol functions", function () {
 
         it("should subscribe and receive defineTask results without a filter", function() {
             var self = this,
-                testData = { abc: '123' };
-
-            return self.taskgraphrunner.subscribeDefineTask(function(filter) {
+                testData = { abc: '123' },
+                testDef = { definition: 'abc' };
+            messenger.request.resolves({value:testData});
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback({value:testDef},testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            return taskgraphrunner.subscribeDefineTask(function(filter) {
                 expect(filter).to.be.undefined;
                 return testData;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-
-                testSubscription = subscription;
-                return self.taskgraphrunner.defineTask();
+                return taskgraphrunner.defineTask(testDef);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
             });
@@ -336,20 +344,15 @@ describe("TaskGraph Runner protocol functions", function () {
 
         it("should subscribe and receive defineTask failures", function() {
             var self = this,
-                testFilter = { foo: 'bar'},
-                sampleError = new Error('someError');
-
-            var ErrorEvent = helper.injector.get('ErrorEvent');
-
-            return self.taskgraphrunner.subscribeDefineTask(function(filter) {
+                testFilter = { foo: 'bar'};
+            messenger.request.rejects(sampleError); 
+            return taskgraphrunner.subscribeDefineTask(function(filter) {
                 expect(filter).to.deep.equal(testFilter);
                 throw sampleError;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-                testSubscription = subscription;
-
-                return self.taskgraphrunner.defineTask(testFilter);
-            }).should.be.rejectedWith(ErrorEvent, 'someError');
+                return taskgraphrunner.defineTask(testFilter);
+            }).should.be.rejectedWith(sampleError);
         });
     });
 
@@ -358,15 +361,17 @@ describe("TaskGraph Runner protocol functions", function () {
             var self = this,
                 testFilter = { foo: 'bar'},
                 testData = { abc: '123' };
-
-            return self.taskgraphrunner.subscribeRunTaskGraph(function(filter) {
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback({filter:testFilter},testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.request.resolves({value:testData});
+            return taskgraphrunner.subscribeRunTaskGraph(function(filter) {
                 expect(filter).to.deep.equal(testFilter);
                 return testData;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-
-                testSubscription = subscription;
-                return self.taskgraphrunner.runTaskGraph(testFilter);
+                return taskgraphrunner.runTaskGraph(testFilter);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
             });
@@ -374,16 +379,23 @@ describe("TaskGraph Runner protocol functions", function () {
 
         it("should subscribe and receive runTaskGraph results without a filter", function() {
             var self = this,
-                testData = { abc: '123' };
-
-            return self.taskgraphrunner.subscribeRunTaskGraph(function(filter) {
+                testData = { abc: '123' },
+                testOpts = { 
+                    name: 'abc',
+                    options: {},
+                    target: '' 
+                };
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback({value:testOpts},testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.request.resolves({value:testData});
+            return taskgraphrunner.subscribeRunTaskGraph(function(filter) {
                 expect(filter).to.be.undefined;
                 return testData;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-
-                testSubscription = subscription;
-                return self.taskgraphrunner.runTaskGraph();
+                return taskgraphrunner.runTaskGraph(testOpts);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
             });
@@ -391,20 +403,15 @@ describe("TaskGraph Runner protocol functions", function () {
 
         it("should subscribe and receive runTaskGraph failures", function() {
             var self = this,
-                testFilter = { foo: 'bar'},
-                sampleError = new Error('someError');
-
-            var ErrorEvent = helper.injector.get('ErrorEvent');
-
-            return self.taskgraphrunner.subscribeRunTaskGraph(function(filter) {
+                testFilter = { foo: 'bar'};
+            messenger.request.rejects(sampleError); 
+            return taskgraphrunner.subscribeRunTaskGraph(function(filter) {
                 expect(filter).to.deep.equal(testFilter);
                 throw sampleError;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-                testSubscription = subscription;
-
-                return self.taskgraphrunner.runTaskGraph(testFilter);
-            }).should.be.rejectedWith(ErrorEvent, 'someError');
+                return taskgraphrunner.runTaskGraph(testFilter);
+            }).should.be.rejectedWith(sampleError);
         });
     });
 
@@ -413,15 +420,17 @@ describe("TaskGraph Runner protocol functions", function () {
             var self = this,
                 testFilter = { foo: 'bar'},
                 testData = { abc: '123' };
-
-            return self.taskgraphrunner.subscribeCancelTaskGraph(function(filter) {
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback(testFilter,testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.request.resolves({value:testData});
+            return taskgraphrunner.subscribeCancelTaskGraph(function(filter) {
                 expect(filter).to.deep.equal(testFilter);
                 return testData;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-
-                testSubscription = subscription;
-                return self.taskgraphrunner.cancelTaskGraph(testFilter);
+                return taskgraphrunner.cancelTaskGraph(testFilter);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
             });
@@ -429,20 +438,15 @@ describe("TaskGraph Runner protocol functions", function () {
 
         it("should subscribe and receive cancelTaskGraph failures", function() {
             var self = this,
-                testFilter = { foo: 'bar'},
-                sampleError = new Error('someError');
-
-            var ErrorEvent = helper.injector.get('ErrorEvent');
-
-            return self.taskgraphrunner.subscribeCancelTaskGraph(function(filter) {
+                testFilter = { foo: 'bar'};
+            messenger.request.rejects(sampleError); 
+            return taskgraphrunner.subscribeCancelTaskGraph(function(filter) {
                 expect(filter).to.deep.equal(testFilter);
                 throw sampleError;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-                testSubscription = subscription;
-
-                return self.taskgraphrunner.cancelTaskGraph(testFilter);
-            }).should.be.rejectedWith(ErrorEvent, 'someError');
+                return taskgraphrunner.cancelTaskGraph(testFilter);
+            }).should.be.rejectedWith(sampleError);
         });
     });
 
@@ -451,15 +455,17 @@ describe("TaskGraph Runner protocol functions", function () {
             var self = this,
                 testFilter = { foo: 'bar'},
                 testData = { abc: '123' };
-
-            return self.taskgraphrunner.subscribePauseTaskGraph(function(filter) {
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback(testFilter,testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.request.resolves({value:testData});
+            return taskgraphrunner.subscribePauseTaskGraph(function(filter) {
                 expect(filter).to.deep.equal(testFilter);
                 return testData;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-
-                testSubscription = subscription;
-                return self.taskgraphrunner.pauseTaskGraph(testFilter);
+                return taskgraphrunner.pauseTaskGraph(testFilter);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
             });
@@ -467,20 +473,15 @@ describe("TaskGraph Runner protocol functions", function () {
 
         it("should subscribe and receive pauseTaskGraph failures", function() {
             var self = this,
-                testFilter = { foo: 'bar'},
-                sampleError = new Error('someError');
-
-            var ErrorEvent = helper.injector.get('ErrorEvent');
-
-            return self.taskgraphrunner.subscribePauseTaskGraph(function(filter) {
+                testFilter = { foo: 'bar'};
+            messenger.request.rejects(sampleError); 
+            return taskgraphrunner.subscribePauseTaskGraph(function(filter) {
                 expect(filter).to.deep.equal(testFilter);
                 throw sampleError;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-                testSubscription = subscription;
-
-                return self.taskgraphrunner.pauseTaskGraph(testFilter);
-            }).should.be.rejectedWith(ErrorEvent, 'someError');
+                return taskgraphrunner.pauseTaskGraph(testFilter);
+            }).should.be.rejectedWith(sampleError);
         });
     });
 
@@ -489,15 +490,17 @@ describe("TaskGraph Runner protocol functions", function () {
             var self = this,
                 testFilter = { foo: 'bar'},
                 testData = { abc: '123' };
-
-            return self.taskgraphrunner.subscribeResumeTaskGraph(function(filter) {
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback(testFilter,testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.request.resolves({value:testData});
+            return taskgraphrunner.subscribeResumeTaskGraph(function(filter) {
                 expect(filter).to.deep.equal(testFilter);
                 return testData;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-
-                testSubscription = subscription;
-                return self.taskgraphrunner.resumeTaskGraph(testFilter);
+                return taskgraphrunner.resumeTaskGraph(testFilter);
             }).then(function(data) {
                 expect(data).to.deep.equal(testData);
             });
@@ -505,20 +508,15 @@ describe("TaskGraph Runner protocol functions", function () {
 
         it("should subscribe and receive resumeTaskGraph failures", function() {
             var self = this,
-                testFilter = { foo: 'bar'},
-                sampleError = new Error('someError');
-
-            var ErrorEvent = helper.injector.get('ErrorEvent');
-
-            return self.taskgraphrunner.subscribeResumeTaskGraph(function(filter) {
+                testFilter = { foo: 'bar'};
+            messenger.request.rejects(sampleError);
+            return taskgraphrunner.subscribeResumeTaskGraph(function(filter) {
                 expect(filter).to.deep.equal(testFilter);
                 throw sampleError;
             }).then(function(subscription) {
                 expect(subscription).to.be.ok;
-                testSubscription = subscription;
-
-                return self.taskgraphrunner.resumeTaskGraph(testFilter);
-            }).should.be.rejectedWith(ErrorEvent, 'someError');
+                return taskgraphrunner.resumeTaskGraph(testFilter);
+            }).should.be.rejectedWith(sampleError);
         });
     });
 });
