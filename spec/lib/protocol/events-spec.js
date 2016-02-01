@@ -117,6 +117,7 @@ describe("Event protocol subscribers", function () {
                     taskId: uuid.v4(),
                     graphId: uuid.v4(),
                     state: 'succeeded',
+                    context: {},
                     terminalOnStates: ['failed', 'timeout']
                 };
             messenger.subscribe = sinon.spy(function(a,b,callback) {

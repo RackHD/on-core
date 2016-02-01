@@ -71,20 +71,23 @@ describe('Task Graph mongo store interface', function () {
     });
 
     it('setTaskState', function() {
-        var state = 'succeeded';
-        var taskId = uuid.v4();
-        var graphId = uuid.v4();
+        var task = {
+            state: 'succeeded',
+            taskId: uuid.v4(),
+            graphId: uuid.v4(),
+            context: {}
+        };
 
-        return mongo.setTaskState(taskId, graphId, state)
+        return mongo.setTaskState(task)
         .then(function() {
             expect(waterline.taskdependencies.updateMongo).to.have.been.calledOnce;
             expect(waterline.taskdependencies.updateMongo).to.have.been.calledWith(
                 {
-                    taskId: taskId,
-                    graphId: graphId,
+                    taskId: task.taskId,
+                    graphId: task.graphId,
                     reachable: true
                 },
-                { $set: { state: 'succeeded' } },
+                { $set: { state: 'succeeded', context: {} } },
                 { multi: true }
             );
         });
