@@ -74,7 +74,7 @@ describe('Task Graph', function () {
                 context: { target: 'testnode' }
             })
             .then(function(graph) {
-                expect(graph).to.have.property('node').with.property('id').that.equals('testnode');
+                expect(graph).to.have.property('node').that.equals('testnode');
             });
         });
 
@@ -85,7 +85,7 @@ describe('Task Graph', function () {
                 options: { nodeId: 'testnode' }
             })
             .then(function(graph) {
-                expect(graph).to.have.property('node').with.property('id').that.equals('testnode');
+                expect(graph).to.have.property('node').that.equals('testnode');
             });
         });
 
