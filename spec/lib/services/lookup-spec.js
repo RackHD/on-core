@@ -4,7 +4,11 @@
 'use strict';
 
 describe('Lookup Service', function () {
-    var lookupService, MacAddress, Errors, waterline;
+    var lookupService, 
+        MacAddress, 
+        Errors, 
+        WaterlineService,
+        sandbox = sinon.sandbox.create();
 
     var lookup = [{
         ipAddress: '127.0.0.1',
@@ -23,16 +27,44 @@ describe('Lookup Service', function () {
         id: 'node'
     };
 
-    helper.before();
+    helper.before(function(context) {
+        context.Core = {
+            start: sandbox.stub().resolves(),
+            stop: sandbox.stub().resolves()
+        };
+        return helper.di.simpleWrapper(context.Core, 'Services.Core' );
+    });
 
     before('Lookup Service before', function () {
         lookupService = helper.injector.get('Services.Lookup');
-        waterline = helper.injector.get('Services.Waterline');
+        WaterlineService = helper.injector.get('Services.Waterline');
         MacAddress = helper.injector.get('MacAddress');
         Errors = helper.injector.get('Errors');
+        
+        // Mock out the waterline collection methods and initialize them
+        var config = {
+                adapters: { mongo: {} },
+                connections: { mongo: { adapter: 'mongo', url: '' }}
+            };
+        WaterlineService.start = sinon.spy(function() {
+            var Waterline = helper.injector.get('Waterline');
+            WaterlineService.service = new Waterline();
+            helper.injector.getMatching('Models.*').forEach(function (model) {
+                WaterlineService.service.loadCollection(model);
+            });
+            WaterlineService.service.initialize(config, function(err,data) {
+                _.forOwn(data.collections, function(collection, name) {
+                    WaterlineService[name] = collection;
+                });
+            });
+        });
+        WaterlineService.start(); 
     });
 
     helper.after();
+    after(function() {
+        sandbox.restore();
+    });
 
     describe('Node ID Cache', function () {
         var spy1 = sinon.spy(),
@@ -83,7 +115,8 @@ describe('Lookup Service', function () {
         });
 
         it('should call findByTerm with macAddress', function() {
-            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(lookup);
+            var findByTerm = this.sandbox.stub(
+                    WaterlineService.lookups, 'findByTerm').resolves(lookup);
 
             return lookupService.macAddressToNodeId('127.0.0.1').then(function (result) {
                 expect(result).to.equal(lookup[0].node);
@@ -92,7 +125,8 @@ describe('Lookup Service', function () {
         });
 
         it('should reject with NotFoundError if no lookup record exists', function() {
-            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves();
+            var findByTerm = this.sandbox.stub(
+                    WaterlineService.lookups, 'findByTerm').resolves();
 
             return expect(
                 lookupService.macAddressToNodeId('00:11:22:33:44:55')
@@ -102,7 +136,8 @@ describe('Lookup Service', function () {
         });
 
         it('should reject with NotFoundError if no node association exists', function() {
-            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(noNode);
+            var findByTerm = this.sandbox.stub(
+                    WaterlineService.lookups, 'findByTerm').resolves(noNode);
 
             return expect(
                 lookupService.macAddressToNodeId('00:11:22:33:44:55')
@@ -114,8 +149,10 @@ describe('Lookup Service', function () {
 
     describe('macAddressToNode', function() {
         it('should call findByTerm with macAddress', function() {
-            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(lookup),
-                needOneById = this.sandbox.stub(waterline.nodes, 'needOneById').resolves(node);
+            var findByTerm = this.sandbox.stub(
+                    WaterlineService.lookups, 'findByTerm').resolves(lookup),
+                needOneById = this.sandbox.stub(
+                    WaterlineService.nodes, 'needOneById').resolves(node);
 
             return lookupService.macAddressToNode('00:11:22:33:44:55').then(function (result) {
                 expect(result).to.equal(node);
@@ -125,7 +162,8 @@ describe('Lookup Service', function () {
         });
 
         it('should reject with NotFoundError if no lookup record exists', function() {
-            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves();
+            var findByTerm = this.sandbox.stub(
+                    WaterlineService.lookups, 'findByTerm').resolves();
 
             return expect(
                 lookupService.macAddressToNode('00:11:22:33:44:55')
@@ -135,7 +173,8 @@ describe('Lookup Service', function () {
         });
 
         it('should reject with NotFoundError if no node association exists', function() {
-            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(noNode);
+            var findByTerm = this.sandbox.stub(
+                WaterlineService.lookups, 'findByTerm').resolves(noNode);
 
             return expect(
                 lookupService.macAddressToNode('00:11:22:33:44:55')
@@ -145,8 +184,9 @@ describe('Lookup Service', function () {
         });
 
         it('should reject with NotFoundError if no node record exists', function() {
-            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(lookup),
-                needOneById = this.sandbox.stub(waterline.nodes, 'needOneById').rejects(
+            var findByTerm = this.sandbox.stub(
+                    WaterlineService.lookups, 'findByTerm').resolves(lookup),
+                needOneById = this.sandbox.stub(WaterlineService.nodes, 'needOneById').rejects(
                     new Errors.NotFoundError()
                 );
 
@@ -158,10 +198,34 @@ describe('Lookup Service', function () {
             });
         });
     });
+    
+    describe('macAddressToIp', function () {
+        beforeEach(function () {
+          lookupService.resetNodeIdCache();
+        });
+
+        it('should call findByTerm with macAddress', function() {
+            var ipAddress = lookup[0].ipAddress,
+                findByTerm = this.sandbox.stub(
+                    WaterlineService.lookups, 'findByTerm').resolves(lookup);
+            return lookupService.macAddressToIp('127.0.0.1').then(function (result) {
+                expect(result).to.equal(ipAddress);
+                expect(findByTerm).to.have.been.calledWith(ipAddress);
+            });
+        });
+        
+        it('should reject with NotFoundError on findOneByTerm', function() {
+            var ipAddress = lookup[0].ipAddress;
+            this.sandbox.stub(WaterlineService.lookups, 'findByTerm').resolves({ipAddress:null});
+            return expect(lookupService.macAddressToIp(ipAddress))
+                .to.be.rejectedWith(Errors.NotFoundError);
+        });
+    });
 
     describe('ipAddressToMacAddress', function () {
         it('should call findByTerm with ipAddress', function() {
-            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(lookup);
+            var findByTerm = this.sandbox.stub(
+                WaterlineService.lookups, 'findByTerm').resolves(lookup);
 
             return lookupService.ipAddressToMacAddress('127.0.0.1').then(function (result) {
                 expect(result).to.equal(lookup[0].macAddress);
@@ -170,7 +234,8 @@ describe('Lookup Service', function () {
         });
 
         it('should reject with NotFoundError if no lookup record exists', function() {
-            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves();
+            var findByTerm = this.sandbox.stub(
+                WaterlineService.lookups, 'findByTerm').resolves();
 
             return expect(
                 lookupService.ipAddressToMacAddress('127.0.0.1')
@@ -182,8 +247,10 @@ describe('Lookup Service', function () {
 
     describe('ipAddressToNode', function () {
         it('should call findByTerm with ipAddress', function() {
-            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(lookup),
-                needOneById = this.sandbox.stub(waterline.nodes, 'needOneById').resolves(node);
+            var findByTerm = this.sandbox.stub(
+                    WaterlineService.lookups, 'findByTerm').resolves(lookup),
+                needOneById = this.sandbox.stub(
+                    WaterlineService.nodes, 'needOneById').resolves(node);
 
             return lookupService.ipAddressToNode('127.0.0.1').then(function (result) {
                 expect(result).to.equal(node);
@@ -193,7 +260,7 @@ describe('Lookup Service', function () {
         });
 
         it('should reject with NotFoundError if no lookup record exists', function() {
-            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves();
+            var findByTerm = this.sandbox.stub(WaterlineService.lookups, 'findByTerm').resolves();
 
             return expect(
                 lookupService.ipAddressToNode('127.0.0.1')
@@ -203,7 +270,8 @@ describe('Lookup Service', function () {
         });
 
         it('should reject with NotFoundError if no node association exists', function() {
-            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(noNode);
+            var findByTerm = this.sandbox.stub(
+                WaterlineService.lookups, 'findByTerm').resolves(noNode);
 
             return expect(
                 lookupService.ipAddressToNode('127.0.0.1')
@@ -213,8 +281,9 @@ describe('Lookup Service', function () {
         });
 
         it('should reject with NotFoundError if no node record exists', function() {
-            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(lookup),
-                needOneById = this.sandbox.stub(waterline.nodes, 'needOneById').rejects(
+            var findByTerm = this.sandbox.stub(
+                WaterlineService.lookups, 'findByTerm').resolves(lookup),
+                needOneById = this.sandbox.stub(WaterlineService.nodes, 'needOneById').rejects(
                     new Errors.NotFoundError()
                 );
 
@@ -233,7 +302,8 @@ describe('Lookup Service', function () {
         });
 
         it('should call findByTerm with ipAddress', function() {
-            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(lookup);
+            var findByTerm = this.sandbox.stub(
+                WaterlineService.lookups, 'findByTerm').resolves(lookup);
 
             return lookupService.ipAddressToNodeId('127.0.0.1').then(function (result) {
                 expect(result).to.equal(lookup[0].node);
@@ -242,7 +312,7 @@ describe('Lookup Service', function () {
         });
 
         it('should reject with NotFoundError if no lookup record exists', function() {
-            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves();
+            var findByTerm = this.sandbox.stub(WaterlineService.lookups, 'findByTerm').resolves();
 
             return expect(
                 lookupService.ipAddressToNodeId('127.0.0.1')
@@ -252,7 +322,8 @@ describe('Lookup Service', function () {
         });
 
         it('should reject with NotFoundError if no node association exists', function() {
-            var findByTerm = this.sandbox.stub(waterline.lookups, 'findByTerm').resolves(noNode);
+            var findByTerm = this.sandbox.stub(
+                WaterlineService.lookups, 'findByTerm').resolves(noNode);
 
             return expect(
                 lookupService.ipAddressToNodeId('127.0.0.1')
@@ -307,11 +378,25 @@ describe('Lookup Service', function () {
 
             middleware(req, {}, next);
         });
+
+        it('should return undefined', function (done) {
+            var middleware = lookupService.ipAddressToMacAddressMiddleware();
+
+            this.sandbox.stub(lookupService, 'ipAddressToMacAddress').resolves(undefined);
+
+            var req = {},
+                next = function () {
+                    expect(req.macaddress).to.equal(undefined);
+                    done();
+                };
+
+            middleware(req, {}, next);
+        });
     });
 
     describe('nodeIdToIpAddresses', function () {
         it('should return an empty array if no records exist', function() {
-            this.sandbox.stub(waterline.lookups, 'findByTerm').resolves([]);
+            this.sandbox.stub(WaterlineService.lookups, 'findByTerm').resolves([]);
 
             return lookupService.nodeIdToIpAddresses(
                 '507f1f77bcf86cd799439011'
@@ -319,7 +404,7 @@ describe('Lookup Service', function () {
         });
 
         it('should return an array with all assigned addresses', function() {
-            this.sandbox.stub(waterline.lookups, 'findByTerm').resolves([
+            this.sandbox.stub(WaterlineService.lookups, 'findByTerm').resolves([
                 { ipAddress: '1.1.1.1' },
                 {},
                 { ipAddress: '2.2.2.2'}
@@ -332,11 +417,11 @@ describe('Lookup Service', function () {
     });
 
     it('setIpAddress', function() {
-        this.sandbox.stub(waterline.lookups, 'setIp').resolves();
+        this.sandbox.stub(WaterlineService.lookups, 'setIp').resolves();
         return lookupService.setIpAddress('ip', 'mac')
         .then(function() {
-            expect(waterline.lookups.setIp).to.have.been.calledOnce;
-            expect(waterline.lookups.setIp).to.have.been.calledWith('ip', 'mac');
+            expect(WaterlineService.lookups.setIp).to.have.been.calledOnce;
+            expect(WaterlineService.lookups.setIp).to.have.been.calledWith('ip', 'mac');
         });
-    });
+    });    
 });
