@@ -35,7 +35,7 @@ describe("TaskGraph Runner protocol functions", function () {
             var graphId = uuid.v4();
             messenger.publish.resolves();
 
-            return taskgraphrunner.runTaskGraph('default', graphId)
+            return taskgraphrunner.runTaskGraph(graphId, 'default')
             .then(function() {
                 expect(messenger.publish).to.have.been.calledOnce;
                 expect(messenger.publish).to.have.been.calledWith(
@@ -47,17 +47,21 @@ describe("TaskGraph Runner protocol functions", function () {
         });
 
         it("should receive runTaskGraph results", function() {
-            messenger.subscribe = sinon.stub.resolves();
+            messenger.subscribe.resolves();
+            var cb = function () {
+                // test
+            };
 
-            return taskgraphrunner.subscribeRunTaskGraph(
-                'default', function() { }
-            ).then(function() {
+            return taskgraphrunner.subscribeRunTaskGraph('default', cb)
+            .then(function() {
                 expect(messenger.subscribe).to.have.been.calledOnce;
                 expect(messenger.subscribe).to.have.been.calledWith(
                     Constants.Protocol.Exchanges.TaskGraphRunner.Name,
-                    'methods.runTaskGraph.default',
-                    function() {}
+                    'methods.runTaskGraph.default'
                 );
+                expect(
+                    messenger.subscribe.firstCall.args[2].toString()
+                ).to.equal(cb.toString());
             });
         });
     });

@@ -131,7 +131,13 @@ describe("Event protocol subscribers", function () {
             }).then(function (subscription) {
                 expect(subscription).to.be.ok;
                 return events.publishTaskFinished(
-                    domain, data.taskId, data.graphId, data.state, data.terminalOnStates);
+                    domain,
+                    data.taskId,
+                    data.graphId,
+                    data.state,
+                    data.context,
+                    data.terminalOnStates
+                );
             });
         });
     });
