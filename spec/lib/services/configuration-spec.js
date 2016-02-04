@@ -68,6 +68,33 @@ describe(require('path').basename(__filename), function () {
                     );
                 });
             });
+            describe('backwards compatable defaults', function () {
+                before(function () {
+                    sinon.stub(fs, 'existsSync').withArgs(
+                        Constants.Configuration.Files.Global
+                    ).returns(false);
+
+                    sinon.stub(fs, 'existsSync').withArgs(
+                        Constants.Configuration.Files.OnRack
+                    ).returns(true);
+
+                    sinon.stub(nconf, 'file').returns();
+                });
+
+                after(function () {
+                    fs.existsSync.restore();
+
+                    nconf.file.restore();
+                });
+
+                it('applies defaults from the OnRack configuration file', function() {
+                    this.subject.load();
+                    nconf.file.should.have.been.calledWith(
+                        'global',
+                        Constants.Configuration.Files.OnRack
+                    );
+                });
+            });
         });
     });
 });
