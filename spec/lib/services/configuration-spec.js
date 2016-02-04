@@ -57,14 +57,22 @@ describe(require('path').basename(__filename), function () {
                 });
 
                 it('applies defaults from the global configuration file', function() {
-                    fs.existsSync.withArgs( Constants.Configuration.Files.Global ).returns(true);
+                    fs.existsSync.withArgs(
+                        Constants.Configuration.Files.Global
+                    ).returns(true);
                     this.subject.load();
-                    nconf.file.should.have.been.calledWith( 'global', Constants.Configuration.Files.Global );
+                    nconf.file.should.have.been.calledWith(
+                        'global', Constants.Configuration.Files.Global
+                    );
                 });
                 it('applies defaults from the OnRack configuration file', function() {
-                    fs.existsSync.withArgs( Constants.Configuration.Files.OnRack ).returns(true);
+                    fs.existsSync.withArgs(
+                        Constants.Configuration.Files.OnRack
+                    ).returns(true);
                     this.subject.load();
-                    nconf.file.should.have.been.calledWith( 'global', Constants.Configuration.Files.OnRack );
+                    nconf.file.should.have.been.calledWith(
+                        'global', Constants.Configuration.Files.OnRack
+                    );
                 });
             });
         });
