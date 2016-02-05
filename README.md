@@ -20,7 +20,7 @@ some services to be available and running locally:
 
 # Configuration
 
-The following configuration values can be overridden via the environment, command line, or via the global configuration file located at /opt/onrack/etc/monorail.json.
+The following configuration values can be overridden via the environment, command line, or via the global configuration file located at /opt/monorail/config.json.
 
 The global configuration file location can be overridden by setting a new configuration file value in the environment using the MONORAIL_CONFIG environment variable.
 

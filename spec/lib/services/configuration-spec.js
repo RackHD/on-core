@@ -46,25 +46,32 @@ describe(require('path').basename(__filename), function () {
 
         describe('start', function () {
             describe('defaults', function () {
-                before(function () {
-                    sinon.stub(fs, 'existsSync').withArgs(
-                        Constants.Configuration.Files.Global
-                    ).returns(true);
-
+                beforeEach(function () {
+                    sinon.stub(fs, 'existsSync');
                     sinon.stub(nconf, 'file').returns();
                 });
 
-                after(function () {
+                afterEach(function () {
                     fs.existsSync.restore();
-
                     nconf.file.restore();
                 });
 
                 it('applies defaults from the global configuration file', function() {
+                    fs.existsSync.withArgs(
+                        Constants.Configuration.Files.Global
+                    ).returns(true);
                     this.subject.load();
                     nconf.file.should.have.been.calledWith(
-                        'global',
-                        Constants.Configuration.Files.Global
+                        'global', Constants.Configuration.Files.Global
+                    );
+                });
+                it('applies defaults from the OnRack configuration file', function() {
+                    fs.existsSync.withArgs(
+                        Constants.Configuration.Files.OnRack
+                    ).returns(true);
+                    this.subject.load();
+                    nconf.file.should.have.been.calledWith(
+                        'global', Constants.Configuration.Files.OnRack
                     );
                 });
             });
