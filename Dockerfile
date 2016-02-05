@@ -1,3 +1,5 @@
+# Copyright 2016, EMC, Inc.
+
 FROM node:argon
 
 RUN mkdir -p /RackHD/on-core
