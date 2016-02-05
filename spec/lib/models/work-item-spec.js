@@ -5,9 +5,18 @@
 'use strict';
 
 var base = require('./base-spec');
+function MessengerServices()  {
+}
+MessengerServices.prototype.start = sinon.stub().returns(Promise.resolve());
+MessengerServices.prototype.stop = sinon.stub().returns(Promise.resolve());
+MessengerServices.prototype.publish = sinon.stub().returns(Promise.resolve());
 
 describe('Models.WorkItem', function () {
-    helper.before();
+    helper.before(function () {
+        return [
+            helper.di.simpleWrapper(MessengerServices, 'Messenger')
+        ];
+    });
 
     var workitems;
     var Promise;

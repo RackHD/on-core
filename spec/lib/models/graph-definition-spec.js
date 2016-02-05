@@ -4,9 +4,17 @@
 'use strict';
 
 var base = require('./base-spec');
-
+function MessengerServices()  {
+}
+MessengerServices.prototype.start = sinon.stub().returns(Promise.resolve());
+MessengerServices.prototype.stop = sinon.stub().returns(Promise.resolve());
+MessengerServices.prototype.publish = sinon.stub().returns(Promise.resolve());
 describe('Models.GraphDefinition', function () {
-    helper.before();
+    helper.before(function () {
+        return [
+            helper.di.simpleWrapper(MessengerServices, 'Messenger')
+        ];
+    });
 
     base.before(function (context) {
         context.model = helper.injector.get('Services.Waterline').graphdefinitions;

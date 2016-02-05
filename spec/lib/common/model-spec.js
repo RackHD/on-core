@@ -6,10 +6,16 @@
 var bluebird = require('bluebird');
 
 describe('Model', function () {
-    var waterline;
+    var waterline,
+        messenger;
     var waterlineProtocol = {
-        publishRecord: sinon.stub().returns(bluebird.resolve())
+        publishRecord: sinon.stub().returns(Promise.resolve())
     };
+    function MessengerServices()  {
+    }
+    MessengerServices.prototype.start = sinon.stub().returns(Promise.resolve());
+    MessengerServices.prototype.stop = sinon.stub().returns(Promise.resolve());
+    MessengerServices.prototype.publish = sinon.stub().returns(Promise.resolve());
 
     var Errors;
 
@@ -28,13 +34,15 @@ describe('Model', function () {
     helper.before(function () {
         return [
             helper.di.simpleWrapper(waterlineProtocol, 'Protocol.Waterline'),
-            helper.di.overrideInjection(testModelFactory, 'Models.TestObject', ['Model'])
+            helper.di.overrideInjection(testModelFactory, 'Models.TestObject', ['Model']),
+            helper.di.simpleWrapper(MessengerServices, 'Messenger')
         ];
     });
 
     before(function () {
         waterline = helper.injector.get('Services.Waterline');
         Errors = helper.injector.get('Errors');
+        messenger = helper.injector.get('Services.Messenger');
     });
 
     helper.after();
@@ -521,6 +529,16 @@ describe('Model', function () {
             )
             .should.be.fulfilled.and.eventually.have.length(0);
         });
+
+        it('Should find a document via criteria ', function () {
+              return waterline.testobjects.needOne({ dummy: 'magic' })
+            .should.be.fulfilled.and.eventually.have.property('id').that.equals(records[0].id);
+        });
+
+        it('Shuld destroy by criteria', function () {
+            return waterline.testobjects.destroyOneById(records[0].id)
+                .should.be.fulfilled.and.eventually.have.property('id').that.equals(records[0].id);
+          });
     });
 
     describe('publishRecord() failure', function () {

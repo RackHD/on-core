@@ -2,14 +2,23 @@
 
 
 'use strict';
-
 describe('Subscription', function () {
     var Subscription;
+    var Logger;
+    var Messenger;
 
     helper.before();
 
     before(function () {
         Subscription = helper.injector.get('Subscription');
+
+        Logger = helper.injector.get('Logger');
+        Logger.prototype.warning = sinon.stub().returns(Promise.resolve());
+        Logger.prototype.error = sinon.stub().returns(Promise.resolve());
+
+        Messenger = helper.injector.get('Messenger');
+        Messenger.prototype.publish = sinon.stub().returns(Promise.resolve());
+
 
         this.options = {
             consumerTag: 'fake'
@@ -27,6 +36,7 @@ describe('Subscription', function () {
             this.queue,
             this.options
         );
+
     });
 
     helper.after();
@@ -54,7 +64,6 @@ describe('Subscription', function () {
 
         it('should prevent closing the queue multiple times', function() {
             var self = this;
-
             return self.subject.dispose()
             .then(function() {
                 return self.subject.dispose();
@@ -89,7 +98,8 @@ describe('Subscription', function () {
             });
         });
 
-        it('should reject with an error if the queue is already unsubscribed', function () {
+         it('should reject with an error if the queue is already unsubscribed', function () {
+             
             this.subject.queue.state = 'closing';
 
             return this.subject.dispose().should.be.rejectedWith(
