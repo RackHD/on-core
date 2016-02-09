@@ -74,7 +74,7 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
 
     it('subscribeCancel', function() {
         var callback = function() {};
-        return amqp.subscribeCancel(callback)
+        return amqp.subscribeCancelTask(callback)
         .then(function() {
             expect(taskProtocol.subscribeCancel).to.have.been.calledOnce;
             expect(taskProtocol.subscribeCancel).to.have.been.calledWith(callback);
