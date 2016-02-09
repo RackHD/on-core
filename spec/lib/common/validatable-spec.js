@@ -47,7 +47,7 @@ describe('Validatable', function () {
             it('should reject on failure', function () {
                 return new Subject(
                     { name: 1337 }
-                ).validate().should.be.rejectedWith(Errors.SchemaError);
+                ).validate().should.be.rejectedWith(Error);
             });
         });
 
@@ -81,7 +81,7 @@ describe('Validatable', function () {
             it('should reject on failure', function () {
                 return new Subject(
                     { arbitrary: 1337 }
-                ).validate().should.be.rejectedWith(Errors.SchemaError);
+                ).validate().should.be.rejectedWith(Error);
             });
         });
 
@@ -115,7 +115,7 @@ describe('Validatable', function () {
             it('should reject non-ipv4', function () {
                 return new Subject(
                     { ip: 'garbage' }
-                ).validate().should.be.rejectedWith(Errors.SchemaError);
+                ).validate().should.be.rejectedWith(Error);
             });
         });
     });

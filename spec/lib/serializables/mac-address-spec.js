@@ -44,13 +44,13 @@ describe('MacAddress', function () {
 
         describe('rejected', function () {
             it('should reject if value is not present', function () {
-                return new MacAddress().validate().should.be.rejectedWith(Errors.SchemaError);
+                return new MacAddress().validate().should.be.rejectedWith(Error);
             });
 
             it('should reject if value is not a mac address', function () {
                 return new MacAddress(
                     { value: 'invalid' }
-                ).validate().should.be.rejectedWith(Errors.SchemaError);
+                ).validate().should.be.rejectedWith(Error);
             });
         });
     });
