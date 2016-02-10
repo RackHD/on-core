@@ -1,3 +1,4 @@
+
 // Copyright 2015, EMC, Inc.
 
 
@@ -5,112 +6,255 @@
 
 describe('Connection', function () {
     var Connection;
+    var amqp, sandbox = sinon.sandbox.create();
 
-    helper.before();
+    helper.before(function(context) {
+        context.Core = {
+            start: sandbox.stub().resolves(),
+            stop: sandbox.stub().resolves()
+        };
+
+        context.amqp = function() {
+            this.createConnection = sandbox.stub();
+        };
+        
+        return [
+            helper.di.simpleWrapper(context.Core, 'Services.Core' ),
+            helper.di.simpleWrapper(context.amqp, 'amqp' )
+        ]
+    });
 
     before(function () {
         Connection = helper.injector.get('Connection');
-        this.uri  = helper.injector.get('Services.Configuration').get('amqp');
+        amqp = helper.injector.get('amqp');
+    });
+   
+    beforeEach(function() {
+        this.subject = new Connection({url: ''}, {}, 'test');
     });
 
-    beforeEach(function () {
-        this.subject = new Connection({
-            url: this.uri
-        }, {}, 'test');
+    after(function() {
+        sandbox.restore();
     });
-
-    afterEach(function () {
-        if (this.connection && this.connection.connected) {
-            return this.connection.stop();
-        }
-    });
-
-    helper.after();
 
     describe('Connection', function () {
         describe('start', function () {
+
             it('should fulfill on success', function () {
+                amqp.createConnection = sandbox.spy(function () {
+                    return ({
+                        'on': function (a, callback) {
+                            if (a === 'ready') {
+                                callback(null, {});
+                            }
+                        }
+                    })
+                })
                 return this.subject.start();
             });
 
-            it('should reject if started twice', function () {
+            it('should reject on trying to start twice', function () {
+                amqp.createConnection = sandbox.spy(function () {
+                    return ({
+                        'on': function (a, callback) {
+                            callback(null, {});
+                        }
+                    })
+                })
                 var self = this;
-
                 return this.subject.start().then(function () {
                     return self.subject.start().should.be.rejected;
                 });
             });
 
-            it('should reject on max retry attempts', function() {
-                this.subject.maxConnectionRetries = 3;
-                var startPromise = this.subject.start();
-                this.subject.connection.removeAllListeners('ready');
-                this.subject.connection.emit('error', new Error('test'));
-                this.subject.connection.emit('error', new Error('test'));
-                this.subject.connection.emit('error', new Error('test'));
-                this.subject.connection.emit('error', new Error('test'));
-                return expect(startPromise).to.be.rejectedWith(/Exceeded max retries/);
-            });
-
-            it('should increment retry attempts if initial connection fails', function() {
-                this.subject.initialConnection = false;
-                this.subject.start();
-                this.subject.connection.removeAllListeners('ready');
-                this.subject.connection.emit('error', new Error('test'));
-                this.subject.connection.emit('error', new Error('test'));
-                this.subject.connection.emit('error', new Error('test'));
-                expect(this.subject.initialConnectionRetries).to.equal(3);
-            });
-
-            it('should not increment retry attempts if initial connection succeeded', function() {
-                this.subject.initialConnection = true;
-                this.subject.start();
-                this.subject.connection.removeAllListeners('ready');
-                this.subject.connection.emit('error', new Error('test'));
-                this.subject.connection.emit('error', new Error('test'));
-                expect(this.subject.initialConnectionRetries).to.equal(0);
-            });
-        });
-
-        describe('connected', function () {
-            it('should be false if not connected', function () {
-                this.subject.connected.should.equal(false);
-            });
-
-            it('should be true if connected', function () {
-                var self = this;
-
-                return this.subject.start().then(function () {
-                    return self.subject.connected.should.equal(true);
+            it('should suppress Error Code ECONNRESET', function () {
+                amqp.createConnection = sandbox.spy(function () {
+                    return ({
+                        'on': function (a, callback) {
+                            callback({'code': 'ECONNRESET'}, {});
+                        }
+                    })
                 });
-            });
-        });
-
-        describe('exchanges', function () {
-            it('should be undefined if not connected', function () {
-                expect(this.subject.exchanges).equal(undefined);
+                return this.subject.start();
             });
 
-            it('should have exchanges if connected', function () {
-                var self = this;
+            it('should check if initialConnection is true', function () {
+                this.subject.initialConnection = {};
+                amqp.createConnection = sandbox.spy(function () {
+                    return ({
+                        'on': function (a, callback) {
+                            callback({'message': 'Hit an error'}, {});
+                        }
+                    })
+                })
+                return this.subject.start();
+            });
 
-                this.subject.start().then(function () {
-                    self.subject.exchanges.should.not.be.undefined;
+            it('should check if max retries exceeded', function () {
+                this.subject.initialConnectionRetries = 100;
+                amqp.createConnection = sandbox.spy(function () {
+                    return ({
+                        'on': function (a, callback) {
+                            if (a === 'error') {
+                                callback({'message': 'error'}, {});
+                            }
+                        }
+                    })
+                })
+                return expect(this.subject.start()).to.be.rejectedWith(Error);
+            });
+
+            describe('connected', function () {
+                it('should be false if not connected', function () {
+                    this.subject.connected.should.equal(false);
                 });
-            });
-        });
 
-        describe('stop', function () {
-            it('should fulfill on success', function () {
-                var self = this;
-
-                return this.subject.start().then(function () {
-                    return self.subject.stop();
+                it('should be true if connected', function () {
+                    var self = this;
+                    amqp.createConnection = sandbox.spy(function () {
+                        return ({
+                            'on': function (a, callback) {
+                                callback(null, {});
+                            }
+                        })
+                    })
+                    return this.subject.start().then(function () {
+                        return self.subject.connected.should.equal(true);
+                    });
                 });
             });
 
-            it('should reject if not running', function () {
-                return this.subject.stop().should.be.rejected;
+            describe('exchanges', function () {
+                it('should be undefined if not connected', function () {
+                    expect(this.subject.exchanges).equal(undefined);
+                });
+
+                it('should have exchanges if connected', function () {
+                    var self = this;
+
+                    amqp.createConnection = sandbox.spy(function () {
+                        return ({
+                            'on': function (a, callback) {
+                                callback(null, {});
+                            },
+                            'exchanges':
+                                'on.test'
+                        })
+                    })
+                    return this.subject.start().then(function () {
+                        self.subject.exchanges.should.not.be.undefined;
+                    });
+                });
+            });
+
+            describe('exchange', function ()  {
+                it('should not provide an exchange if connection not established ', function () {
+                    return expect(this.subject.exchange()).to.be.rejectedWith(Error);
+                });
+
+                it('should provide an exchange if connection established and options is a valid object', function () {
+                    var self = this;
+                    amqp.createConnection = sandbox.spy(function () {
+                        return ({
+                            'on': function (a, callback) {
+                                callback(null, {});
+                            },
+                            'exchange': function (a, b, callback){
+                                callback('Hello');
+                            },
+                            'exchanges':
+                                'on.test'
+                        })
+                    })
+                    return this.subject.start().then(function () {
+                        if (self.subject.connected === true) {
+                            return self.subject.exchange('amqp', {url: ''}).should.become('Hello');
+                        }
+                    });
+                });
+
+                it('should error out if objects is not valid ', function () {
+                    var self = this;
+                    amqp.createConnection = sandbox.spy(function () {
+                        return ({
+                            'on': function (a, callback) {
+                                callback(null, {});
+                            },
+                            'exchange': function (a, b, callback){
+                                callback('Hello', {})
+                            },
+                            'exchanges':
+                                'on.test'
+                        });
+                    });
+                    return this.subject.start().then(function () {
+                        if (self.subject.connected === true) {
+                            return expect(self.subject.exchange('amqp')).to.be.rejectedWith(Error);
+                        }
+                    });
+                });
+
+                it('should publish exchange if name is present ', function () {
+                    var self = this;
+                    amqp.createConnection = sandbox.spy(function () {
+                        return ({
+                            'on': function (a, callback) {
+                                callback(null, {});
+                            },
+                            'exchange': function (a, b, callback){
+                                callback('exchange', {});
+                            },
+                            'exchanges':
+                                'on.test'
+                        });
+                    });
+                    return this.subject.start().then(function () {
+                        if (self.subject.connected === true) {
+                            var name = 2;
+                            return expect(self.subject.exchange(name)).to.be.ok;
+                        }
+                    });
+                });
+            });
+
+            describe('stop', function () {
+                it('should close connection if on', function () {
+                    var self = this;
+                    amqp.createConnection = sandbox.spy(function () {
+                        return ({
+                            'on': function (a, callback) {
+                                if(a==='ready' || a=== 'close')
+                                {
+                                    callback(null, {});
+                                }
+                            }
+                        });
+                    });
+                    return this.subject.start().then(function () {
+                        return expect(self.subject.stop()).to.be.ok;
+                    });
+                });
+
+                it('should disconnect connection', function (done) {
+                    var self = this;
+                    amqp.createConnection = sandbox.spy(function () {
+                        return ({
+                            'on': function (a, callback) {
+                                if(a === 'ready'){
+                                    callback(null, {});
+                                }
+                            },
+                            'disconnect':function(){done();},
+                        });
+                    });
+                    return this.subject.start().then(function () {
+                        return expect(self.subject.stop()).to.be.ok;
+                    });
+                });
+
+                it('should reject if not connected', function () {
+                    return this.subject.stop().should.be.rejected;
+                });
             });
         });
     });
