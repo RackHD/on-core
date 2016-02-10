@@ -31,7 +31,7 @@ describe("ChildProcess", function () {
     });
 
     beforeEach(function() {
-        child = new ChildProcess('child-process-spec.js');
+        child = new ChildProcess('child-process-spec.js', null, null, [1]);
     });
 
     after("ChildProcess after", function() {
@@ -119,6 +119,13 @@ describe("ChildProcess", function () {
                 new ChildProcess("child-process-spec.js", ['test', 123]);  // jshint ignore:line
             }).to.throw(/args must be an array of strings/);
         });
+
+        it("should reject if code are not an array of numbers", function () {
+            expect(function() {
+                new ChildProcess("child-process-spec.js", null, null, 1);  // jshint ignore:line
+            }).to.throw('number ([number]) required');
+        });
+
     });
 
     describe("_deferred", function() {
@@ -268,14 +275,34 @@ describe("ChildProcess", function () {
             });
         });
 
-        it("should run and return a rejected promise if returned an error w/ code", function () {
+        it("should run and return a rejected promise if no matched exit code", function (done) {
             var mockSpawnedProcess = new events.EventEmitter();
             var execFileStub = this.childprocess.execFile;
             execFileStub.returns(mockSpawnedProcess)
                 .callsArgWith(3, {code: -1}, undefined, "stderr result");
 
-            return child.run().should.be.rejected.then(function () {
-                expect(execFileStub.called).to.equal(true);
+            return child.run().then(function() {
+                done(new Error('Expect job to fail'));
+            })
+            .catch(function(e) {
+                try {
+                    expect(e).to.deep.equal({code: -1});
+                    done();
+                } catch (e) {
+                    done(e);
+                }
+            });
+        });
+
+        it("should run and return a resolved promise if the exit code matches", function () {
+            var mockSpawnedProcess = new events.EventEmitter();
+            var execFileStub = this.childprocess.execFile;
+            execFileStub.returns(mockSpawnedProcess)
+                .callsArgWith(3, {code: 1}, undefined, "stderr result");
+
+            return child.run().then(function(ret) {
+                expect(execFileStub).to.have.been.called;
+                expect(ret).to.deep.equal({stdout: undefined, stderr: "stderr result"});
             });
         });
 

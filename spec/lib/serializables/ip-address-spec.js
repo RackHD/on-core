@@ -44,13 +44,13 @@ describe('IpAddress', function () {
 
         describe('rejected', function () {
             it('should reject if value is not present', function () {
-                return new IpAddress().validate().should.be.rejectedWith(Errors.SchemaError);
+                return new IpAddress().validate().should.be.rejectedWith(Error);
             });
 
             it('should reject if value is not an ip address', function () {
                 return new IpAddress(
                     { value: 'invalid' }
-                ).validate().should.be.rejectedWith(Errors.SchemaError);
+                ).validate().should.be.rejectedWith(Error);
             });
         });
     });
