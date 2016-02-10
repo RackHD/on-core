@@ -6,26 +6,42 @@
 
 describe('Connection', function () {
     var Connection;
-    var amqp, amqpConnection;
-    helper.before();
+    var amqp, sandbox = sinon.sandbox.create();
+
+    helper.before(function(context) {
+        context.Core = {
+            start: sandbox.stub().resolves(),
+            stop: sandbox.stub().resolves()
+        };
+
+        context.amqp = function() {
+            this.createConnection = sandbox.stub();
+        };
+        
+        return [
+            helper.di.simpleWrapper(context.Core, 'Services.Core' ),
+            helper.di.simpleWrapper(context.amqp, 'amqp' )
+        ]
+    });
 
     before(function () {
         Connection = helper.injector.get('Connection');
         amqp = helper.injector.get('amqp');
     });
-    this.uri = 'amqp://localhost';
-    beforeEach(function () {
-        this.subject = new Connection({url: 'amqp://localhost'}, {}, 'test');
-
+   
+    beforeEach(function() {
+        this.subject = new Connection({url: ''}, {}, 'test');
     });
 
-    helper.after();
+    after(function() {
+        sandbox.restore();
+    });
 
     describe('Connection', function () {
         describe('start', function () {
 
             it('should fulfill on success', function () {
-                amqp.createConnection = sinon.spy(function () {
+                amqp.createConnection = sandbox.spy(function () {
                     return ({
                         'on': function (a, callback) {
                             if (a === 'ready') {
@@ -38,7 +54,7 @@ describe('Connection', function () {
             });
 
             it('should reject on trying to start twice', function () {
-                amqp.createConnection = sinon.spy(function () {
+                amqp.createConnection = sandbox.spy(function () {
                     return ({
                         'on': function (a, callback) {
                             callback(null, {});
@@ -52,7 +68,7 @@ describe('Connection', function () {
             });
 
             it('should suppress Error Code ECONNRESET', function () {
-                amqp.createConnection = sinon.spy(function () {
+                amqp.createConnection = sandbox.spy(function () {
                     return ({
                         'on': function (a, callback) {
                             callback({'code': 'ECONNRESET'}, {});
@@ -64,7 +80,7 @@ describe('Connection', function () {
 
             it('should check if initialConnection is true', function () {
                 this.subject.initialConnection = {};
-                amqp.createConnection = sinon.spy(function () {
+                amqp.createConnection = sandbox.spy(function () {
                     return ({
                         'on': function (a, callback) {
                             callback({'message': 'Hit an error'}, {});
@@ -76,7 +92,7 @@ describe('Connection', function () {
 
             it('should check if max retries exceeded', function () {
                 this.subject.initialConnectionRetries = 100;
-                amqp.createConnection = sinon.spy(function () {
+                amqp.createConnection = sandbox.spy(function () {
                     return ({
                         'on': function (a, callback) {
                             if (a === 'error') {
@@ -85,10 +101,7 @@ describe('Connection', function () {
                         }
                     })
                 })
-                return this.subject.start()
-                    .catch(function (Error) {
-                        console.log(Error);
-                    });
+                return expect(this.subject.start()).to.be.rejectedWith(Error);
             });
 
             describe('connected', function () {
@@ -98,7 +111,7 @@ describe('Connection', function () {
 
                 it('should be true if connected', function () {
                     var self = this;
-                    amqp.createConnection = sinon.spy(function () {
+                    amqp.createConnection = sandbox.spy(function () {
                         return ({
                             'on': function (a, callback) {
                                 callback(null, {});
@@ -119,7 +132,7 @@ describe('Connection', function () {
                 it('should have exchanges if connected', function () {
                     var self = this;
 
-                    amqp.createConnection = sinon.spy(function () {
+                    amqp.createConnection = sandbox.spy(function () {
                         return ({
                             'on': function (a, callback) {
                                 callback(null, {});
@@ -128,8 +141,7 @@ describe('Connection', function () {
                                 'on.test'
                         })
                     })
-                    this.subject.start().then(function () {
-
+                    return this.subject.start().then(function () {
                         self.subject.exchanges.should.not.be.undefined;
                     });
                 });
@@ -137,40 +149,33 @@ describe('Connection', function () {
 
             describe('exchange', function ()  {
                 it('should not provide an exchange if connection not established ', function () {
-                    var self = this;
-                    return this.subject.exchange()
-                        .catch(function (Error) {
-                            console.log(Error);
-                        });
+                    return expect(this.subject.exchange()).to.be.rejectedWith(Error);
                 });
 
                 it('should provide an exchange if connection established and options is a valid object', function () {
                     var self = this;
-                    amqp.createConnection = sinon.spy(function () {
+                    amqp.createConnection = sandbox.spy(function () {
                         return ({
                             'on': function (a, callback) {
                                 callback(null, {});
                             },
                             'exchange': function (a, b, callback){
-                                callback('Hello', {})
+                                callback('Hello');
                             },
                             'exchanges':
                                 'on.test'
                         })
                     })
-                    this.subject.start().then(function () {
-                        if (self.subject.connected == true) {
-                            var name = 'amqp://localhost';
-                            return self.subject.exchange(name, {url: 'amqp://localhost'}, function(callback) {
-                                callback('exchange', {});
-                            });
+                    return this.subject.start().then(function () {
+                        if (self.subject.connected === true) {
+                            return self.subject.exchange('amqp', {url: ''}).should.become('Hello');
                         }
                     });
                 });
 
                 it('should error out if objects is not valid ', function () {
                     var self = this;
-                    amqp.createConnection = sinon.spy(function () {
+                    amqp.createConnection = sandbox.spy(function () {
                         return ({
                             'on': function (a, callback) {
                                 callback(null, {});
@@ -180,38 +185,33 @@ describe('Connection', function () {
                             },
                             'exchanges':
                                 'on.test'
-                        })
-                    })
-                    this.subject.start().then(function () {
-                        if (self.subject.connected == true) {
-                            var name = 'test';
-                            return self.subject.exchange(name)
-                                .catch(function (Error) {
-                                    console.log(Error);
-                                });
+                        });
+                    });
+                    return this.subject.start().then(function () {
+                        if (self.subject.connected === true) {
+                            return expect(self.subject.exchange('amqp')).to.be.rejectedWith(Error);
                         }
                     });
                 });
 
                 it('should publish exchange if name is present ', function () {
                     var self = this;
-                    amqp.createConnection = sinon.spy(function () {
+                    amqp.createConnection = sandbox.spy(function () {
                         return ({
                             'on': function (a, callback) {
                                 callback(null, {});
                             },
                             'exchange': function (a, b, callback){
-                                callback('exchange', {})
+                                callback('exchange', {});
                             },
                             'exchanges':
                                 'on.test'
-                        })
-                    })
-                    this.subject.start().then(function () {
-                        if (self.subject.connected == true) {
+                        });
+                    });
+                    return this.subject.start().then(function () {
+                        if (self.subject.connected === true) {
                             var name = 2;
-                            return self.subject.exchange(name)
-                            callback('exchange', {});
+                            return expect(self.subject.exchange(name)).to.be.ok;
                         }
                     });
                 });
@@ -220,33 +220,35 @@ describe('Connection', function () {
             describe('stop', function () {
                 it('should close connection if on', function () {
                     var self = this;
-                    amqp.createConnection = sinon.spy(function () {
+                    amqp.createConnection = sandbox.spy(function () {
                         return ({
                             'on': function (a, callback) {
                                 if(a==='ready' || a=== 'close')
+                                {
                                     callback(null, {});
+                                }
                             }
-                        })
-                    })
+                        });
+                    });
                     return this.subject.start().then(function () {
-                        return self.subject.stop();
+                        return expect(self.subject.stop()).to.be.ok;
                     });
                 });
 
                 it('should disconnect connection', function (done) {
                     var self = this;
-                    amqp.createConnection = sinon.spy(function () {
+                    amqp.createConnection = sandbox.spy(function () {
                         return ({
                             'on': function (a, callback) {
                                 if(a === 'ready'){
                                     callback(null, {});
                                 }
                             },
-                            'disconnect':function(){done();}
-                        })
-                    })
+                            'disconnect':function(){done();},
+                        });
+                    });
                     return this.subject.start().then(function () {
-                        return self.subject.stop();
+                        return expect(self.subject.stop()).to.be.ok;
                     });
                 });
 
