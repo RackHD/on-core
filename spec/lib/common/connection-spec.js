@@ -21,7 +21,7 @@ describe('Connection', function () {
         return [
             helper.di.simpleWrapper(context.Core, 'Services.Core' ),
             helper.di.simpleWrapper(context.amqp, 'amqp' )
-        ]
+        ];
     });
 
     before(function () {
@@ -73,7 +73,7 @@ describe('Connection', function () {
                         'on': function (a, callback) {
                             callback({'code': 'ECONNRESET'}, {});
                         }
-                    })
+                    });
                 });
                 return this.subject.start();
             });
@@ -85,8 +85,8 @@ describe('Connection', function () {
                         'on': function (a, callback) {
                             callback({'message': 'Hit an error'}, {});
                         }
-                    })
-                })
+                    });
+                });
                 return this.subject.start();
             });
 
@@ -99,8 +99,8 @@ describe('Connection', function () {
                                 callback({'message': 'error'}, {});
                             }
                         }
-                    })
-                })
+                    });
+                });
                 return expect(this.subject.start()).to.be.rejectedWith(Error);
             });
 
@@ -152,7 +152,8 @@ describe('Connection', function () {
                     return expect(this.subject.exchange()).to.be.rejectedWith(Error);
                 });
 
-                it('should provide an exchange if connection established and options is a valid object', function () {
+                it('should provide an exchange if connection established and options ' +
+                    'is a valid object', function () {
                     var self = this;
                     amqp.createConnection = sandbox.spy(function () {
                         return ({
@@ -167,9 +168,8 @@ describe('Connection', function () {
                         });
                     });
                     return this.subject.start().then(function () {
-                        if (self.subject.connected === true) {
-                            return self.subject.exchange('amqp', {url: ''}).should.become('Hello');
-                        }
+                        expect(self.subject.connected).to.equal(true)
+                          return self.subject.exchange('amqp', {url: ''}).should.become('Hello');
                     });
                 });
 
@@ -181,17 +181,16 @@ describe('Connection', function () {
                                 callback(null, {});
                             },
                             'exchange': function (a, b, callback){
-                                callback('Hello', {})
+                                callback('Hello', {});
                             },
                             'exchanges':
                                 'on.test'
                         });
                     });
                     return this.subject.start().then(function () {
-                        if (self.subject.connected === true) {
+                        if(self.subject.connected === true)
                             return expect(self.subject.exchange('amqp')).to.be.rejectedWith(Error);
-                        }
-                    });
+                        });
                 });
 
                 it('should publish exchange if name is present ', function () {
@@ -209,7 +208,8 @@ describe('Connection', function () {
                         });
                     });
                     return this.subject.start().then(function () {
-                        if (self.subject.connected === true) {
+                        expect(self.subject.connected).to.equal(true)
+                        {
                             var name = 2;
                             return expect(self.subject.exchange(name)).to.be.ok;
                         }
@@ -231,7 +231,7 @@ describe('Connection', function () {
                         });
                     });
                     return this.subject.start().then(function () {
-                        return expect(self.subject.stop()).to.be.ok;
+                        return expect(self.subject.stop()).to.be.fulfilled;
                     });
                 });
 
@@ -248,7 +248,7 @@ describe('Connection', function () {
                         });
                     });
                     return this.subject.start().then(function () {
-                        return expect(self.subject.stop()).to.be.ok;
+                        return expect(self.subject.stop()).to.be.fulfilled;
                     });
                 });
 
