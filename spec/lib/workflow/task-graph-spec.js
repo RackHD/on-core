@@ -53,7 +53,7 @@ describe('Task Graph', function () {
         it('should use the default domain', function() {
             return TaskGraph.create(undefined, { definition: definitions.graphDefinition })
             .then(function(graph) {
-                expect(graph.domain).to.equal(Constants.DefaultTaskDomain);
+                expect(graph.domain).to.equal(Constants.Task.DefaultDomain);
             });
         });
 

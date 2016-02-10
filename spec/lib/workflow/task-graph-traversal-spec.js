@@ -128,10 +128,10 @@ describe("Task Graph sorting", function () {
         expect(graph.tasks['2'].terminalOnStates).to.deep.equal([]);
         expect(graph.tasks['3']).to.have.property('terminalOnStates');
         expect(graph.tasks['3'].terminalOnStates.sort())
-            .to.deep.equal(Constants.FinishedTaskStates.sort());
+            .to.deep.equal(Constants.Task.FinishedStates.sort());
         expect(graph.tasks['4']).to.have.property('terminalOnStates');
         expect(graph.tasks['4'].terminalOnStates.sort())
-            .to.deep.equal(Constants.FinishedTaskStates.sort());
+            .to.deep.equal(Constants.Task.FinishedStates.sort());
     });
 
     it('should set terminal nodes when there are failure branches', function() {
@@ -147,13 +147,13 @@ describe("Task Graph sorting", function () {
 
         expect(graph.tasks['1']).to.have.property('terminalOnStates');
         expect(graph.tasks['1'].terminalOnStates.sort()).to.deep.equal([
-            Constants.TaskStates.Cancelled,
-            Constants.TaskStates.Succeeded,
-            Constants.TaskStates.Timeout
+            Constants.Task.States.Cancelled,
+            Constants.Task.States.Succeeded,
+            Constants.Task.States.Timeout
         ]);
         expect(graph.tasks['2']).to.have.property('terminalOnStates');
         expect(graph.tasks['2'].terminalOnStates.sort()).to.deep.equal(
-            Constants.FinishedTaskStates.sort());
+            Constants.Task.FinishedStates.sort());
     });
 
     it('should set terminal nodes when there are deep failure branches', function() {
@@ -170,19 +170,19 @@ describe("Task Graph sorting", function () {
 
         expect(graph.tasks['1']).to.have.property('terminalOnStates');
         expect(graph.tasks['1'].terminalOnStates.sort()).to.deep.equal([
-            Constants.TaskStates.Cancelled,
-            Constants.TaskStates.Succeeded,
-            Constants.TaskStates.Timeout
+            Constants.Task.States.Cancelled,
+            Constants.Task.States.Succeeded,
+            Constants.Task.States.Timeout
         ]);
         expect(graph.tasks['2']).to.have.property('terminalOnStates');
         expect(graph.tasks['2'].terminalOnStates.sort()).to.deep.equal([
-            Constants.TaskStates.Cancelled,
-            Constants.TaskStates.Succeeded,
-            Constants.TaskStates.Timeout
+            Constants.Task.States.Cancelled,
+            Constants.Task.States.Succeeded,
+            Constants.Task.States.Timeout
         ]);
         expect(graph.tasks['3']).to.have.property('terminalOnStates');
         expect(graph.tasks['3'].terminalOnStates.sort()).to.deep.equal(
-            Constants.FinishedTaskStates.sort());
+            Constants.Task.FinishedStates.sort());
     });
 
     it('should set terminal nodes when there are failure and success branches', function() {
@@ -200,18 +200,18 @@ describe("Task Graph sorting", function () {
 
         expect(graph.tasks['1']).to.have.property('terminalOnStates');
         expect(graph.tasks['1'].terminalOnStates.sort()).to.deep.equal([
-            Constants.TaskStates.Cancelled,
-            Constants.TaskStates.Timeout
+            Constants.Task.States.Cancelled,
+            Constants.Task.States.Timeout
         ]);
         expect(graph.tasks['2']).to.have.property('terminalOnStates');
         expect(graph.tasks['2'].terminalOnStates.sort()).to.deep.equal([
-            Constants.TaskStates.Cancelled,
-            Constants.TaskStates.Succeeded,
-            Constants.TaskStates.Timeout
+            Constants.Task.States.Cancelled,
+            Constants.Task.States.Succeeded,
+            Constants.Task.States.Timeout
         ]);
         expect(graph.tasks['3']).to.have.property('terminalOnStates');
         expect(graph.tasks['3'].terminalOnStates.sort()).to.deep.equal(
-            Constants.FinishedTaskStates.sort());
+            Constants.Task.FinishedStates.sort());
     });
 
     it('should set terminal nodes when there are failure and success branches', function() {
@@ -229,18 +229,18 @@ describe("Task Graph sorting", function () {
 
         expect(graph.tasks['1']).to.have.property('terminalOnStates');
         expect(graph.tasks['1'].terminalOnStates.sort()).to.deep.equal([
-            Constants.TaskStates.Cancelled,
-            Constants.TaskStates.Timeout
+            Constants.Task.States.Cancelled,
+            Constants.Task.States.Timeout
         ]);
         expect(graph.tasks['2']).to.have.property('terminalOnStates');
         expect(graph.tasks['2'].terminalOnStates.sort()).to.deep.equal([
-            Constants.TaskStates.Cancelled,
-            Constants.TaskStates.Succeeded,
-            Constants.TaskStates.Timeout
+            Constants.Task.States.Cancelled,
+            Constants.Task.States.Succeeded,
+            Constants.Task.States.Timeout
         ]);
         expect(graph.tasks['3']).to.have.property('terminalOnStates');
         expect(graph.tasks['3'].terminalOnStates.sort()).to.deep.equal(
-            Constants.FinishedTaskStates.sort());
+            Constants.Task.FinishedStates.sort());
     });
 
     it('should mark terminal states correctly for a complex graph', function() {
@@ -274,7 +274,7 @@ describe("Task Graph sorting", function () {
 
         expect(graph.tasks['2']).to.have.property('terminalOnStates');
         expect(graph.tasks['2'].terminalOnStates).to.deep.equal([
-            Constants.TaskStates.Cancelled
+            Constants.Task.States.Cancelled
         ]);
 
         expect(graph.tasks['6']).to.have.property('terminalOnStates');
@@ -282,11 +282,11 @@ describe("Task Graph sorting", function () {
 
         expect(graph.tasks['5']).to.have.property('terminalOnStates');
         expect(graph.tasks['5'].terminalOnStates.sort())
-            .to.deep.equal(Constants.FinishedTaskStates.sort());
+            .to.deep.equal(Constants.Task.FinishedStates.sort());
 
         expect(graph.tasks['8']).to.have.property('terminalOnStates');
         expect(graph.tasks['8'].terminalOnStates.sort())
-            .to.deep.equal(Constants.FinishedTaskStates.sort());
+            .to.deep.equal(Constants.Task.FinishedStates.sort());
     });
 
     it('should remove redundant waitOn states if "finished" is specified', function() {

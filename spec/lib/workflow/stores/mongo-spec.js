@@ -62,7 +62,7 @@ describe('Task Graph mongo store interface', function () {
         .then(function() {
             expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledOnce;
             expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledWith(
-                { instanceId: data.graphId, _status: Constants.TaskStates.Pending },
+                { instanceId: data.graphId, _status: Constants.Task.States.Pending },
                 {},
                 { $set: { _status: 'succeeded' } },
                 { new: true }
@@ -226,7 +226,7 @@ describe('Task Graph mongo store interface', function () {
                 {
                     taskId: taskDependencyItem.taskId,
                     graphId: graphId,
-                    state: Constants.TaskStates.Pending,
+                    state: Constants.Task.States.Pending,
                     dependencies: {},
                     terminalOnStates: ['failed', 'timeout', 'cancelled']
                 }
@@ -274,7 +274,7 @@ describe('Task Graph mongo store interface', function () {
         .then(function() {
             expect(waterline.taskdependencies.updateMongo).to.have.been.calledOnce;
             expect(waterline.taskdependencies.updateMongo).to.have.been.calledWith(
-                { taskRunnerLease: leaseId, reachable: true, state: Constants.TaskStates.Pending }
+                { taskRunnerLease: leaseId, reachable: true, state: Constants.Task.States.Pending }
             );
             var update = waterline.taskdependencies.updateMongo.firstCall.args[1];
             expect(update).to.have.property('$set')
@@ -298,7 +298,7 @@ describe('Task Graph mongo store interface', function () {
                     where: {
                         taskRunnerLease: leaseId,
                         reachable: true,
-                        state: Constants.TaskStates.Pending
+                        state: Constants.Task.States.Pending
                     }
                 }
             );
@@ -310,7 +310,7 @@ describe('Task Graph mongo store interface', function () {
         .then(function() {
             expect(waterline.graphobjects.find).to.have.been.calledOnce;
             expect(waterline.graphobjects.find).to.have.been.calledWith(
-                { domain: 'default', _status: Constants.TaskStates.Pending }
+                { domain: 'default', _status: Constants.Task.States.Pending }
             );
         });
     });
@@ -332,7 +332,7 @@ describe('Task Graph mongo store interface', function () {
                     domain: 'default',
                     evaluated: false,
                     reachable: true,
-                    state: { $in: Constants.FinishedTaskStates }
+                    state: { $in: Constants.Task.FinishedStates }
                 }
             );
             expect(promise.limit).to.have.been.calledOnce;
@@ -360,7 +360,7 @@ describe('Task Graph mongo store interface', function () {
                     domain: 'default',
                     dependencies: {},
                     reachable: true,
-                    state: Constants.TaskStates.Pending,
+                    state: Constants.Task.States.Pending,
                     graphId: graphId
                 }
             );
@@ -388,7 +388,7 @@ describe('Task Graph mongo store interface', function () {
                     domain: 'default',
                     dependencies: {},
                     reachable: true,
-                    state: Constants.TaskStates.Pending
+                    state: Constants.Task.States.Pending
                 }
             );
             expect(result).to.have.property('graphId').that.equals(null);
@@ -438,7 +438,7 @@ describe('Task Graph mongo store interface', function () {
             expect(waterline.taskdependencies.findOne).to.have.been.calledWith(
                 {
                     graphId: data.graphId,
-                    state: Constants.TaskStates.Pending,
+                    state: Constants.Task.States.Pending,
                     reachable: true
                 }
             );
@@ -474,7 +474,7 @@ describe('Task Graph mongo store interface', function () {
                 reachable: true
             };
             query['dependencies.' + data.taskId] = {
-                $in: [data.state, Constants.TaskStates.Finished]
+                $in: [data.state, Constants.Task.States.Finished]
             };
             var update = {
                 $unset: {}
@@ -499,7 +499,7 @@ describe('Task Graph mongo store interface', function () {
             reachable: true
         };
         query['dependencies.' + data.taskId] = {
-            $in: _.difference(Constants.FinishedTaskStates, [data.state])
+            $in: _.difference(Constants.Task.FinishedStates, [data.state])
         };
 
         return mongo.updateUnreachableTasks(data)
@@ -547,7 +547,7 @@ describe('Task Graph mongo store interface', function () {
             expect(query).to.have.property('domain').that.equals('default');
             expect(query).to.have.property('reachable').that.equals(true);
             expect(query).to.have.property('taskRunnerLease').that.deep.equals({ $ne: null });
-            expect(query).to.have.property('state').that.equals(Constants.TaskStates.Pending);
+            expect(query).to.have.property('state').that.equals(Constants.Task.States.Pending);
             expect(query.taskRunnerHeartbeat).to.have.property('$lt').that.is.an.instanceof(Date);
             // Just make sure we did some subtraction with leaseAdjust. Getting the
             // hard value here/stubbing Date.now isn't really worth the effort.
@@ -582,7 +582,7 @@ describe('Task Graph mongo store interface', function () {
                         {
                             evaluated: true,
                             state: {
-                                $in: Constants.FinishedTaskStates
+                                $in: Constants.Task.FinishedStates
                             }
                         },
                         { reachable: false }
