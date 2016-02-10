@@ -48,8 +48,8 @@ describe('Connection', function () {
                                 callback(null, {});
                             }
                         }
-                    })
-                })
+                    });
+                });
                 return this.subject.start();
             });
 
@@ -59,8 +59,8 @@ describe('Connection', function () {
                         'on': function (a, callback) {
                             callback(null, {});
                         }
-                    })
-                })
+                    });
+                });
                 var self = this;
                 return this.subject.start().then(function () {
                     return self.subject.start().should.be.rejected;
@@ -116,8 +116,8 @@ describe('Connection', function () {
                             'on': function (a, callback) {
                                 callback(null, {});
                             }
-                        })
-                    })
+                        });
+                    });
                     return this.subject.start().then(function () {
                         return self.subject.connected.should.equal(true);
                     });
@@ -139,8 +139,8 @@ describe('Connection', function () {
                             },
                             'exchanges':
                                 'on.test'
-                        })
-                    })
+                        });
+                    });
                     return this.subject.start().then(function () {
                         self.subject.exchanges.should.not.be.undefined;
                     });
@@ -164,8 +164,8 @@ describe('Connection', function () {
                             },
                             'exchanges':
                                 'on.test'
-                        })
-                    })
+                        });
+                    });
                     return this.subject.start().then(function () {
                         if (self.subject.connected === true) {
                             return self.subject.exchange('amqp', {url: ''}).should.become('Hello');
