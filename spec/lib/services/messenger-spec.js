@@ -4,10 +4,81 @@
 'use strict';
 
 describe('Messenger', function () {
-    var subscription, Errors, ErrorEvent, IpAddress, Constants;
-
-    helper.before();
-
+    var Errors, ErrorEvent, IpAddress, Constants,
+        testData = { hello: 'world' },
+        sandbox = sinon.sandbox.create();
+    
+    helper.before(function(context) {
+        function MockPromise () {
+            this.addCallback = sandbox.spy(function(callback) {
+                callback({});
+            });
+        }
+        
+        var exchange = {
+            publish: sandbox.stub().resolves()
+        };
+        
+        var queue = {
+            subscribe: sandbox.spy(function(a,callback) {
+                callback(testData,{},{});
+                return new MockPromise();
+            }),
+            bind: sandbox.spy(function(a,b,callback) {
+                callback();
+            })
+        };
+        
+        context.statsd = {
+            stop: sandbox.stub().resolves(),
+            start: sandbox.stub().resolves(),
+            sanitize: sandbox.stub().resolves(),
+            timing: sandbox.stub().resolves()
+        };
+        
+        context.Subscription = function () {
+            this.dispose = sandbox.stub();
+        };
+        
+        context.Connection = function () {
+            this.start = sandbox.stub().resolves();
+            this.stop = sandbox.stub().resolves();
+            this.exchange = sandbox.stub().resolves(exchange);
+            this.queue = sandbox.spy(function(a,b,callback) {
+                callback(queue);
+            });
+            this.exchanges = {'on.test':{}};
+            this.initialConnection = true;
+        };
+        
+        context.Message = function (data) {
+            this.data = data;
+            this.resolve = sandbox.stub().resolves();
+            this.respond = sandbox.stub().resolves();
+            this.isRequest = sandbox.stub().resolves();
+            this.reject = sandbox.stub().resolves();
+        };
+        
+        context.Timer = function () {
+            this.stop = sandbox.stub().resolves();
+            this.start = sandbox.stub().resolves();
+        };
+        
+        context.Core = {
+            start: sandbox.stub().resolves(),
+            stop: sandbox.stub().resolves()
+        };
+        
+        return [
+            helper.di.simpleWrapper(context.Message, 'Message'),
+            helper.di.simpleWrapper(context.Connection, 'Connection'),
+            helper.di.simpleWrapper(context.Timer, 'Timer'),
+            helper.di.simpleWrapper(context.statsd, 'Services.StatsD'),
+            helper.di.simpleWrapper(context.Subscription, 'Subscription'),
+            helper.di.simpleWrapper(context.Core, 'Services.Core' )
+        ];
+    });
+    
     before(function () {
         this.subject = helper.injector.get('Services.Messenger');
         Errors = helper.injector.get('Errors');
@@ -15,19 +86,20 @@ describe('Messenger', function () {
         IpAddress = helper.injector.get('IpAddress');
         Constants = helper.injector.get('Constants');
     });
-
-    afterEach(function () {
-        if (subscription) {
-            return subscription.dispose().then(function () {
-                subscription = undefined;
-            }).catch(function () {
-                subscription = undefined;
-            });
-        }
-    });
-
+    
     helper.after();
-
+    after(function() {
+        sandbox.restore();
+    });
+    
+    beforeEach(function() {
+        this.subject.start();
+    });
+    
+    afterEach(function() {
+        this.subject.stop();
+    });
+    
     describe('publish/subscribe', function () {
         it('should resolve if the published data is an object', function () {
             return this.subject.publish(
@@ -53,33 +125,28 @@ describe('Messenger', function () {
             ).should.be.fulfilled;
         });
 
-        it('should send data to the proper exchange', function (done) {
+        it('should send data to the proper exchange', function () {
             var self = this;
-
-            this.subject.subscribe(
+            return this.subject.subscribe(
                 Constants.Protocol.Exchanges.Test.Name,
                 '#',
                 function (data) {
-                    data.should.deep.equal({ hello: 'world' });
-
-                    done();
+                    data.should.deep.equal(
+                        { hello: 'world' }
+                    );
                 }
             ).then(function (sub) {
-                subscription = sub;
-
+                expect(sub).to.be.ok;
                 return self.subject.publish(
                     Constants.Protocol.Exchanges.Test.Name,
                     'test',
                     { hello: 'world' }
-                );
-            }).catch(function (error) {
-                done(error);
+                ).should.be.fulfilled;
             });
         });
 
-        it('should send data to the proper routing key', function (done) {
+        it('should send data to the proper routing key', function () {
             var self = this;
-
             return this.subject.subscribe(
                 Constants.Protocol.Exchanges.Test.Name,
                 'test',
@@ -87,19 +154,13 @@ describe('Messenger', function () {
                     data.should.deep.equal(
                         { hello: 'world' }
                     );
-
-                    done();
                 }
             ).then(function (sub) {
-                subscription = sub;
-
                 return self.subject.publish(
                     Constants.Protocol.Exchanges.Test.Name,
                     'test',
                     { hello: 'world' }
-                );
-            }).catch(function (error) {
-                done(error);
+                ).should.be.fulfilled;
             });
         });
 
@@ -110,6 +171,19 @@ describe('Messenger', function () {
                 function (){}
             ).should.be.rejectedWith(Error);
         });
+        
+        it('should throw if subscribed with an invalid type', function () {
+            testData = { hello: 'world' };
+            var self = this;
+            return this.subject.subscribe(
+                Constants.Protocol.Exchanges.Test.Name,
+                'test',
+                function(){},
+                function(){}
+            ).then(function() {
+                expect(self.subject.receive.queue).to.throw(Error);
+            });
+        });
 
         it('should reject if published to an invalid exchange', function () {
             return this.subject.publish(
@@ -118,49 +192,49 @@ describe('Messenger', function () {
                 { hello: 'invalid' }
             ).should.be.rejectedWith(Error);
         });
+        
+        it('should reject if no transmit connection established', function () {
+            this.subject.transmit = undefined;
+            return this.subject.publish(
+                Constants.Protocol.Exchanges.Test.Name,
+                'test',
+                { hello: 'world' }
+            ).should.be.rejectedWith(Error);
+        });
     });
 
     describe('request', function () {
         it('should resolve on a successful response', function () {
+            testData = { hello: 'world' };
             var self = this;
 
             return this.subject.subscribe(
                 Constants.Protocol.Exchanges.Test.Name,
                 '#',
                 function (data, message) {
-                    data.should.deep.equal({ hello: 'world' });
-
-                    message.resolve(
-                        { world: 'hello' }
-                    );
+                    data.should.deep.equal(testData);
+                    message.resolve(testData);
                 }
             ).then(function (sub) {
-                subscription = sub;
-
                 return self.subject.request(
                     Constants.Protocol.Exchanges.Test.Name,
                     'test',
-                    { hello: 'world' }
-                ).should.eventually.deep.equal({ world: 'hello' });
+                    testData
+                ).should.eventually.deep.equal(testData);
             });
         });
 
         it('should reject on an unsuccessful response', function () {
             var self = this;
-
+            testData = new ErrorEvent();
             return this.subject.subscribe(
                 Constants.Protocol.Exchanges.Test.Name,
                 '#',
                 function (data, message) {
                     data.should.deep.equal({ hello: 'world' });
-
-                    message.reject(
-                        new Error('world hello')
-                    );
+                    message.reject(testData);
                 }
             ).then(function (sub) {
-                subscription = sub;
-
                 return self.subject.request(
                     Constants.Protocol.Exchanges.Test.Name,
                     'test',
@@ -170,18 +244,16 @@ describe('Messenger', function () {
         });
 
         it('should reject if a request times out', function () {
-            this.subject.timeout = 100;
-
+            this.subject.timeout = 0;
             return this.subject.request(
-                    'test',
+                    Constants.Protocol.Exchanges.Test.Name,
                     'test',
                     { hello: 'world' }
-                ).should.be.rejectedWith(Errors.RequestTimedOutError);
+                ).should.be.rejectedWith(Errors.RequestTimedOutError());
         });
 
         it('should reject request messages which are not what the subscriber expects', function () {
             var self = this;
-
             return this.subject.subscribe(
                 Constants.Protocol.Exchanges.Test.Name,
                 '#',
@@ -190,8 +262,6 @@ describe('Messenger', function () {
                 },
                 IpAddress
             ).then(function (sub) {
-                subscription = sub;
-
                 return self.subject.request(
                     Constants.Protocol.Exchanges.Test.Name,
                     'test',
@@ -202,16 +272,14 @@ describe('Messenger', function () {
 
         it('should reject response messages which are not what the requester expects', function () {
             var self = this;
-
+                testData = { hello: 'world' };
             return this.subject.subscribe(
                 Constants.Protocol.Exchanges.Test.Name,
                 '#',
                 function (data, message) {
-                    message.resolve({ hello: 'world' });
+                    message.resolve(testData);
                 }
             ).then(function (sub) {
-                subscription = sub;
-
                 return self.subject.request(
                     Constants.Protocol.Exchanges.Test.Name,
                     'test',
