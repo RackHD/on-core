@@ -4,19 +4,19 @@
 'use strict';
 
 var base = require('./base-spec');
-function MessengerServices()  {
-}
-MessengerServices.prototype.start = sinon.stub().returns(Promise.resolve());
-MessengerServices.prototype.stop = sinon.stub().returns(Promise.resolve());
-MessengerServices.prototype.publish = sinon.stub().returns(Promise.resolve());
+var  sandbox = sinon.sandbox.create();
 
 describe('Models.Template', function () {
-    helper.before(function () {
+    helper.before(function (context) {
+        context.MessengerServices = function() {
+            this.start= sandbox.stub().resolves();
+            this.stop = sandbox.stub().resolves();
+            this.publish = sandbox.stub().resolves();
+        };
         return [
-            helper.di.simpleWrapper(MessengerServices, 'Messenger')
+            helper.di.simpleWrapper(context.MessengerServices, 'Messenger')
         ];
     });
-
     base.before(function (context) {
         context.model = helper.injector.get('Services.Waterline').templates;
         context.attributes = context.model._attributes;

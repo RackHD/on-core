@@ -5,25 +5,31 @@
 describe('Subscription', function () {
     var Subscription;
     var Logger;
-    var Messenger;
+    var sandbox = sinon.sandbox.create();
 
-    helper.before();
+    helper.before(function (context) {
+        context.MessengerServices = function() {
+            this.start= sandbox.stub().resolves();
+            this.stop = sandbox.stub().resolves();
+            this.publish = sandbox.stub().resolves();
+        };
+        return [
+            helper.di.simpleWrapper(context.MessengerServices, 'Messenger')
+        ];
+    });
 
     before(function () {
         Subscription = helper.injector.get('Subscription');
 
         Logger = helper.injector.get('Logger');
-        Logger.prototype.warning = sinon.stub().returns(Promise.resolve());
-        Logger.prototype.error = sinon.stub().returns(Promise.resolve());
 
-        Messenger = helper.injector.get('Messenger');
-        Messenger.prototype.publish = sinon.stub().returns(Promise.resolve());
+        Logger.prototype.log = sinon.spy();
 
-
-        this.options = {
+            this.options = {
             consumerTag: 'fake'
         };
     });
+
 
     beforeEach(function() {
         this.queue = {
@@ -98,7 +104,7 @@ describe('Subscription', function () {
             });
         });
 
-         it('should reject with an error if the queue is already unsubscribed', function () {
+        it('should reject with an error if the queue is already unsubscribed', function () {
              
             this.subject.queue.state = 'closing';
 

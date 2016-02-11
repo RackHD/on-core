@@ -7,15 +7,11 @@ var bluebird = require('bluebird');
 
 describe('Model', function () {
     var waterline,
-        messenger;
+        sandbox = sinon.sandbox.create();
+
     var waterlineProtocol = {
         publishRecord: sinon.stub().returns(Promise.resolve())
     };
-    function MessengerServices()  {
-    }
-    MessengerServices.prototype.start = sinon.stub().returns(Promise.resolve());
-    MessengerServices.prototype.stop = sinon.stub().returns(Promise.resolve());
-    MessengerServices.prototype.publish = sinon.stub().returns(Promise.resolve());
 
     var Errors;
 
@@ -31,18 +27,23 @@ describe('Model', function () {
         });
     }
 
-    helper.before(function () {
+    helper.before(function (context) {
+
+        context.MessengerServices = function() {
+            this.start= sandbox.stub().resolves();
+            this.stop = sandbox.stub().resolves();
+            this.publish = sandbox.stub().resolves();
+        };
         return [
             helper.di.simpleWrapper(waterlineProtocol, 'Protocol.Waterline'),
             helper.di.overrideInjection(testModelFactory, 'Models.TestObject', ['Model']),
-            helper.di.simpleWrapper(MessengerServices, 'Messenger')
+            helper.di.simpleWrapper(context.MessengerServices, 'Messenger')
         ];
     });
 
     before(function () {
         waterline = helper.injector.get('Services.Waterline');
         Errors = helper.injector.get('Errors');
-        messenger = helper.injector.get('Services.Messenger');
     });
 
     helper.after();
