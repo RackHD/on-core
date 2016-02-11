@@ -239,6 +239,25 @@ describe('Connection', function () {
                 });
             });
 
+            describe('queue', function() {
+                it('should provide a queue', function () {
+                    var self = this;
+                    amqp.createConnection = sandbox.spy(function () {
+                        return ({
+                            'queue': function (a, b, callback) {
+                                callback;
+                            },
+                                'on': function (a, callback) {
+                                    callback(null, {});
+                            }
+                        });
+                    });
+                        return this.subject.start().then(function () {
+                            return self.subject.queue('amqp', {url: ''});
+                        });
+                });
+            });
+
             describe('stop', function () {
                 it('should close connection if on', function () {
                     var self = this;
