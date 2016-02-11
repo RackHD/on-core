@@ -152,6 +152,50 @@ describe('Connection', function () {
                     return expect(this.subject.exchange()).to.be.rejectedWith(Error);
                 });
 
+                it('should publish exchange if name is present ', function () {
+                    var self = this;
+                    amqp.createConnection = sandbox.spy(function () {
+                        return ({
+                            'on': function (a, callback) {
+                                callback(null, {});
+                            },
+                            'exchange': function (a, b, callback){
+                                callback('exchange', {});
+                            },
+                            'exchanges':
+                                'on.test'
+                        });
+                    });
+                    return this.subject.start().then(function () {
+                        expect(self.subject.connected).to.equal(true);
+                        {
+                            var name = 2;
+                            return expect(self.subject.exchange(name)).to.be.ok;
+                        }
+                    });
+                });
+
+                it('should publish default exchange if name is not present ', function () {
+                    var self = this;
+                    amqp.createConnection = sandbox.spy(function () {
+                        return ({
+                            'on': function (a, callback) {
+                                callback(null, {});
+                            },
+                            'exchange': function (){
+                            },
+                            'exchanges':
+                                'on.test'
+                        });
+                    });
+                    return this.subject.start().then(function () {
+                        expect(self.subject.connected).to.equal(true);
+                        {
+                            return expect(self.subject.exchange()).to.be.ok;
+                        }
+                    });
+                });
+
                 it('should provide an exchange if connection established and options ' +
                     'is a valid object', function () {
                     var self = this;
@@ -168,7 +212,7 @@ describe('Connection', function () {
                         });
                     });
                     return this.subject.start().then(function () {
-                        expect(self.subject.connected).to.equal(true)
+                        expect(self.subject.connected).to.equal(true);
                           return self.subject.exchange('amqp', {url: ''}).should.become('Hello');
                     });
                 });
@@ -188,30 +232,8 @@ describe('Connection', function () {
                         });
                     });
                     return this.subject.start().then(function () {
-                        if(self.subject.connected === true)
+                        if(self.subject.connected === true) {
                             return expect(self.subject.exchange('amqp')).to.be.rejectedWith(Error);
-                        });
-                });
-
-                it('should publish exchange if name is present ', function () {
-                    var self = this;
-                    amqp.createConnection = sandbox.spy(function () {
-                        return ({
-                            'on': function (a, callback) {
-                                callback(null, {});
-                            },
-                            'exchange': function (a, b, callback){
-                                callback('exchange', {});
-                            },
-                            'exchanges':
-                                'on.test'
-                        });
-                    });
-                    return this.subject.start().then(function () {
-                        expect(self.subject.connected).to.equal(true)
-                        {
-                            var name = 2;
-                            return expect(self.subject.exchange(name)).to.be.ok;
                         }
                     });
                 });
