@@ -6,7 +6,18 @@
 var base = require('./base-spec');
 
 describe('Models.File', function () {
-    helper.before();
+    var sandbox = sinon.sandbox.create();
+    helper.before(function (context) {
+
+        context.MessengerServices = function() {
+            this.start= sandbox.stub().resolves();
+            this.stop = sandbox.stub().resolves();
+            this.publish = sandbox.stub().resolves();
+        };
+        return [
+            helper.di.simpleWrapper(context.MessengerServices, 'Messenger'),
+        ];
+    });
 
     base.before(function (context) {
         context.model = helper.injector.get('Services.Waterline').files;

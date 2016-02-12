@@ -6,9 +6,11 @@
 var bluebird = require('bluebird');
 
 describe('Model', function () {
-    var waterline;
+    var waterline,
+        sandbox = sinon.sandbox.create();
+
     var waterlineProtocol = {
-        publishRecord: sinon.stub().returns(bluebird.resolve())
+        publishRecord: sinon.stub().returns(Promise.resolve())
     };
 
     var Errors;
@@ -25,10 +27,17 @@ describe('Model', function () {
         });
     }
 
-    helper.before(function () {
+    helper.before(function (context) {
+
+        context.MessengerServices = function() {
+            this.start= sandbox.stub().resolves();
+            this.stop = sandbox.stub().resolves();
+            this.publish = sandbox.stub().resolves();
+        };
         return [
             helper.di.simpleWrapper(waterlineProtocol, 'Protocol.Waterline'),
-            helper.di.overrideInjection(testModelFactory, 'Models.TestObject', ['Model'])
+            helper.di.overrideInjection(testModelFactory, 'Models.TestObject', ['Model']),
+            helper.di.simpleWrapper(context.MessengerServices, 'Messenger')
         ];
     });
 
@@ -521,6 +530,16 @@ describe('Model', function () {
             )
             .should.be.fulfilled.and.eventually.have.length(0);
         });
+
+        it('Should find a document via criteria ', function () {
+              return waterline.testobjects.needOne({ dummy: 'magic' })
+            .should.be.fulfilled.and.eventually.have.property('id').that.equals(records[0].id);
+        });
+
+        it('Shuld destroy by criteria', function () {
+            return waterline.testobjects.destroyOneById(records[0].id)
+                .should.be.fulfilled.and.eventually.have.property('id').that.equals(records[0].id);
+          });
     });
 
     describe('publishRecord() failure', function () {
