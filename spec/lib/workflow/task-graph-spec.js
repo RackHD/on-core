@@ -90,7 +90,10 @@ describe('Task Graph', function () {
         });
 
         it('should create a graph with an inline task definition', function() {
-            return TaskGraph.create('domain', { definition: definitions.graphDefinitionInline });
+            return TaskGraph.create('domain', { definition: definitions.graphDefinitionInline })
+            .then(function(graph) {
+                expect(graph).to.be.okay;
+            });
         });
     });
 

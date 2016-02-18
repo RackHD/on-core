@@ -570,4 +570,107 @@ describe('Model', function () {
             }).should.be.rejected.and.eventually.have.property('originalError', error);
         });
     });
+
+    describe('native mongo methods', function() {
+        var query,
+            update,
+            options;
+
+        before(function() {
+            this.sandbox = sinon.sandbox.create();
+        });
+
+        beforeEach(function() {
+            this.sandbox.restore();
+            this.sandbox.stub(waterline.testobjects, 'runNativeMongo').resolves();
+            query = {docField: 'testQuery'};
+            update = {$set: {}};
+            options = {optionField: 'option'};
+        });
+
+        it('should have a runNativeMongo medthod for making calls to Mongo', function() {
+            var collectionStub = this.sandbox.stub().resolves();
+            waterline.testobjects.runNativeMongo.restore();
+            this.sandbox.stub(Promise, 'fromNode').resolves({
+                findAndModify: collectionStub
+            });
+            return waterline.testobjects.runNativeMongo('findAndModify',
+                [query, {}, update, options])
+            .then(function() {
+                expect(collectionStub).to.have.been.calledOnce;
+                expect(collectionStub).to.have.been.calledWith(query, {}, update, options);
+            });
+        });
+
+        it('should have a findMongo method that calls the runNativeMongo method', function() {
+            waterline.testobjects.runNativeMongo.resolves({toArray: this.sandbox.stub()});
+            return waterline.testobjects.findMongo(query)
+            .then(function() {
+                expect(waterline.testobjects.runNativeMongo).to.have.been.calledOnce;
+                expect(waterline.testobjects.runNativeMongo)
+                    .to.have.been.calledWith('find', [query]);
+            });
+        });
+
+        it('should have a findAndModifyMongo method that calls the runNativeMongo method',
+                function() {
+            return waterline.testobjects.findAndModifyMongo(query, {}, update, options)
+            .then(function() {
+                expect(waterline.testobjects.runNativeMongo).to.have.been.calledOnce;
+                expect(waterline.testobjects.runNativeMongo).to.have.been.calledWith(
+                    'findAndModify',
+                    [query, {}, update, options]
+                );
+            });
+        });
+
+        it('should have an updateMongo method that calls the runNativeMongo method', function() {
+
+            return waterline.testobjects.updateMongo(query, update, options)
+            .then(function() {
+                expect(waterline.testobjects.runNativeMongo).to.have.been.calledOnce;
+                expect(waterline.testobjects.runNativeMongo).to.have.been.calledWith(
+                    'update',
+                    [query, update, options]
+                );
+            });
+        });
+
+        it('should have a findOneMongo method that calls the runNativeMongo method', function() {
+
+            return waterline.testobjects.findOneMongo(query)
+            .then(function() {
+                expect(waterline.testobjects.runNativeMongo).to.have.been.calledOnce;
+                expect(waterline.testobjects.runNativeMongo).to.have.been.calledWith(
+                    'findOne',
+                    [query]
+                );
+            });
+        });
+
+        it('should have a removeMongo method that calls the runNativeMongo method', function() {
+
+            return waterline.testobjects.removeMongo(query)
+            .then(function() {
+                expect(waterline.testobjects.runNativeMongo).to.have.been.calledOnce;
+                expect(waterline.testobjects.runNativeMongo).to.have.been.calledWith(
+                    'remove',
+                    [query]
+                );
+            });
+        });
+
+        it('should have a createMongoIndexes method that calls the runNativeMongo method',
+                function() {
+            var index = {testIndexField: 1};
+            return waterline.testobjects.createMongoIndexes(index)
+            .then(function() {
+                expect(waterline.testobjects.runNativeMongo).to.have.been.calledOnce;
+                expect(waterline.testobjects.runNativeMongo).to.have.been.calledWith(
+                    'createIndex',
+                    index
+                );
+            });
+        });
+    });
 });
