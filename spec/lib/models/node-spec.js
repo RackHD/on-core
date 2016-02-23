@@ -152,5 +152,72 @@ describe('Models.Node', function () {
             });
         });
 
+        describe('tags', function() {
+            before(function() {
+                this.subject = this.attributes.tags;
+            });
+
+            it('should be an array', function() {
+                expect(this.subject.type).to.equal('array');
+            });
+
+            it('should default to empty', function() {
+                expect(this.subject.defaultsTo).to.deep.equal([]);
+            });
+        });
+
+        describe('Node Tag Functions', function() {
+            var collection = {
+                update: sinon.stub().resolves()
+            };
+
+            before(function() {
+                sinon.stub(this.model, "native", function(cb) { cb(null, collection); });
+            });
+
+            after(function() {
+                this.model.native.restore();
+            });
+
+            it('should have all valid functions', function() {
+                var self = this;
+                var valid = ['addTags', 'remTags', 'findByTag'];
+                _.forEach(valid, function(name) {
+                    expect(self.model[name]).to.exist;
+                    expect(self.model).to.respondTo(name);
+                });
+            });
+
+            it('addTags should call update', function() {
+                var self = this;
+                return this.model.addTags.call(this.model, 'id', ['tag'])
+                    .then(function() {
+                        expect(collection.update).to.have.been.called;
+                        expect(self.model.native).to.have.been.called;
+                    });
+            });
+
+            it('remTags should call update', function() {
+                var self = this;
+                return this.model.remTags.call(this.model, 'id', 'tag')
+                    .then(function() {
+                        expect(collection.update).to.have.been.called;
+                        expect(self.model.native).to.have.been.called;
+                    });
+            });
+
+            it('findByTag should call find', function() {
+                var self = this;
+                sinon.stub(this.model, "find").resolves();
+                return this.model.findByTag.call(this.model, 'tag')
+                    .then(function() {
+                        expect(self.model.find).to.have.been.calledWith({tags: 'tag'});
+                    })
+                    .finally(function() {
+                        self.model.find.restore();
+                    });
+            });
+
+        });
     });
 });
