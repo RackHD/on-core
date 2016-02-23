@@ -65,6 +65,11 @@ module.exports = function (di, directory) {
 
     return {
         helper: helper,
-        injectables: injectables
+        injectables: injectables,
+        workflowInjectables: _.flatten([
+            helper.requireGlob(__dirname + '/lib/workflow/stores/*.js'),
+            helper.requireGlob(__dirname + '/lib/workflow/messengers/*.js'),
+            helper.requireGlob(__dirname + '/lib/workflow/*.js'),
+        ])
     };
 };

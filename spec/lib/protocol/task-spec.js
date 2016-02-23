@@ -9,7 +9,7 @@ describe("Task protocol functions", function() {
         events,
         task,
         Errors;
-        
+
     helper.before();
 
     before(function () {
@@ -30,13 +30,12 @@ describe("Task protocol functions", function() {
     helper.after();
 
     describe("Run", function() {
-
         it("should subscribe to task.run and receive run events", function() {
             var uuid = helper.injector.get('uuid'),
                 taskId = uuid.v4(),
                 args = 'someArgs';
             messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback({value:args},testMessage);
+                callback(args,testMessage);
                 return Promise.resolve(testSubscription);
             });
             messenger.publish.resolves();
@@ -65,7 +64,7 @@ describe("Task protocol functions", function() {
                 return Promise.resolve(testSubscription);
             });
             messenger.publish.resolves();
-            task.subscribeCancel(taskId, function(_data) {
+            task.subscribeCancel(function(_data) {
                 expect(_data).to.be.an.instanceof(Error);
                 expect(_data).to.have.property('message').that.equals(data.errMessage);
             }).then(function(subscription) {
@@ -86,7 +85,7 @@ describe("Task protocol functions", function() {
                 return Promise.resolve(testSubscription);
             });
             messenger.publish.resolves();
-            return task.subscribeCancel(taskId, function(_data) {
+            return task.subscribeCancel(function(_data) {
                 expect(_data).to.be.an.instanceof(Errors.TaskTimeoutError);
                 expect(_data).to.have.property('message').that.equals(data.errMessage);
             }).then(function(subscription) {
@@ -551,7 +550,7 @@ describe("Task protocol functions", function() {
     });
 
     describe("SNMPCommandResult", function() {
-        
+
         it("should subscribe and receive snmpCommand results", function() {
             var uuid = helper.injector.get('uuid'),
                 testUuid = uuid.v4(),
