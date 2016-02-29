@@ -117,6 +117,7 @@ describe("Event protocol subscribers", function () {
                     taskId: uuid.v4(),
                     graphId: uuid.v4(),
                     state: 'succeeded',
+                    error: null,
                     context: {},
                     terminalOnStates: ['failed', 'timeout']
                 };
@@ -135,6 +136,7 @@ describe("Event protocol subscribers", function () {
                     data.taskId,
                     data.graphId,
                     data.state,
+                    data.error,
                     data.context,
                     data.terminalOnStates
                 );

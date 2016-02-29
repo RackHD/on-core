@@ -103,11 +103,11 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
 
     it('should wrap the events protocol publishTaskFinished method', function() {
         return amqp.publishTaskFinished(
-            'default', 'testtaskid', 'testgraphid', 'succeeded', ['failed', 'timeout'])
+            'default', 'testtaskid', 'testgraphid', 'succeeded', null, ['failed', 'timeout'])
         .then(function() {
             expect(eventsProtocol.publishTaskFinished).to.have.been.calledOnce;
             expect(eventsProtocol.publishTaskFinished).to.have.been.calledWith(
-                'default', 'testtaskid', 'testgraphid', 'succeeded', ['failed', 'timeout']
+                'default', 'testtaskid', 'testgraphid', 'succeeded', null, ['failed', 'timeout']
             );
         });
     });
