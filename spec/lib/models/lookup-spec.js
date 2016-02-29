@@ -7,6 +7,7 @@ var base = require('./base-spec');
 var  sandbox = sinon.sandbox.create();
 
 describe('Models.Lookup', function () {
+
     helper.before(function (context) {
         context.MessengerServices = function() {
             this.start= sandbox.stub().resolves();
@@ -210,105 +211,59 @@ describe('Models.Lookup', function () {
         });
 
         describe('setIp', function() {
-            it('should noop if the ip is already set', function() {
+
+            it('should set the mac with the ip', function() {
                 var record = {
-                    ipAddress: '99.99.99.99',
+                    ipAddress: '99.99.99.12',
                     macAddress: '7a:c0:7a:c0:be:ef'
                 };
-                this.sandbox.stub(waterline.lookups, 'findOne').resolves(record);
-                this.sandbox.stub(waterline.lookups, 'create');
-                return waterline.lookups.setIp('99.99.99.99', '7a:c0:7a:c0:be:ef')
-                .then(function(out) {
-                    expect(out).to.equal(undefined);
-                    expect(waterline.lookups.findOne)
-                        .to.have.been.calledWith({ ipAddress: '99.99.99.99' });
-                    expect(waterline.lookups.findOne)
-                        .to.have.been.calledWith({ macAddress: '7a:c0:7a:c0:be:ef' });
-                    expect(waterline.lookups.create).to.not.have.been.called;
-                });
-            });
 
-            it('should remove a conflicting IP from a different lookup record', function() {
-                var ipRecord = {
-                    id: 'testid-1',
-                    ipAddress: '99.99.99.99',
-                    macAddress: '7a:c0:7a:c0:be:ef'
-                };
-                var macRecord = {
-                    id: 'testid-2',
-                    ipAddress: null,
-                    macAddress: 'be:ef:be:ef:be:ef'
-                };
-                this.sandbox.stub(waterline.lookups, 'destroy').resolves();
-                this.sandbox.stub(waterline.lookups, 'update').resolves();
-                this.sandbox.stub(waterline.lookups, 'create').resolves();
-                this.sandbox.stub(waterline.lookups, 'findOne');
-                waterline.lookups.findOne
-                    .withArgs({ ipAddress: '99.99.99.99' })
-                    .resolves(ipRecord);
-                waterline.lookups.findOne
-                    .withArgs({ macAddress: 'be:ef:be:ef:be:ef' })
-                    .resolves(macRecord);
+                this.sandbox.stub(waterline.lookups, 'findAndModifyMongo').resolves();
 
-                return waterline.lookups.setIp('99.99.99.99', 'be:ef:be:ef:be:ef')
-                .then(function() {
-                    expect(waterline.lookups.update).to.have.been.calledOnce;
-                    expect(waterline.lookups.create).to.have.been.calledWith(
-                            _.omit(ipRecord, 'ipAddress')
-                    );
-                    expect(waterline.lookups.destroy).to.have.been.calledWith(
-                        { id: ipRecord.id }
-                    );
-                    expect(waterline.lookups.update).to.have.been.calledWith(
-                        { id: macRecord.id }, { ipAddress: '99.99.99.99' }
-                    );
-                });
-            });
-
-            it('should create a new lookup record if one does not exist for the mac', function() {
-                this.sandbox.stub(waterline.lookups, 'findOne').resolves(null);
-                this.sandbox.stub(waterline.lookups, 'create').resolves(null);
-
-                return waterline.lookups.setIp('99.99.99.99', 'be:ef:be:ef:be:ef')
-                .then(function() {
-                    expect(waterline.lookups.create).to.have.been.calledOnce;
-                    expect(waterline.lookups.create).to.have.been.calledWith(
-                        { ipAddress: '99.99.99.99', macAddress: 'be:ef:be:ef:be:ef' }
-                    );
-                });
-            });
-
-
-            it('should update entries appropriately instead of adding duplicate keys', function() {
-                    return waterline.start()
+                return waterline.lookups.setIp(record.ipAddress, record.macAddress)
                     .then(function() {
-                       return  waterline.lookups.setIp('99.99.99.99', 'be:ef:be:ef:be:ef');
-                    })
-                    .then(function(){
-                       return  waterline.lookups.setIp('99.99.99.99', 'be:ef:be:ef:be:e7');
-                    })
-                    .finally(function() {
-                        helper.reset();
+                        var update = {
+                            $set: {
+                                ipAddress: null
+                            }
+                        };
+
+                        expect(waterline.lookups.findAndModifyMongo).to.have.been.calledWith(
+                            {
+                                ipAddress: record.ipAddress,
+                                macAddress: { $ne: record.macAddress }
+                            },
+                            {},
+                            update,
+                            { new: true }
+                        );
+
+                        update = {
+                            $set: {
+                                ipAddress: record.ipAddress // 10.1.1.2
+                            },
+                            $setOnInsert: {
+                                macAddress: record.macAddress
+                            }
+                        };
+
+                        var options = {
+                            upsert: true,
+                            new: true
+                        };
+
+                        expect(waterline.lookups.findAndModifyMongo).to.have.been.calledWith(
+                            {
+                                ipAddress: { $ne: record.ipAddress },
+                                macAddress: record.macAddress
+                            },
+                            {},
+                            update,
+                            options
+                        );
                     });
             });
 
-            it('should not create duplicate null keys when detaching an ip address' +
-                    'from a record', function() {
-
-                    return waterline.start()
-                    .then(function() {
-                       return  waterline.lookups.setIp('99.99.99.99', 'be:ef:be:ef:be:e1');
-                    })
-                    .then(function(){
-                       return  waterline.lookups.setIp('99.99.99.99', 'be:ef:be:ef:be:e2');
-                    })
-                    .then(function() {
-                       return  waterline.lookups.setIp('99.99.99.99', 'be:ef:be:ef:be:e3');
-                    })
-                    .finally(function(){
-                        return helper.reset();
-                    });
-            });
         });
     });
 });
