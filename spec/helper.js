@@ -33,6 +33,7 @@ global.sinonPromise = require('sinon-as-promised')(bluebird);
 global.chai = require('chai');
 global.chai.use(require('chai-as-promised'));
 global.chai.use(require('sinon-chai'));
+global.chai.use(require('chai-string'));
 
 /**
  *  set up global expect for testing

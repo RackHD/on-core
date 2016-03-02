@@ -53,6 +53,7 @@
   "devDependencies": {
     "chai": "^2.0.0",
     "chai-as-promised": "^4.2.0",
+    "chai-string": "^1.2.0",
     "coveralls": "^2.11.4",
     "express": "^4.10.7",
     "grunt": "^0.4.5",
