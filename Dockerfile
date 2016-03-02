@@ -10,6 +10,8 @@ COPY ./package.json /tmp/
 RUN cd /tmp && npm install --ignore-scripts --production
 
 COPY . /RackHD/on-core/
-RUN cp -a /tmp/node_modules /RackHD/on-core/
+RUN cp -a -f /tmp/node_modules /RackHD/on-core/
 
 ENV DEBIAN_FRONTEND noninteractive
+
+VOLUME /opt/monorail
