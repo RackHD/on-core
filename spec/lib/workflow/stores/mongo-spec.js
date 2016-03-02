@@ -93,26 +93,53 @@ describe('Task Graph mongo store interface', function () {
         });
     });
 
-    it('setTaskStateInGraph', function() {
-        var data = {
-            state: 'succeeded',
-            taskId: uuid.v4(),
-            graphId: uuid.v4()
-        };
+    describe('setTaskStateInGraph', function() {
+        it('should set a task state within a graph object', function() {
+            var data = {
+                state: 'succeeded',
+                taskId: uuid.v4(),
+                graphId: uuid.v4()
+            };
 
-        return mongo.setTaskStateInGraph(data)
-        .then(function() {
-            var modify = { $set: {} };
-            modify.$set['tasks.' + data.taskId + '.state'] = 'succeeded';
-            expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledOnce;
-            expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledWith(
-                {
-                    instanceId: data.graphId
-                },
-                {},
-                modify,
-                { new: true }
-            );
+            return mongo.setTaskStateInGraph(data)
+            .then(function() {
+                var modify = { $set: {} };
+                modify.$set['tasks.' + data.taskId + '.state'] = 'succeeded';
+                expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledOnce;
+                expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledWith(
+                    {
+                        instanceId: data.graphId
+                    },
+                    {},
+                    modify,
+                    { new: true }
+                );
+            });
+        });
+
+        it('should set a task state and error within a graph object', function() {
+            var data = {
+                state: 'succeeded',
+                error: new Error('test error message').toString(),
+                taskId: uuid.v4(),
+                graphId: uuid.v4()
+            };
+
+            return mongo.setTaskStateInGraph(data)
+            .then(function() {
+                var modify = { $set: {} };
+                modify.$set['tasks.' + data.taskId + '.state'] = 'succeeded';
+                modify.$set['tasks.' + data.taskId + '.error'] = 'Error: test error message';
+                expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledOnce;
+                expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledWith(
+                    {
+                        instanceId: data.graphId
+                    },
+                    {},
+                    modify,
+                    { new: true }
+                );
+            });
         });
     });
 

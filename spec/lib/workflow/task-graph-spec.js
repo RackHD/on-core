@@ -50,6 +50,17 @@ describe('Task Graph', function () {
             store.getTaskDefinition.resolves(definitions.testTask);
         });
 
+        it('should not modify the definition by reference', function() {
+            // Ensure the waitOn properties of the definition object aren't changed, since
+            // TaskGraph should clone the object and change the waitOn properties to UUIDs
+            // on the clone.
+            expect(definitions.graphDefinition.tasks[1].waitOn).to.have.property('test-1');
+            return TaskGraph.create(undefined, { definition: definitions.graphDefinition })
+            .then(function() {
+                expect(definitions.graphDefinition.tasks[1].waitOn).to.have.property('test-1');
+            });
+        });
+
         it('should use the default domain', function() {
             return TaskGraph.create(undefined, { definition: definitions.graphDefinition })
             .then(function(graph) {
