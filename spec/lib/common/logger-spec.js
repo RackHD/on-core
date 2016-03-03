@@ -101,6 +101,7 @@ describe('Logger', function () {
                 });
 
                 it('should emit to the shared events object', function (done) {
+                    configuration.set('minLogLevel', 0); //set a min enough log level
                     this.subject[level]('message ' + level);
 
                     setImmediate(function () {
