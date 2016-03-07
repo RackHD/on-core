@@ -19,7 +19,7 @@ env:
 
 
 after_success:
-  - ./node_modules/.bin/istanbul cover -x "**/spec/**" ./node_modules/.bin/_mocha --report lcovonly -- $(find spec -name '*-spec.js') -R spec --require spec/helper.js
+  - sh ./HWIMO-TEST
   - cat ./coverage/lcov.info | node_modules/.bin/coveralls
   - chmod 755 ./build_children.sh
   - ./build_children.sh
