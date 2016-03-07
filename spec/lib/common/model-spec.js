@@ -672,5 +672,18 @@ describe('Model', function () {
                 );
             });
         });
+
+        it('should have a createUniqueMongoIndexes method that calls the runNativeMongo method',
+                function() {
+            var index = {testIndexField: 1};
+            return waterline.testobjects.createUniqueMongoIndexes(index)
+            .then(function() {
+                expect(waterline.testobjects.runNativeMongo).to.have.been.calledOnce;
+                expect(waterline.testobjects.runNativeMongo).to.have.been.calledWith(
+                    'createIndex',
+                    [ index, { unique: true } ]
+                );
+            });
+        });
     });
 });
