@@ -211,7 +211,6 @@ describe('Models.Lookup', function () {
         });
 
         describe('setIp', function() {
-
             it('should set the mac with the ip', function() {
                 var record = {
                     ipAddress: '99.99.99.12',
@@ -222,25 +221,29 @@ describe('Models.Lookup', function () {
 
                 return waterline.lookups.setIp(record.ipAddress, record.macAddress)
                     .then(function() {
+                        expect(waterline.lookups.findAndModifyMongo).to.have.been.calledTwice;
+
                         var update = {
-                            $set: {
-                                ipAddress: null
+                            $unset: {
+                                ipAddress: ""
                             }
                         };
 
-                        expect(waterline.lookups.findAndModifyMongo).to.have.been.calledWith(
-                            {
-                                ipAddress: record.ipAddress,
-                                macAddress: { $ne: record.macAddress }
-                            },
-                            {},
-                            update,
-                            { new: true }
+                        expect(waterline.lookups.findAndModifyMongo.firstCall.args).to.deep.equal(
+                            [
+                                {
+                                    ipAddress: record.ipAddress,
+                                    macAddress: { $ne: record.macAddress }
+                                },
+                                {},
+                                update,
+                                { new: true }
+                            ]
                         );
 
                         update = {
                             $set: {
-                                ipAddress: record.ipAddress // 10.1.1.2
+                                ipAddress: record.ipAddress
                             },
                             $setOnInsert: {
                                 macAddress: record.macAddress
@@ -252,14 +255,15 @@ describe('Models.Lookup', function () {
                             new: true
                         };
 
-                        expect(waterline.lookups.findAndModifyMongo).to.have.been.calledWith(
-                            {
-                                ipAddress: { $ne: record.ipAddress },
-                                macAddress: record.macAddress
-                            },
-                            {},
-                            update,
-                            options
+                        expect(waterline.lookups.findAndModifyMongo.secondCall.args).to.deep.equal(
+                            [
+                                {
+                                    macAddress: record.macAddress
+                                },
+                                {},
+                                update,
+                                options
+                            ]
                         );
                     });
             });
