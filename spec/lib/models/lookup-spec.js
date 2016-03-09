@@ -267,8 +267,28 @@ describe('Models.Lookup', function () {
                         );
                     });
             });
-
         });
+
+        describe('setIndexes', function () {
+            it('should set unique indexes', function() {
+                this.sandbox.stub(waterline.lookups, 'createUniqueMongoIndexes').resolves();
+
+                return waterline.lookups.setIndexes().then(function () {
+                    expect(waterline.lookups.createUniqueMongoIndexes)
+                        .to.have.been.calledOnce;
+                    expect(waterline.lookups.createUniqueMongoIndexes)
+                        .to.have.been.calledWith([
+                            {
+                                macAddress: 1
+                            },
+                            {
+                                ipAddress: 1
+                            }
+                        ]);
+                });
+            });
+        });
+
     });
 });
 
