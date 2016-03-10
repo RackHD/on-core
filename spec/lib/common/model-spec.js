@@ -675,13 +675,17 @@ describe('Model', function () {
 
         it('should have a createUniqueMongoIndexes method that calls the runNativeMongo method',
                 function() {
-            var index = {testIndexField: 1};
-            return waterline.testobjects.createUniqueMongoIndexes(index)
+            var indexes = [{testIndexField: 1}, {testIndexField2: 1}];
+            return waterline.testobjects.createUniqueMongoIndexes(indexes)
             .then(function() {
-                expect(waterline.testobjects.runNativeMongo).to.have.been.calledOnce;
+                expect(waterline.testobjects.runNativeMongo).to.have.been.calledTwice;
                 expect(waterline.testobjects.runNativeMongo).to.have.been.calledWith(
                     'createIndex',
-                    [ index, { unique: true } ]
+                    [ indexes[0], { unique: true } ]
+                );
+                expect(waterline.testobjects.runNativeMongo).to.have.been.calledWith(
+                    'createIndex',
+                    [ indexes[1], { unique: true } ]
                 );
             });
         });
