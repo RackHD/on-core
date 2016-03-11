@@ -92,7 +92,7 @@ describe('Models.LocalUsers', function () {
                 expect(user.password).to.not.equal('read123');
                 expect(user.comparePassword('read123')).to.be.true;
                 expect(user.comparePassword('badread')).to.be.false;
-            })
+            });
         });
     });
 });
