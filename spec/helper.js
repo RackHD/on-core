@@ -121,7 +121,12 @@ global.helper = {
 
     setupInjector: function (overrides) {
         // Start with the core dependencies.
-        var dependencies = require('../index')(di, '..').injectables;
+        var core = require('../index')(di, '..');
+
+        var dependencies = _.flattenDeep([
+            core.injectables,
+            core.workflowInjectables
+        ]);
 
         // If overrides are provided then we'll process those before
         // creating the injector.
