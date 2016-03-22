@@ -664,4 +664,17 @@ describe('Task Graph mongo store interface', function () {
             Errors.NotFoundError, 'Could not find task definition with injectableName testname');
     });
 
+
+    it('destroyGraphDefinition', function() {
+        var graph = { injectableName: 'testname'  };
+        waterline.graphdefinitions.destroy.resolves(graph);
+        return mongo.destroyGraphDefinition('testname')
+        .then(function() {
+            expect(waterline.graphdefinitions.destroy).to.have.been.calledOnce;
+            expect(waterline.graphdefinitions.destroy).to.have.been.calledWith(
+                {injectableName: 'testname'}
+            );
+        });
+    });
 });
+
