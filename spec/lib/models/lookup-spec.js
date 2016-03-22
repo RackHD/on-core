@@ -282,7 +282,7 @@ describe('Models.Lookup', function () {
                                 macAddress: 1
                             },
                             {
-                                ipAddress: 1
+                                macAddress: 1, ipAddress: 1
                             }
                         ]);
                 });
@@ -291,4 +291,3 @@ describe('Models.Lookup', function () {
 
     });
 });
-
