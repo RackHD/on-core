@@ -64,7 +64,7 @@ describe('FileLoader', function () {
             'should return a promise fulfilled with the file basename to contents in an object',
             function () {
                 fs.readFileAsync.resolves('getAll');
-                fs.readdirAsync.resolves(['/tmp/foo.txt']);
+                fs.readdirAsync.resolves(['foo.txt']);
                 fs.statAsync.resolves({ isDirectory: function() { return false; } });
                 return this.subject.getAll('/tmp').then(function (files) {
                     fs.readdirAsync.should.have.been.calledWith('/tmp');
@@ -74,13 +74,27 @@ describe('FileLoader', function () {
             }
         );
         it(
-            'should skip directories',
+            'should skip directories when recursive is disabled',
             function () {
                 fs.readFileAsync.resolves('getAll');
-                fs.readdirAsync.resolves(['/tmp/foo']);
+                fs.readdirAsync.resolves(['foo']);
                 fs.statAsync.resolves({ isDirectory: function() { return true; } });
                 return this.subject.getAll('/tmp').then(function (files) {
                     fs.readdirAsync.should.have.been.calledWith('/tmp');
+                    fs.readFileAsync.should.not.have.been.called;
+                });
+            }
+        );
+        it(
+            'should not skip directories when recursive is enabled',
+            function () {
+                fs.readFileAsync.resolves('getAll');
+                fs.readdirAsync.withArgs('/tmp').resolves(['foo']);
+                fs.readdirAsync.withArgs('/tmp/foo').resolves([]);
+                fs.statAsync.resolves({ isDirectory: function() { return true; } });
+                return this.subject.getAll('/tmp', true).then(function (files) {
+                    fs.readdirAsync.should.have.been.calledWith('/tmp');
+                    fs.readdirAsync.should.have.been.calledWith('/tmp/foo');
                     fs.readFileAsync.should.not.have.been.called;
                 });
             }
