@@ -658,13 +658,6 @@ describe('Task Graph mongo store interface', function () {
         });
     });
 
-    it('deleteTaskByName should fail on an invalid query(injectable name)', function() {
-        waterline.taskdefinitions.destroy.resolves(undefined);
-        return expect(mongo.getTaskDefinition('testname')).to.be.rejectedWith(
-            Errors.NotFoundError, 'Could not find task definition with injectableName testname');
-    });
-
-
     it('destroyGraphDefinition', function() {
         var graph = { injectableName: 'testname'  };
         waterline.graphdefinitions.destroy.resolves(graph);
