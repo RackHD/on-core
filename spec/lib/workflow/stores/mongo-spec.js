@@ -18,6 +18,7 @@ describe('Task Graph mongo store interface', function () {
             findOne: sinon.stub().resolves(),
             find: sinon.stub().resolves(),
             create: sinon.stub().resolves(),
+            destroy: sinon.stub().resolves(),
             mongo: { objectId: sinon.stub() }
         };
     };
@@ -643,4 +644,30 @@ describe('Task Graph mongo store interface', function () {
             );
         });
     });
+
+    it('deleteTaskByName', function() {
+        var task = { injectableName: 'testname' };
+        task.toJSON = function() { return this; };
+        waterline.taskdefinitions.destroy.resolves(task);
+        return mongo.deleteTaskByName('testname')
+        .then(function() {
+            expect(waterline.taskdefinitions.destroy).to.have.been.calledOnce;
+            expect(waterline.taskdefinitions.destroy).to.have.been.calledWith(
+                { injectableName: 'testname' }
+            );
+        });
+    });
+
+    it('destroyGraphDefinition', function() {
+        var graph = { injectableName: 'testname'  };
+        waterline.graphdefinitions.destroy.resolves(graph);
+        return mongo.destroyGraphDefinition('testname')
+        .then(function() {
+            expect(waterline.graphdefinitions.destroy).to.have.been.calledOnce;
+            expect(waterline.graphdefinitions.destroy).to.have.been.calledWith(
+                {injectableName: 'testname'}
+            );
+        });
+    });
 });
+
