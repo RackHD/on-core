@@ -153,6 +153,40 @@ describe('Task Graph', function () {
             return Promise.all([p1, p2]);
         });
 
+        it('should not fail option validation on falsey option values', function() {
+            definitions.testTask.options.option1 = 0;
+            definitions.graphDefinitionInline.tasks[0].taskDefinition.options.option1 = 0;
+
+            return Promise.all([
+                expect(TaskGraph.create('domain',
+                        { definition: definitions.graphDefinition })).to.be.fulfilled,
+                expect(TaskGraph.create('domain',
+                    { definition: definitions.graphDefinitionInline })).to.be.fulfilled
+            ])
+            .then(function() {
+                definitions.testTask.options.option1 = false;
+                definitions.graphDefinitionInline.tasks[0].taskDefinition.options.option1 = false;
+
+                return Promise.all([
+                    expect(TaskGraph.create('domain',
+                            { definition: definitions.graphDefinition })).to.be.fulfilled,
+                    expect(TaskGraph.create('domain',
+                        { definition: definitions.graphDefinitionInline })).to.be.fulfilled
+                ]);
+            })
+            .then(function() {
+                definitions.testTask.options.option1 = '';
+                definitions.graphDefinitionInline.tasks[0].taskDefinition.options.option1 = '';
+
+                return Promise.all([
+                    expect(TaskGraph.create('domain',
+                            { definition: definitions.graphDefinition })).to.be.fulfilled,
+                    expect(TaskGraph.create('domain',
+                        { definition: definitions.graphDefinitionInline })).to.be.fulfilled
+                ]);
+            });
+        });
+
         it('should fail on task duplicate labels', function() {
             definitions.graphDefinition.tasks.push({
                 'label': 'test-duplicate'
