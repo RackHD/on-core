@@ -47,14 +47,16 @@ describe('LogEvent', function () {
                 LogEvent.initRedact([/password/i, 'community', 123, ['a', 'b']]);
             });
 
-            it('should have initialized the redactions regex', function() {
-                LogEvent._redactRegexes.should.be.an.array;
-                LogEvent._redactRegexes.should.have.length(2);
-                _.forEach(LogEvent._redactRegexes, function(reg) {
-                    _.isRegExp(reg).should.be.true;
-                });
-                LogEvent._redactRegexes[0].toString().should.equal('/password/i');
-                LogEvent._redactRegexes[1].toString().should.equal('/^community$/');
+            it('should have initialized the RegExp redaction pattern in advance', function() {
+                LogEvent._redactPatterns.should.be.an.array;
+                LogEvent._redactPatterns.should.have.length(2);
+                _.isRegExp(LogEvent._redactPatterns[0]).should.be.true;
+                LogEvent._redactPatterns[0].toString().should.equal('/password/i');
+            });
+
+            it('should have kept the String redaction pattern of its original type', function() {
+                LogEvent._redactPatterns[1].should.be.a('string');
+                LogEvent._redactPatterns[1].toString().should.equal('community');
             });
 
             it('should not redact fields not marked for redaction', function() {
