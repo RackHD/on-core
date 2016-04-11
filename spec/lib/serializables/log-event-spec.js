@@ -21,8 +21,6 @@ describe('LogEvent', function () {
                 LogEvent.sanitize(
                     { foo: 'bar' }
                 ).should.deep.equal({ foo: 'bar' });
-
-
             });
 
             it('should remove fields marked for sanitization', function() {
@@ -39,36 +37,81 @@ describe('LogEvent', function () {
         });
 
         describe('redact', function() {
+            var testRedactKeys = ['password', 'PASSWORD', 'serverPassword', 'plainPassword',
+                'Password123', 'pppassword', 'encryptedPasswords', 'community'];
+            var testNotRedactKeys = ['pass_word', 'foobar', 'Community', 'community123',
+                'acommunity', 'p.assword'];
+
+            before('redact', function() {
+                //intentionally add some non-supported redactions to verify they are ignored
+                LogEvent.initRedact([/password/i, 'community', 123, ['a', 'b']]);
+            });
+
+            it('should have initialized the RegExp redaction pattern in advance', function() {
+                LogEvent._redactPatterns.should.be.an.array;
+                LogEvent._redactPatterns.should.have.length(2);
+                _.isRegExp(LogEvent._redactPatterns[0]).should.be.true;
+                LogEvent._redactPatterns[0].toString().should.equal('/password/i');
+            });
+
+            it('should have kept the String redaction pattern of its original type', function() {
+                LogEvent._redactPatterns[1].should.be.a('string');
+                LogEvent._redactPatterns[1].toString().should.equal('community');
+            });
+
             it('should not redact fields not marked for redaction', function() {
-                LogEvent.redact(
-                    { foo: 'bar' }
-                ).should.deep.equal({ foo: 'bar' });
+                _.forEach(testNotRedactKeys, function(key) {
+                    var srcObj = {};
+                    srcObj[key] = 'bar';
+                    LogEvent.redact(srcObj).should.deep.equal(srcObj);
+                });
             });
 
             it('should redact fields which are marked for redaction', function() {
-                LogEvent.redact(
-                    { password: 'bar' }
-                ).should.deep.equal({ password: '[REDACTED]' });
+                _.forEach(testRedactKeys, function(key) {
+                    var srcObj = {}, dstObj = {};
+                    srcObj[key] = 'bar';
+                    dstObj[key] = '[REDACTED]';
+                    LogEvent.redact(srcObj).should.deep.equal(dstObj);
+                });
             });
 
             it('should redact fields in nested objects', function() {
-                LogEvent.redact(
-                    { nested: { password: 'bar' } }
-                ).should.deep.equal({ nested: { password: '[REDACTED]' } });
+                _.forEach(testRedactKeys, function(key) {
+                    var srcObj = { nested: {} };
+                    var dstObj = { nested: {} };
+                    srcObj.nested[key] = 'bar';
+                    dstObj.nested[key] = '[REDACTED]';
+                    LogEvent.redact(srcObj).should.deep.equal(dstObj);
+                });
             });
 
             it('should redact fields in nested arrays', function() {
-                LogEvent.redact(
-                    { array: [ { password: 'bar' } ] }
-                ).should.deep.equal({ array: [ { password: '[REDACTED]' } ] });
+                _.forEach(testRedactKeys, function(key) {
+                    var srcObj = { array: [ {} ] };
+                    var dstObj = { array: [ {} ] };
+                    srcObj.array[0][key] = 'bar';
+                    dstObj.array[0][key] = '[REDACTED]';
+                    LogEvent.redact(srcObj).should.deep.equal(dstObj);
+                });
             });
 
             it('should not modify the original object', function () {
-                var target = { password: 'bar' };
+                _.forEach(testRedactKeys, function(key) {
+                    var target = {};
+                    target[key] = 'bar';
+                    var cloneTarget = _.cloneDeep(target);
+                    LogEvent.redact(target);
+                    target.should.deep.equal(cloneTarget);
+                });
+            });
 
-                LogEvent.redact(target);
-
-                target.should.deep.equal({ password: 'bar' });
+            describe('LogEvent.testRedact', function() {
+                it('should return false if the tested value is not string', function() {
+                    _.forEach([1, {foo: 'bar'}, null, ['a', 'b'] ], function(val) {
+                        LogEvent.testRedact(val).should.be.false;
+                    });
+                });
             });
         });
 
