@@ -44,7 +44,6 @@ module.exports = function (di, directory) {
             helper.requireWrapper('apache-crypt', 'apache-crypt'),
             helper.requireWrapper('util', 'util'),
             helper.requireWrapper('pluralize', 'pluralize'),
-            helper.requireWrapper('blocked', 'blocked'),
             helper.requireWrapper('always-tail', 'Tail'),
             helper.requireWrapper('flat', 'flat'),
 
