@@ -123,7 +123,7 @@ describe("ChildProcess", function () {
         it("should reject if code are not an array of numbers", function () {
             expect(function() {
                 new ChildProcess("child-process-spec.js", null, null, 1);  // jshint ignore:line
-            }).to.throw('number ([number]) required');
+            }).to.throw(/.*\(\[number\]\) is required/);
         });
 
     });
