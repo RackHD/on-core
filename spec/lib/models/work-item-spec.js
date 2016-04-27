@@ -397,7 +397,27 @@ describe('Models.WorkItem', function () {
                 expect(items.length).to.equal(1);
                 expect(items[0].name).to.equal('Pollers.IPMI');
                 expect(items[0]).not.to.have.property('type');
-            })
+            });
+        });
+
+        it('toJSON should delete password property from config', function() {
+            var workItem = snmpPoller;
+            snmpPoller.config.password = 'password';
+
+            return workitems.create(workItem)
+            .then(function(createdItem) {
+                expect(createdItem.toJSON().config).not.to.have.property('password');
+            });
+        });
+
+        it('toJSON should delete community property from config', function() {
+            var workItem = snmpPoller;
+            snmpPoller.config.community = 'commnity';
+
+            return workitems.create(workItem)
+            .then(function(createdItem) {
+                expect(createdItem.toJSON().config).not.to.have.property('community');
+            });
         });
     });
 });
