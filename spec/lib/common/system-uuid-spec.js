@@ -5,6 +5,7 @@ describe("SystemUuid", function() {
     var subject;
     var regEx = /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$/;
     var fs;
+    var uuid = '0e2c320f-f29e-47c6-be18-0c833e0f080c';
     
     before(function () {
         helper.setupInjector();
@@ -23,15 +24,16 @@ describe("SystemUuid", function() {
 
     describe('getUuid', function () {
         it('should return system uuid', function () {
-            fs.readFileAsync.resolves('xyz');
+            fs.readFileAsync.resolves(uuid);
             return subject.getUuid()
             .then(function(data) {
-                expect(data).to.equal('xyz');
+                expect(regEx.test(data)).to.be.ok;
+                expect(data).to.equal(uuid);
             });
         });
         
         it('should return generated uuid', function () {
-            fs.readFileAsync.resolves(null);
+            fs.readFileAsync.resolves('xyz');
             return subject.getUuid()
             .then(function(data) {
                 expect(regEx.test(data)).to.be.ok;
