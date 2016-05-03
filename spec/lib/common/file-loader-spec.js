@@ -69,7 +69,10 @@ describe('FileLoader', function () {
                 return this.subject.getAll('/tmp').then(function (files) {
                     fs.readdirAsync.should.have.been.calledWith('/tmp');
 
-                    files['foo.txt'].should.equal('getAll');
+                    files['foo.txt'].should.have.property('path')
+                        .and.to.equal('/tmp/foo.txt')
+                    files['foo.txt'].should.have.property('contents')
+                        .and.to.equal('getAll')
                 });
             }
         );
