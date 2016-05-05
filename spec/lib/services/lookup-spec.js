@@ -339,7 +339,12 @@ describe('Lookup Service', function () {
 
             this.sandbox.stub(lookupService, 'ipAddressToMacAddress').resolves('00:11:22:33:44:55');
 
-            var req = { ip: '10.1.1.1' },
+            var req = { 
+                    ip: '10.1.1.1',
+                    get: function() {
+                        return undefined;
+                    } 
+                },
                 next = function () {
                     expect(req.macaddress).to.equal('00:11:22:33:44:55');
                     expect(req.macAddress).to.equal('00:11:22:33:44:55');
@@ -354,7 +359,12 @@ describe('Lookup Service', function () {
 
             this.sandbox.stub(lookupService, 'ipAddressToMacAddress').resolves('00:11:22:33:44:55');
 
-            var req = { _remoteAddress: '10.1.1.1', },
+            var req = { 
+                    _remoteAddress: '10.1.1.1',
+                    get: function() {
+                        return undefined;
+                    }
+                }, 
                 next = function () {
                     expect(req.macaddress).to.equal('00:11:22:33:44:55');
                     expect(req.macAddress).to.equal('00:11:22:33:44:55');
@@ -369,11 +379,42 @@ describe('Lookup Service', function () {
 
             this.sandbox.stub(lookupService, 'ipAddressToMacAddress').resolves('00:11:22:33:44:55');
 
-            var req = { connection: { remoteAddress: '10.1.1.1' } },
+            var req = { 
+                    connection: { remoteAddress: '10.1.1.1' },
+                    get: function() {
+                        return undefined;
+                    }
+                },
                 next = function () {
                     expect(req.macaddress).to.equal('00:11:22:33:44:55');
                     expect(req.macAddress).to.equal('00:11:22:33:44:55');
                     done();
+                };
+
+            middleware(req, {}, next);
+        });
+
+        it('should assign macaddress to req with req.get(X-Real-IP)', function (done) {
+            var middleware = lookupService.ipAddressToMacAddressMiddleware();
+
+            this.sandbox.stub(lookupService, 'ipAddressToMacAddress').resolves('00:11:22:33:44:55');
+
+            var req = {
+                    get: function(header) {
+                        if(header === 'X-Real-IP') {
+                            return '10.1.1.1';
+                        }
+                        return undefined;
+                    }
+                },
+                next = function () {
+                    try {
+                        expect(req.macaddress).to.equal('00:11:22:33:44:55');
+                        expect(req.macAddress).to.equal('00:11:22:33:44:55');
+                        done();
+                    } catch (e) {
+                        done(e);
+                    }
                 };
 
             middleware(req, {}, next);
@@ -384,7 +425,11 @@ describe('Lookup Service', function () {
 
             this.sandbox.stub(lookupService, 'ipAddressToMacAddress').resolves(undefined);
 
-            var req = {},
+            var req = {
+                    get: function() {
+                        return undefined;
+                    }
+                },
                 next = function () {
                     expect(req.macaddress).to.equal(undefined);
                     done();
