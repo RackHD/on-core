@@ -19,7 +19,6 @@ describe('Task Graph mongo store interface', function () {
             find: sinon.stub().resolves(),
             create: sinon.stub().resolves(),
             createMongoIndexes: sinon.stub().resolves(),
-            createUniqueMongoIndexes: sinon.stub().resolves(),
             destroy: sinon.stub().resolves(),
             mongo: { objectId: sinon.stub() }
         };
@@ -675,24 +674,14 @@ describe('Task Graph mongo store interface', function () {
     it('setIndexes', function() {
         var indexObject = {
             taskdependencies: [
-                {index: {taskId: 1}, unique: true},
-                {index: {graphId: 1}},
-                {index: {taskId: 1, graphId: 1}}
-            ],
-            graphobjects: [
-                {index: {instanceId: 1}, unique: true}
+                {taskId: 1, graphId: 1}
             ]
         };
 
         return mongo.setIndexes(indexObject)
         .then(function() {
-            expect(waterline.graphobjects.createUniqueMongoIndexes).to.be
-                .calledWithExactly([indexObject.graphobjects[0].index]);
-            expect(waterline.taskdependencies.createUniqueMongoIndexes).to.be
-                .calledWithExactly([indexObject.taskdependencies[0].index]);
             expect(waterline.taskdependencies.createMongoIndexes).to.be
-                .calledWithExactly(indexObject.taskdependencies[1].index).and
-                .calledWithExactly(indexObject.taskdependencies[2].index);
+                .calledWithExactly({taskId: 1, graphId: 1});
         });
     });
 });
