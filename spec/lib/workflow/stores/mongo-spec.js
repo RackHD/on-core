@@ -18,6 +18,7 @@ describe('Task Graph mongo store interface', function () {
             findOne: sinon.stub().resolves(),
             find: sinon.stub().resolves(),
             create: sinon.stub().resolves(),
+            createMongoIndexes: sinon.stub().resolves(),
             destroy: sinon.stub().resolves(),
             mongo: { objectId: sinon.stub() }
         };
@@ -667,6 +668,20 @@ describe('Task Graph mongo store interface', function () {
             expect(waterline.graphdefinitions.destroy).to.have.been.calledWith(
                 {injectableName: 'testname'}
             );
+        });
+    });
+
+    it('setIndexes', function() {
+        var indexObject = {
+            taskdependencies: [
+                {taskId: 1, graphId: 1}
+            ]
+        };
+
+        return mongo.setIndexes(indexObject)
+        .then(function() {
+            expect(waterline.taskdependencies.createMongoIndexes).to.be
+                .calledWithExactly({taskId: 1, graphId: 1});
         });
     });
 });
