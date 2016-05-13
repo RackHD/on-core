@@ -18,6 +18,7 @@ describe('Task Graph mongo store interface', function () {
             findOne: sinon.stub().resolves(),
             find: sinon.stub().resolves(),
             create: sinon.stub().resolves(),
+            createMongoIndexes: sinon.stub().resolves(),
             destroy: sinon.stub().resolves(),
             mongo: { objectId: sinon.stub() }
         };
@@ -63,7 +64,7 @@ describe('Task Graph mongo store interface', function () {
         .then(function() {
             expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledOnce;
             expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledWith(
-                { instanceId: data.graphId, _status: Constants.Task.States.Pending },
+                { instanceId: data.graphId, _status: {$in: Constants.Task.ActiveStates} },
                 {},
                 { $set: { _status: 'succeeded' } },
                 { new: true }
@@ -338,7 +339,7 @@ describe('Task Graph mongo store interface', function () {
         .then(function() {
             expect(waterline.graphobjects.find).to.have.been.calledOnce;
             expect(waterline.graphobjects.find).to.have.been.calledWith(
-                { domain: 'default', _status: Constants.Task.States.Pending }
+                { domain: 'default', _status: {$in: Constants.Task.ActiveStates} }
             );
         });
     });
@@ -669,5 +670,18 @@ describe('Task Graph mongo store interface', function () {
             );
         });
     });
-});
 
+    it('setIndexes', function() {
+        var indexObject = {
+            taskdependencies: [
+                {taskId: 1, graphId: 1}
+            ]
+        };
+
+        return mongo.setIndexes(indexObject)
+        .then(function() {
+            expect(waterline.taskdependencies.createMongoIndexes).to.be
+                .calledWithExactly({taskId: 1, graphId: 1});
+        });
+    });
+});

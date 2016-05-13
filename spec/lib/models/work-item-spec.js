@@ -367,8 +367,58 @@ describe('Models.WorkItem', function () {
                  '_1_3_6_1_2_1_1_5'
             ]);
         });
+
+        it('should change poller.type to poller.name on create', function() {
+            var workItem = snmpPoller;
+
+            workItem.type = 'snmp';
+            delete workItem.name;
+
+            return workitems.create(workItem)
+            .then(function(createdItem) {
+                expect(createdItem.name).to.equal('Pollers.SNMP');
+                expect(createdItem).not.to.have.property('type');
+            });
+        });
+
+        it('should change poller.type to poller.name on update', function() {
+            var workItem = snmpPoller;
+
+            return workitems.create(workItem)
+            .then(function(createdItem) {
+                createdItem.type = 'ipmi';
+                delete createdItem.name;
+                return createdItem.save();
+            })
+            .then(function() {
+                return workitems.find({name: 'Pollers.IPMI'});
+            })
+            .then(function(items) {
+                expect(items.length).to.equal(1);
+                expect(items[0].name).to.equal('Pollers.IPMI');
+                expect(items[0]).not.to.have.property('type');
+            });
+        });
+
+        it('toJSON should delete password property from config', function() {
+            var workItem = snmpPoller;
+            snmpPoller.config.password = 'password';
+
+            return workitems.create(workItem)
+            .then(function(createdItem) {
+                expect(createdItem.toJSON().config).not.to.have.property('password');
+            });
+        });
+
+        it('toJSON should delete community property from config', function() {
+            var workItem = snmpPoller;
+            snmpPoller.config.community = 'commnity';
+
+            return workitems.create(workItem)
+            .then(function(createdItem) {
+                expect(createdItem.toJSON().config).not.to.have.property('community');
+            });
+        });
     });
-
-
 });
 

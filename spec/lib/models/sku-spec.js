@@ -77,6 +77,87 @@ describe('Models.Sku', function () {
                 expect(this.subject.type).to.equal('json');
             });
         });
+
+        describe('httpStaticRoot', function () {
+            before(function () {
+                this.subject = this.attributes.httpStaticRoot;
+            });
+
+            it('should be string', function () {
+                expect(this.subject.type).to.equal('string');
+            });
+        });
+
+        describe('httpTemplateRoot', function () {
+            before(function () {
+                this.subject = this.attributes.httpTemplateRoot;
+            });
+
+            it('should be string', function () {
+                expect(this.subject.type).to.equal('string');
+            });
+        });
+
+        describe('httpProfileRoot', function () {
+            before(function () {
+                this.subject = this.attributes.httpProfileRoot;
+            });
+
+            it('should be string', function () {
+                expect(this.subject.type).to.equal('string');
+            });
+        });
+
+        describe('workflowRoot', function () {
+            before(function () {
+                this.subject = this.attributes.workflowRoot;
+            });
+
+            it('should be string', function () {
+                expect(this.subject.type).to.equal('string');
+            });
+        });
+
+        describe('taskRoot', function () {
+            before(function () {
+                this.subject = this.attributes.taskRoot;
+            });
+
+            it('should be string', function () {
+                expect(this.subject.type).to.equal('string');
+            });
+        });
+
+        describe('skuConfig', function () {
+            before(function () {
+                this.subject = this.attributes.skuConfig;
+            });
+
+            it('should be json', function () {
+                expect(this.subject.type).to.equal('json');
+            });
+        });
+
+        describe('version', function () {
+            before(function () {
+                this.subject = this.attributes.version;
+            });
+
+            it('should be string', function () {
+                expect(this.subject.type).to.equal('string');
+            });
+        });
+
+        describe('description', function () {
+            before(function () {
+                this.subject = this.attributes.description;
+            });
+
+            it('should be string', function () {
+                expect(this.subject.type).to.equal('string');
+            });
+        });
+
     });
 
     describe('SKU Rules', function () {
