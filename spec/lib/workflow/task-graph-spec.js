@@ -296,6 +296,9 @@ describe('Task Graph', function () {
                 expect(taskWithDependencies).to.be.ok;
                 expect(taskWithNoDependencies).to.be.ok;
 
+                expect(taskWithDependencies.label).to.be.ok;
+                expect(taskWithNoDependencies.label).to.be.ok;
+
                 expect(taskWithDependencies.instanceId).to.be.a.uuid;
                 expect(taskWithNoDependencies.instanceId).to.be.a.uuid;
 
@@ -498,12 +501,12 @@ describe('Task Graph', function () {
                 definition: definitions.graphDefinition
             })
             .then(function(graph) {
-                return [graph, graph.persist()];
+                return [graph, graph.persist('isNew')];
             })
             .spread(function(graph, _graph) {
                 expect(graph).to.equal(_graph);
                 expect(store.persistGraphObject).to.have.been.calledOnce;
-                expect(store.persistGraphObject).to.have.been.calledWith(graph);
+                expect(store.persistGraphObject).to.have.been.calledWith(graph, 'isNew');
                 expect(store.persistTaskDependencies.callCount)
                     .to.equal(_.keys(graph.tasks).length);
                 var taskItems = graph.createTaskDependencyItems();
