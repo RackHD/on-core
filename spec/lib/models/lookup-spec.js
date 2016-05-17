@@ -231,14 +231,8 @@ describe('Models.Lookup', function () {
                 });
             });
 
-            it('should be rejected with Errors.NotFoundError no record is returned by find', function() {
-                var record = {
-                    id: 'id',
-                    macAddress: 'macAddress',
-                    ipAddress: 'ipAddress',
-                    node: 'node'
-                },
-                findOne = this.sandbox.stub(waterline.lookups, 'findOne').resolves();
+            it('should reject with Errors.NotFoundError if no records are returned', function() {
+                var findOne = this.sandbox.stub(waterline.lookups, 'findOne').resolves();
 
                 return expect(waterline.lookups.upsertProxyToMacAddress(
                     'proxy',
