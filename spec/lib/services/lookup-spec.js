@@ -23,6 +23,13 @@ describe('Lookup Service', function () {
         }
     ];
 
+    var withProxy = [{
+        ipAddress: '127.0.0.1',
+        macAddress: '00:11:22:33:44:55',
+        node: 'node',
+        proxy: '12.1.1.1'
+    }];
+
     var node = {
         id: 'node'
     };
@@ -329,6 +336,42 @@ describe('Lookup Service', function () {
                 lookupService.ipAddressToNodeId('127.0.0.1')
             ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
                 expect(findByTerm).to.have.been.calledWith('127.0.0.1');
+            });
+        });
+    });
+
+   describe('nodeIdToProxy', function () {
+        beforeEach(function () {
+          lookupService.resetNodeIdCache();
+        });
+
+        it('should call findByTerm with nodeId', function() {
+            var findByTerm = this.sandbox.stub(
+                WaterlineService.lookups, 'findByTerm').resolves(withProxy);
+
+            return lookupService.nodeIdToProxy('node').then(function (result) {
+                expect(result).to.equal(withProxy[0].proxy);
+                expect(findByTerm).to.have.been.calledWith('node');
+            });
+        });
+
+        it('should reject with NotFoundError if no lookup record exists', function() {
+            var findByTerm = this.sandbox.stub(WaterlineService.lookups, 'findByTerm').resolves();
+
+            return expect(
+                lookupService.nodeIdToProxy('node')
+            ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
+                expect(findByTerm).to.have.been.calledWith('node');
+            });
+        });
+
+        it('should return undefined if no proxy association exists', function() {
+            var findByTerm = this.sandbox.stub(
+                WaterlineService.lookups, 'findByTerm').resolves(lookup);
+
+            return lookupService.nodeIdToProxy('node').then(function (result) {
+                expect(result).to.equal(undefined);
+                expect(findByTerm).to.have.been.calledWith('node');
             });
         });
     });
