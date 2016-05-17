@@ -17,6 +17,7 @@ describe('db-renderable-content', function () {
         this.subject = new DbRenderable();
         this.subject.collectionName = 'things';
         this.subject.directory = '/tmp'
+        this.sandbox = sinon.sandbox.create();
 
         waterline = helper.injector.get('Services.Waterline');
         waterline.things = {
@@ -32,21 +33,25 @@ describe('db-renderable-content', function () {
     });
 
     beforeEach(function() {
-        loader.prototype.getAll = sinon.stub();
-        loader.prototype.get = sinon.stub();
-        loader.prototype.put = sinon.stub();
-        loader.prototype.unlink = sinon.stub();
+        this.sandbox.stub(loader.prototype, 'getAll');
+        this.sandbox.stub(loader.prototype, 'get');
+        this.sandbox.stub(loader.prototype, 'put');
+        this.sandbox.stub(loader.prototype, 'unlink');
+
         Logger.prototype.log.reset();
+    });
+
+    afterEach(function() {
+        this.sandbox.restore();
     });
 
     describe('loading', function() {
         var put;
 
         beforeEach(function() {
-            waterline.things.findOne.reset();
-            waterline.things.find.reset();
-            waterline.things.create.reset();
-            waterline.things.findOne.reset()
+            waterline.things.find = sinon.stub();
+            waterline.things.findOne = sinon.stub();
+            waterline.things.create = sinon.stub();
         });
 
         it('should have a loader', function() {
@@ -132,8 +137,6 @@ describe('db-renderable-content', function () {
 
     describe('get/put', function() {
         beforeEach(function() {
-            loader.prototype.get = sinon.stub();
-            loader.prototype.put = sinon.stub();
             waterline.things.find = sinon.stub();
             waterline.things.findOne = sinon.stub();
             waterline.things.create = sinon.stub();
