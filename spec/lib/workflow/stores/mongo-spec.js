@@ -64,7 +64,7 @@ describe('Task Graph mongo store interface', function () {
         .then(function() {
             expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledOnce;
             expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledWith(
-                { instanceId: data.graphId, _status: Constants.Task.States.Pending },
+                { instanceId: data.graphId, _status: {$in: Constants.Task.ActiveStates} },
                 {},
                 { $set: { _status: 'succeeded' } },
                 { new: true }
@@ -339,7 +339,7 @@ describe('Task Graph mongo store interface', function () {
         .then(function() {
             expect(waterline.graphobjects.find).to.have.been.calledOnce;
             expect(waterline.graphobjects.find).to.have.been.calledWith(
-                { domain: 'default', _status: Constants.Task.States.Pending }
+                { domain: 'default', _status: {$in: Constants.Task.ActiveStates} }
             );
         });
     });
@@ -685,4 +685,3 @@ describe('Task Graph mongo store interface', function () {
         });
     });
 });
-
