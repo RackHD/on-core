@@ -7,7 +7,6 @@ describe('db-renderable-content', function () {
     var waterline;
     var loader;
     var Logger;
-    var config;
     var crypto;
     var EventEmitter = require('events').EventEmitter;
 
@@ -16,7 +15,7 @@ describe('db-renderable-content', function () {
         var DbRenderable = helper.injector.get('DbRenderableContent');
         this.subject = new DbRenderable();
         this.subject.collectionName = 'things';
-        this.subject.directory = '/tmp'
+        this.subject.directory = '/tmp';
         this.sandbox = sinon.sandbox.create();
 
         waterline = helper.injector.get('Services.Waterline');
@@ -25,7 +24,7 @@ describe('db-renderable-content', function () {
             findOne: sinon.stub().resolves(),
             create: sinon.stub().resolves(),
             destroy: sinon.stub().resolves()
-        }
+        };
         loader = helper.injector.get('FileLoader');
         Logger = helper.injector.get('Logger');
         crypto = helper.injector.get('crypto');
@@ -46,8 +45,6 @@ describe('db-renderable-content', function () {
     });
 
     describe('loading', function() {
-        var put;
-
         beforeEach(function() {
             waterline.things.find = sinon.stub();
             waterline.things.findOne = sinon.stub();
@@ -60,7 +57,6 @@ describe('db-renderable-content', function () {
         });
 
         it('should load base things', function() {
-            var self = this;
             var things = {
                 'thing0': {
                     path: 'path/to/thing0',
@@ -87,8 +83,6 @@ describe('db-renderable-content', function () {
         });
 
         it('should load existing base things', function() {
-            var self = this;
-
             var things = {
                 'thing0': {
                     path: 'path/to/thing0',
@@ -177,7 +171,7 @@ describe('db-renderable-content', function () {
                 expect(out).to.be.an('array');
                 expect(out.length).to.equal(1);
                 expect(waterline.things.find).to.be.calledWith({name: 'thing0'});
-                expect(out[0].scope).to.equal('a')
+                expect(out[0].scope).to.equal('a');
             });
         });
 
@@ -194,7 +188,7 @@ describe('db-renderable-content', function () {
                 scope: 'global',
                 path: 'path',
                 hash: crypto.createHash('md5').update('test contents').digest('base64')
-            }
+            };
             waterline.things.find.resolves([ thing ]);
             loader.prototype.get.resolves('test contents');
             return this.subject.get('test thing')
@@ -202,7 +196,7 @@ describe('db-renderable-content', function () {
                 expect(out).to.have.property('contents');
                 _.forEach(_.keys(out), function(key) {
                     expect(out[key]).to.equal(thing[key] || 'test contents');
-                })
+                });
                 expect(waterline.things.find)
                     .to.have.been.calledWith({ name: 'test thing', scope: [ 'global' ]});
             });
@@ -214,7 +208,7 @@ describe('db-renderable-content', function () {
                 scope: 'global',
                 path: 'path',
                 hash: 'not the right hash'
-            }
+            };
             waterline.things.find.resolves([ thing ]);
             loader.prototype.get.resolves('test contents');
             return this.subject.get('test thing')
@@ -229,7 +223,7 @@ describe('db-renderable-content', function () {
             ];
             var scope = ['b', 'a', 'global'];
             waterline.things.find.resolves(things);
-            _.forEach(things, function(thing, i) {
+            _.forEach(things, function(thing) {
                 loader.prototype.get.withArgs(thing.path).resolves(thing.path);
                 thing.hash = crypto.createHash('md5').update(thing.path).digest('base64');
             });
@@ -389,7 +383,7 @@ describe('db-renderable-content', function () {
                 name: 'it',
                 path: '/tmp/foo',
                 scope: 'global'
-            })
+            });
             return self.subject.unlink('it')
             .then(function() {
                 expect(loader.prototype.unlink).to.have.been.calledWith('/tmp/foo');
@@ -408,7 +402,7 @@ describe('db-renderable-content', function () {
                 name: 'it',
                 path: '/tmp/foo',
                 scope: 'global'
-            })
+            });
             return self.subject.unlink('it', 'scope')
             .then(function() {
                 expect(loader.prototype.unlink).to.have.been.calledWith('/tmp/foo');

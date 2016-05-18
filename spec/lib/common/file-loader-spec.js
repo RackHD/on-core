@@ -70,9 +70,9 @@ describe('FileLoader', function () {
                     fs.readdirAsync.should.have.been.calledWith('/tmp');
 
                     files['foo.txt'].should.have.property('path')
-                        .and.to.equal('/tmp/foo.txt')
+                        .and.to.equal('/tmp/foo.txt');
                     files['foo.txt'].should.have.property('contents')
-                        .and.to.equal('getAll')
+                        .and.to.equal('getAll');
                 });
             }
         );
@@ -82,7 +82,7 @@ describe('FileLoader', function () {
                 fs.readFileAsync.resolves('getAll');
                 fs.readdirAsync.resolves(['foo']);
                 fs.statAsync.resolves({ isDirectory: function() { return true; } });
-                return this.subject.getAll('/tmp').then(function (files) {
+                return this.subject.getAll('/tmp').then(function () {
                     fs.readdirAsync.should.have.been.calledWith('/tmp');
                     fs.readFileAsync.should.not.have.been.called;
                 });
@@ -95,7 +95,7 @@ describe('FileLoader', function () {
                 fs.readdirAsync.withArgs('/tmp').resolves(['foo']);
                 fs.readdirAsync.withArgs('/tmp/foo').resolves([]);
                 fs.statAsync.resolves({ isDirectory: function() { return true; } });
-                return this.subject.getAll('/tmp', true).then(function (files) {
+                return this.subject.getAll('/tmp', true).then(function () {
                     fs.readdirAsync.should.have.been.calledWith('/tmp');
                     fs.readdirAsync.should.have.been.calledWith('/tmp/foo');
                     fs.readFileAsync.should.not.have.been.called;

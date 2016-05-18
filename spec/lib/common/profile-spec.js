@@ -44,7 +44,7 @@ describe('Profiles', function () {
                 scope: 'global',
                 path: 'path',
                 hash: crypto.createHash('md5').update('test contents').digest('base64')
-            }
+            };
             waterline.profiles.find.resolves([ profile  ]);
             loader.prototype.get.resolves('test contents');
             return this.subject.get('test profile')
@@ -52,7 +52,7 @@ describe('Profiles', function () {
                 expect(out).to.have.property('contents');
                 _.forEach(_.keys(out), function(key) {
                     expect(out[key]).to.equal(profile[key] || 'test contents');
-                })
+                });
                 expect(waterline.profiles.find)
                     .to.have.been.calledWith({ name: 'test profile', scope: [ 'global'  ] });
             });
@@ -64,7 +64,7 @@ describe('Profiles', function () {
                 scope: 'global',
                 path: 'path',
                 hash: crypto.createHash('md5').update('test contents').digest('base64')
-            }
+            };
             waterline.profiles.find.resolves([ profile  ]);
             loader.prototype.get.resolves('test contents');
             return this.subject.get('test profile', true)
