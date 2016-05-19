@@ -43,19 +43,5 @@ describe('Models.Profile', function () {
                 expect(this.subject.required).to.equal(true);
             });
         });
-
-        describe('contents', function () {
-            before(function () {
-                this.subject = this.attributes.contents;
-            });
-
-            it('should be a string', function () {
-                expect(this.subject.type).to.equal('string');
-            });
-
-            it('should be required', function () {
-                expect(this.subject.required).to.equal(true);
-            });
-        });
     });
 });
