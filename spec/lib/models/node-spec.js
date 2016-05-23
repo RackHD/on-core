@@ -46,21 +46,6 @@ describe('Models.Node', function () {
             });
         });
 
-        describe('obmSettings', function () {
-            before(function () {
-                this.subject = this.attributes.obmSettings;
-            });
-
-            it('should be json', function () {
-                expect(this.subject.type).to.equal('json');
-                expect(this.subject.json).to.equal(true);
-            });
-
-            it('should not be required', function () {
-                expect(this.subject.required).to.equal(false);
-            });
-        });
-
         describe('workflows', function () {
             before(function () {
                 this.subject = this.attributes.workflows;
