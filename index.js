@@ -2,12 +2,16 @@
 
 'use strict';
 
-var _ = require('lodash');
+var _ = require('lodash'),
+    dependencyInjection = require('di');
 
 require('./lib/extensions');
 
 module.exports = function (di, directory) {
-    var helper = require('./lib/di')(di, directory || __dirname);
+    di = di || dependencyInjection;
+    directory = directory || __dirname;
+
+    var helper = require('./lib/di')(di, directory);
 
     var injectables = _.flattenDeep(
         [
@@ -63,6 +67,7 @@ module.exports = function (di, directory) {
     argHandler.start();
 
     return {
+        di: di,
         helper: helper,
         injectables: injectables,
         workflowInjectables: _.flatten([
