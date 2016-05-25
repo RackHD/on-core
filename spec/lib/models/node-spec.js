@@ -187,11 +187,11 @@ describe('Models.Node', function () {
             };
 
             before(function() {
-                sinon.stub(this.model, "native", function(cb) { cb(null, collection); });
+                sinon.stub(this.model, 'findAndModifyMongo').resolves({_id:'id'});
             });
 
             after(function() {
-                this.model.native.restore();
+                this.model.findAndModifyMongo.restore();
             });
 
             it('should have all valid functions', function() {
@@ -207,8 +207,7 @@ describe('Models.Node', function () {
                 var self = this;
                 return this.model.addTags.call(this.model, 'id', ['tag'])
                     .then(function() {
-                        expect(collection.update).to.have.been.called;
-                        expect(self.model.native).to.have.been.called;
+                        expect(self.model.findAndModifyMongo).to.have.been.called;
                     });
             });
 
@@ -216,8 +215,7 @@ describe('Models.Node', function () {
                 var self = this;
                 return this.model.remTags.call(this.model, 'id', 'tag')
                     .then(function() {
-                        expect(collection.update).to.have.been.called;
-                        expect(self.model.native).to.have.been.called;
+                        expect(self.model.findAndModifyMongo).to.have.been.called;
                     });
             });
 
