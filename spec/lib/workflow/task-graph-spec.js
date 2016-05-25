@@ -18,7 +18,8 @@ describe('Task Graph', function () {
             helper.di.simpleWrapper({
                 getTaskDefinition: sinon.stub().resolves(),
                 persistTaskDependencies: sinon.stub().resolves(),
-                persistGraphObject: sinon.stub().resolves()
+                persistGraphObject: sinon.stub().resolves(),
+                publishGraphRecord: sinon.stub().resolves(),
             }, 'TaskGraph.Store')
         ]);
         Constants = helper.injector.get('Constants');
@@ -501,12 +502,12 @@ describe('Task Graph', function () {
                 definition: definitions.graphDefinition
             })
             .then(function(graph) {
-                return [graph, graph.persist('isNew')];
+                return [graph, graph.persist()];
             })
             .spread(function(graph, _graph) {
                 expect(graph).to.equal(_graph);
                 expect(store.persistGraphObject).to.have.been.calledOnce;
-                expect(store.persistGraphObject).to.have.been.calledWith(graph, 'isNew');
+                expect(store.persistGraphObject).to.have.been.calledWith(graph);
                 expect(store.persistTaskDependencies.callCount)
                     .to.equal(_.keys(graph.tasks).length);
                 var taskItems = graph.createTaskDependencyItems();
