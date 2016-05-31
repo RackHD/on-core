@@ -210,6 +210,39 @@ describe('Models.Lookup', function () {
             });
         });
 
+        describe('upsertProxyToMacAddress', function () {
+            it('should update an existing record by mac adddress', function() {
+                var record = {
+                    id: 'id',
+                    macAddress: 'macAddress',
+                    ipAddress: 'ipAddress',
+                    node: 'node',
+                    proxy: 'proxy'
+                },
+                update = this.sandbox.stub(waterline.lookups, 'update').resolves([record]),
+                findOne = this.sandbox.stub(waterline.lookups, 'findOne').resolves(record);
+
+                return waterline.lookups.upsertProxyToMacAddress(
+                    'proxy',
+                    'macAddress'
+                ).then(function () {
+                    expect(findOne).to.have.been.calledWith({ macAddress: 'macAddress' });
+                    expect(update).to.have.been.calledWith({ id: 'id' }, { proxy: 'proxy' });
+                });
+            });
+
+            it('should reject with Errors.NotFoundError if no records are returned', function() {
+                var findOne = this.sandbox.stub(waterline.lookups, 'findOne').resolves();
+
+                return expect(waterline.lookups.upsertProxyToMacAddress(
+                    'proxy',
+                    'macAddress'
+                )).to.be.rejectedWith(Errors.NotFoundError).then(function () {
+                    expect(findOne).to.have.been.calledWith({ macAddress: 'macAddress' });
+                });
+            });
+        });
+
         describe('setIp', function() {
             it('should set the mac with the ip', function() {
                 var record = {
