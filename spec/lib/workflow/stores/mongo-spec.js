@@ -11,10 +11,12 @@ describe('Task Graph mongo store interface', function () {
 
     var createMockModel = function() {
         return {
+            publishRecord: sinon.stub(),
             findMongo: sinon.stub().resolves(),
             findAndModifyMongo: sinon.stub().resolves(),
             updateMongo: sinon.stub().resolves(),
             removeMongo: sinon.stub().resolves(),
+            needOne: sinon.stub().resolves(),
             findOne: sinon.stub().resolves(),
             find: sinon.stub().resolves(),
             create: sinon.stub().resolves(),

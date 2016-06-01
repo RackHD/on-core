@@ -18,7 +18,8 @@ describe('Task Graph', function () {
             helper.di.simpleWrapper({
                 getTaskDefinition: sinon.stub().resolves(),
                 persistTaskDependencies: sinon.stub().resolves(),
-                persistGraphObject: sinon.stub().resolves()
+                persistGraphObject: sinon.stub().resolves(),
+                publishGraphRecord: sinon.stub().resolves(),
             }, 'TaskGraph.Store')
         ]);
         Constants = helper.injector.get('Constants');
@@ -295,6 +296,9 @@ describe('Task Graph', function () {
                 });
                 expect(taskWithDependencies).to.be.ok;
                 expect(taskWithNoDependencies).to.be.ok;
+
+                expect(taskWithDependencies.label).to.be.ok;
+                expect(taskWithNoDependencies.label).to.be.ok;
 
                 expect(taskWithDependencies.instanceId).to.be.a.uuid;
                 expect(taskWithNoDependencies.instanceId).to.be.a.uuid;
