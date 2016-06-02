@@ -33,15 +33,21 @@ describe('Lookup Service', function () {
     var node = {
         id: 'node'
     };
-
+ 
     helper.before(function(context) {
         context.Core = {
             start: sandbox.stub().resolves(),
             stop: sandbox.stub().resolves()
         };
-        return helper.di.simpleWrapper(context.Core, 'Services.Core' );
+        context.arpCache = {
+            getCurrent: sandbox.stub().resolves()
+        };
+        return [
+            helper.di.simpleWrapper(context.Core, 'Services.Core'),
+            helper.di.simpleWrapper(context.arpCache, 'ARPCache')
+        ];
     });
-
+    
     before('Lookup Service before', function () {
         lookupService = helper.injector.get('Services.Lookup');
         WaterlineService = helper.injector.get('Services.Waterline');
@@ -72,7 +78,11 @@ describe('Lookup Service', function () {
     after(function() {
         sandbox.restore();
     });
-
+    
+    afterEach(function() {
+        this.arpCache.getCurrent.resolves([]);    
+    });
+    
     describe('Node ID Cache', function () {
         var spy1 = sinon.spy(),
             spy2 = sinon.spy();
@@ -511,5 +521,15 @@ describe('Lookup Service', function () {
             expect(WaterlineService.lookups.setIp).to.have.been.calledOnce;
             expect(WaterlineService.lookups.setIp).to.have.been.calledWith('ip', 'mac');
         });
-    });    
+    });   
+    
+    it('validateArpCache', function() {
+        this.sandbox.stub(WaterlineService.lookups, 'setIp').resolves();
+        this.arpCache.getCurrent.resolves([{mac:'mac', ip:'ip'}]);
+        return lookupService.validateArpCache()
+        .then(function() {
+            expect(WaterlineService.lookups.setIp).to.have.been.calledOnce;
+            expect(WaterlineService.lookups.setIp).to.have.been.calledWith('ip', 'mac');
+        });
+    });   
 });
