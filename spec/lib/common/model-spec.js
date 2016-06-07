@@ -51,7 +51,6 @@ describe('Model', function () {
     describe('newly created record', function () {
         var record;
 
-
         before('reset DB collections', function () {
             return helper.reset();
         });
@@ -287,7 +286,6 @@ describe('Model', function () {
             });
         });
     });
-
 
     describe('model destroying', function () {
         var record;
@@ -542,32 +540,50 @@ describe('Model', function () {
           });
     });
 
-    describe('publishRecord() failure', function () {
+    describe('publishRecord', function () {
         beforeEach('set up mocks', function () {
             waterlineProtocol.publishRecord = sinon.stub().returns(bluebird.resolve());
         });
 
-        it('should cause rejection on create()', function () {
-            var error = new Error();
-            waterlineProtocol.publishRecord = sinon.stub().returns(bluebird.reject(error));
-            return waterline.testobjects.create({})
-            .should.be.rejected.and.eventually.have.property('originalError', error);
+        describe('helper method', function () {
+            it('should call waterlineProtocol.publishrecord', function () {
+                waterline.testobjects.publishRecord.call('this', 'event', 'record', 'id');
+                expect(waterlineProtocol.publishRecord).to.have.been.calledOnce;
+                expect(waterlineProtocol.publishRecord).to.have.been.calledWith(
+                    'this', 'event', 'record', 'id');
+            });
+
+            it('should not fail if record is null', function () {
+                waterline.testobjects.publishRecord.call('this', 'event', null, null);
+                expect(waterlineProtocol.publishRecord).to.have.been.calledOnce;
+                expect(waterlineProtocol.publishRecord).to.have.been.calledWith(
+                    'this', 'event', {}, '');
+            });
         });
 
-        it('should cause rejection on update()', function () {
-            var error = new Error();
-            return waterline.testobjects.create({}).then(function (record) {
+        describe('failure', function () {
+            it('should cause rejection on create()', function () {
+                var error = new Error();
                 waterlineProtocol.publishRecord = sinon.stub().returns(bluebird.reject(error));
-                return waterline.testobjects.update(record.id, { dummy: 'test' });
-            }).should.be.rejected.and.eventually.have.property('originalError', error);
-        });
+                return waterline.testobjects.create({})
+                .should.be.rejected.and.eventually.have.property('originalError', error);
+            });
 
-        it('should cause rejection on destroy()', function () {
-            var error = new Error();
-            return waterline.testobjects.create({}).then(function (record) {
-                waterlineProtocol.publishRecord = sinon.stub().returns(bluebird.reject(error));
-                return waterline.testobjects.destroy(record.id);
-            }).should.be.rejected.and.eventually.have.property('originalError', error);
+            it('should cause rejection on update()', function () {
+                var error = new Error();
+                return waterline.testobjects.create({}).then(function (record) {
+                    waterlineProtocol.publishRecord = sinon.stub().returns(bluebird.reject(error));
+                    return waterline.testobjects.update(record.id, { dummy: 'test' });
+                }).should.be.rejected.and.eventually.have.property('originalError', error);
+            });
+
+            it('should cause rejection on destroy()', function () {
+                var error = new Error();
+                return waterline.testobjects.create({}).then(function (record) {
+                    waterlineProtocol.publishRecord = sinon.stub().returns(bluebird.reject(error));
+                    return waterline.testobjects.destroy(record.id);
+                }).should.be.rejected.and.eventually.have.property('originalError', error);
+            });
         });
     });
 
