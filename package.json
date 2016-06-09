@@ -19,7 +19,7 @@
   "homepage": "https://github.com/RackHD/on-core",
   "dependencies": {
     "always-tail": "^0.1.1",
-    "amqp": "^0.2.3",
+    "amqp": "0.2.3",
     "anchor": "^0.10.2",
     "apache-crypt": "1.0.9",
     "assert-plus": "^1.0.0",
