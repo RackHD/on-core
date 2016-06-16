@@ -26,7 +26,25 @@ describe('Models.LocalUsers', function () {
     helper.after();
 
     describe('Base', function () {
-        base.examples();
+        describe('createdAt', function () {
+            before(function () {
+                this.subject = this.attributes.createdAt;
+            });
+
+            it('should be a datetime', function () {
+                expect(this.subject.type).to.equal('datetime');
+            });
+        });
+
+        describe('updatedAt', function () {
+            before(function () {
+                this.subject = this.attributes.updatedAt;
+            });
+
+            it('should be a datetime', function () {
+                expect(this.subject.type).to.equal('datetime');
+            });
+        });
     });
 
     describe('Attributes', function () {
@@ -41,6 +59,10 @@ describe('Models.LocalUsers', function () {
 
             it('should be required', function () {
                 expect(this.subject.required).to.equal(true);
+            });
+
+            it('should be a primary key', function () {
+                expect(this.subject.primaryKey).to.equal(true);
             });
         });
 

@@ -89,18 +89,32 @@ describe('Models.Lookup', function () {
         });
 
         describe('findByTerm', function () {
-            it('should call find with the proper criteria', function() {
+            it('should call find with the proper mac criteria', function() {
                 var find = this.sandbox.stub(waterline.lookups, 'find').resolves([]);
 
                 return waterline.lookups.findByTerm('foo').then(function (records) {
                     expect(records).to.deep.equal([]);
-                    expect(find).to.have.been.calledWith({
-                        or: [
-                            { node: 'foo' },
-                            { macAddress: 'foo' },
-                            { ipAddress: 'foo' }
-                        ]
-                    });
+                    expect(find).to.have.been.calledWith({ macAddress: ['foo'] });
+                });
+            });
+
+            it('should call find with the proper node criteria', function() {
+                var bson = require('bson');
+                var objId = new bson.ObjectID();
+                var find = this.sandbox.stub(waterline.lookups, 'find').resolves([]);
+
+                return waterline.lookups.findByTerm(objId).then(function (records) {
+                    expect(records).to.deep.equal([]);
+                    expect(find).to.have.been.calledWith({ node: objId });
+                });
+            });
+
+            it('should call find with the proper ip criteria', function() {
+                var find = this.sandbox.stub(waterline.lookups, 'find').resolves([]);
+
+                return waterline.lookups.findByTerm('127.0.0.1').then(function (records) {
+                    expect(records).to.deep.equal([]);
+                    expect(find).to.have.been.calledWith({ ipAddress: '127.0.0.1' });
                 });
             });
 
@@ -169,43 +183,17 @@ describe('Models.Lookup', function () {
         });
 
         describe('upsertNodeToMacAddress', function () {
-            it('should update an existing record by mac adddress', function() {
-                var record = {
-                    id: 'id',
-                    macAddress: 'macAddress',
-                    ipAddress: 'ipAddress',
-                    node: 'node'
-                },
-                update = this.sandbox.stub(waterline.lookups, 'update').resolves([record]),
-                findOne = this.sandbox.stub(waterline.lookups, 'findOne').resolves(record);
-
+            it('should update the record with the MAC', function() {
+                this.sandbox.stub(waterline.lookups, 'findAndModifyMongo').resolves();
                 return waterline.lookups.upsertNodeToMacAddress(
                     'node',
                     'macAddress'
                 ).then(function () {
-                    expect(findOne).to.have.been.calledWith({ macAddress: 'macAddress' });
-                    expect(update).to.have.been.calledWith({ id: 'id' }, { node: 'node' });
-                });
-            });
-
-            it('should call create if no record is returned by find', function() {
-                var record = {
-                    id: 'id',
-                    macAddress: 'macAddress',
-                    ipAddress: 'ipAddress',
-                    node: 'node'
-                },
-                create = this.sandbox.stub(waterline.lookups, 'create').resolves(record),
-                findOne = this.sandbox.stub(waterline.lookups, 'findOne').resolves();
-
-                return waterline.lookups.upsertNodeToMacAddress(
-                    'node',
-                    'macAddress'
-                ).then(function () {
-                    expect(findOne).to.have.been.calledWith({ macAddress: 'macAddress' });
-                    expect(create).to.have.been.calledWith(
-                        { node: 'node', macAddress: 'macAddress' }
-                    );
+                    expect(waterline.lookups.findAndModifyMongo).to.have.been.calledOnce;
+                    var query = { macAddress: 'macAddress' };
+                    var update = { $set: { node: 'node' }};
+                    expect(waterline.lookups.findAndModifyMongo.firstCall.args[0]).to.deep.equal(query);
+                    expect(waterline.lookups.findAndModifyMongo.firstCall.args[2]).to.deep.equal(update);
                 });
             });
         });
@@ -244,11 +232,11 @@ describe('Models.Lookup', function () {
         });
 
         describe('setIp', function() {
+            var record = {
+                ipAddress: '99.99.99.12',
+                macAddress: '7a:c0:7a:c0:be:ef'
+            };
             it('should set the mac with the ip', function() {
-                var record = {
-                    ipAddress: '99.99.99.12',
-                    macAddress: '7a:c0:7a:c0:be:ef'
-                };
 
                 this.sandbox.stub(waterline.lookups, 'findAndModifyMongo').resolves();
 
@@ -299,6 +287,16 @@ describe('Models.Lookup', function () {
                             ]
                         );
                     });
+            });
+
+            it('should have a PostgreSQL handler', function() {
+                this.sandbox.stub(waterline.lookups, 'runQuery').resolves();
+                this.sandbox.stub(waterline.lookups, 'postgresqlRunLockedQuery').resolves();
+                return waterline.lookups.setIpPostgreSQL(record.ipAddress, record.macAddress)
+                .then(function() {
+                    expect(waterline.lookups.runQuery).to.be.calledOnce;
+                    expect(waterline.lookups.postgresqlRunLockedQuery).to.be.calledOnce;
+                });
             });
         });
 

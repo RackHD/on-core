@@ -198,7 +198,7 @@ describe('db-renderable-content', function () {
                     expect(out[key]).to.equal(thing[key] || 'test contents');
                 });
                 expect(waterline.things.find)
-                    .to.have.been.calledWith({ name: 'test thing', scope: [ 'global' ]});
+                    .to.have.been.calledWith({ name: 'test thing'});
             });
         });
 
@@ -231,7 +231,7 @@ describe('db-renderable-content', function () {
             .then(function(out) {
                 expect(out.contents).to.equal('b scope');
                 expect(waterline.things.find)
-                    .to.have.been.calledWith({ name: 'thing', scope: scope });
+                    .to.have.been.calledWith({ name: 'thing'});
             });
         });
 
@@ -242,7 +242,7 @@ describe('db-renderable-content', function () {
             .then(function(out) {
                 expect(out).to.equal(undefined);
                 expect(waterline.things.find)
-                    .to.have.been.calledWith({ name: 'thing', scope: scope });
+                    .to.have.been.calledWith({ name: 'thing' });
             });
         });
 
@@ -261,7 +261,7 @@ describe('db-renderable-content', function () {
             .then(function(out) {
                 expect(out.contents).to.equal('a scope');
                 expect(waterline.things.find)
-                    .to.have.been.calledWith({ name: 'thing', scope: scope });
+                    .to.have.been.calledWith({ name: 'thing' });
             });
         });
 

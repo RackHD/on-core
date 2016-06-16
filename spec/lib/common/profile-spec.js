@@ -54,7 +54,7 @@ describe('Profiles', function () {
                     expect(out[key]).to.equal(profile[key] || 'test contents');
                 });
                 expect(waterline.profiles.find)
-                    .to.have.been.calledWith({ name: 'test profile', scope: [ 'global'  ] });
+                    .to.have.been.calledWith({ name: 'test profile' });
             });
         });
 
@@ -71,7 +71,7 @@ describe('Profiles', function () {
             .then(function(out) {
                 expect(out).to.equal('test contents');
                 expect(waterline.profiles.find)
-                    .to.have.been.calledWith({ name: 'test profile', scope: [ 'global'  ] });
+                    .to.have.been.calledWith({ name: 'test profile' });
             });
         });
     });

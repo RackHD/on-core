@@ -23,6 +23,7 @@ module.exports = function (di, directory) {
             helper.requireWrapper('waterline', 'Waterline'),
             helper.requireWrapper('waterline-criteria', 'WaterlineCriteria'),
             helper.requireWrapper('sails-mongo', 'MongoAdapter'),
+            helper.requireWrapper('sails-postgresql', 'PostgreSQLAdapter'),
             helper.requireWrapper('amqp', 'amqp'),
             helper.requireWrapper('domain', 'domain'),
             helper.requireWrapper('node-uuid', 'uuid'),

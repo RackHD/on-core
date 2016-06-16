@@ -195,8 +195,9 @@ describe("Event protocol subscribers", function () {
 
         it("should publish and subscribe to SkuAssigned messages", function () {
             //NOTE: no matching internal code to listen for these events
-            var nodeId = "507f191e810c19729de860ea", //mongoId format
-                skuId = "507f191e810c19729de860eb"; //mongoId format
+            var uuid = helper.injector.get('uuid'),
+                skuId = uuid.v4(); // uuid format
+            var nodeId = "507f191e810c19729de860ea";
             messenger.subscribe = sinon.spy(function(a,b,callback) {
                 callback({sku:skuId},testMessage);
                 return Promise.resolve(testSubscription);
