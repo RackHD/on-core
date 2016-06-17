@@ -33,8 +33,15 @@ module.exports = {
                     expect(this.subject.primaryKey).to.equal(true);
                 });
 
-                it('should be auto increment', function () {
-                    expect(this.subject.autoIncrement).to.equal(true);
+                it('should auto generate an id', function () {
+                    if(this.subject.autoIncrement) {
+                        expect(this.subject.autoIncrement).to.equal(true);
+                    } else {
+                        var Constants = helper.injector.get('Constants');
+                        expect(this.subject.defaultsTo).to.be.a.function;
+                        var data = this.subject.defaultsTo();
+                        expect(Constants.Regex.uuid.test(data)).to.be.ok;
+                    }
                 });
 
                 it('should be unique', function () {

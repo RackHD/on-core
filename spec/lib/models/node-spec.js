@@ -182,18 +182,6 @@ describe('Models.Node', function () {
         });
 
         describe('Node Tag Functions', function() {
-            var collection = {
-                update: sinon.stub().resolves()
-            };
-
-            before(function() {
-                sinon.stub(this.model, 'findAndModifyMongo').resolves({_id:'id'});
-            });
-
-            after(function() {
-                this.model.findAndModifyMongo.restore();
-            });
-
             it('should have all valid functions', function() {
                 var self = this;
                 var valid = ['addTags', 'remTags', 'findByTag'];
@@ -201,22 +189,6 @@ describe('Models.Node', function () {
                     expect(self.model[name]).to.exist;
                     expect(self.model).to.respondTo(name);
                 });
-            });
-
-            it('addTags should call update', function() {
-                var self = this;
-                return this.model.addTags.call(this.model, 'id', ['tag'])
-                    .then(function() {
-                        expect(self.model.findAndModifyMongo).to.have.been.called;
-                    });
-            });
-
-            it('remTags should call update', function() {
-                var self = this;
-                return this.model.remTags.call(this.model, 'id', 'tag')
-                    .then(function() {
-                        expect(self.model.findAndModifyMongo).to.have.been.called;
-                    });
             });
 
             it('findByTag should call find', function() {
@@ -230,7 +202,92 @@ describe('Models.Node', function () {
                         self.model.find.restore();
                     });
             });
+        });
 
+        describe('Node Tag Functions (mongo)', function() {
+            var connection;
+            before(function() {
+                sinon.stub(this.model, 'findAndModifyMongo').resolves({_id:'id'});
+                connection = this.model.connection;
+                this.model.connection = ['mongo'];
+            });
+            after(function() {
+                this.model.findAndModifyMongo.restore();
+                this.model.connection = connection;
+            });
+
+            it('addTags should call update (mongo)', function() {
+                var self = this;
+                return this.model.addTags.call(this.model, 'id', ['tag'])
+                    .then(function() {
+                        expect(self.model.findAndModifyMongo).to.have.been.called;
+                    });
+            });
+
+            it('remTags should call update (mongo)', function() {
+                var self = this;
+                return this.model.remTags.call(this.model, 'id', 'tag')
+                    .then(function() {
+                        expect(self.model.findAndModifyMongo).to.have.been.called;
+                    });
+            });
+
+        });
+
+        describe('Node Tag Functions (postgresql)', function() {
+            var connection;
+            before(function() {
+                sinon.stub(this.model, 'postgresqlRunLockedQuery').resolves({_id:'id'});
+                sinon.stub(this.model, 'findOne').resolves({_id:'id'});
+                connection = this.model.connection;
+                this.model.connection = ['postgresql'];
+            });
+
+            after(function() {
+                this.model.postgresqlRunLockedQuery.restore();
+                this.model.findOne.restore();
+                this.model.connection = connection;
+            });
+
+            it('addTags should call update (postgresql)', function() {
+                var self = this;
+                return this.model.addTags.call(this.model, 'id', ['tag'])
+                    .then(function() {
+                        expect(self.model.postgresqlRunLockedQuery).to.have.been.called;
+                    });
+            });
+
+            it('remTags should call update (postgresql)', function() {
+                var self = this;
+                return this.model.remTags.call(this.model, 'id', 'tag')
+                    .then(function() {
+                        expect(self.model.postgresqlRunLockedQuery).to.have.been.called;
+                    });
+            });
+        });
+
+        describe('database compatibility', function() {
+            var connection;
+            before(function() {
+                connection = this.model.connection;
+                this.model.connection = ['postgresql'];
+            });
+            
+            after(function() {
+                this.model.connection = connection;
+            });
+
+            it('should add properties and set id to BSON id', function() {
+                var validator = helper.injector.get('validator');
+                var obj = {};
+                this.model.beforeCreate(obj, function() {
+                    expect( validator.isMongoId(obj.id) ).is.true;
+                    expect(obj.obmSettings).to.be.an('array').with.length(0);
+                    expect(obj.bootSettings).to.be.an('object');
+                    expect(obj.snmpSettings).to.be.an('object');
+                    expect(obj.sshSettings).to.be.an('object');
+                });
+            });
         });
     });
 });

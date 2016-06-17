@@ -587,6 +587,61 @@ describe('Model', function () {
         });
     });
 
+    describe('native postgresql methods', function() {
+        before(function() {
+            this.sandbox = sinon.sandbox.create();
+            waterline.testobjects.query = function() {};
+            waterline.testobjects.connections.postgresql = {
+                config: {
+                    url: 'postgres://rackhd:rackhd@localhost:5432/pxe'
+                }
+            };
+        });
+
+        after(function() {
+            delete waterline.testobjects.query;
+            delete waterline.testobjects.connections.postgresql;
+            this.sandbox.restore();
+        });
+
+        it('should runQuery', function() {
+            this.sandbox.stub(waterline.testobjects, 'query', function(err, params, cb) {
+                cb();
+            });
+            return waterline.testobjects.runQuery('query')
+            .then(function() {
+                expect(waterline.testobjects.query).to.have.been.calledOnce;
+                expect(waterline.testobjects.query).to.have.been.calledWith('query');
+            });
+        });
+
+        it('should postgresqlRunLockedQuery', function() {
+            var done = sinon.stub();
+            var querySpy = sinon.spy();
+            var connectAsync = sinon.stub().resolves([
+                {
+                    query: function(query, params, cb) {
+                        querySpy(query);
+                        cb = (typeof params === 'function') ? params : cb;
+                        cb();
+                    }
+                }, 
+                done
+            ]);
+            this.sandbox.stub(Promise, 'promisifyAll', function() {
+                return { 
+                    connectAsync: connectAsync
+                };
+            });
+            return waterline.testobjects.postgresqlRunLockedQuery('', [])
+            .then(function() {
+                expect(connectAsync).to.have.been.calledOnce;
+                expect(querySpy).to.have.callCount(4);
+                expect(done).to.have.been.calledOnce;
+            });
+        });
+    });
+
     describe('native mongo methods', function() {
         var query,
             update,
