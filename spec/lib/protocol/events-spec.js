@@ -20,7 +20,18 @@ describe("Event protocol subscribers", function () {
         testSubscription = new Subscription({},{});
         testMessage = new Message({},{},{});
         sinon.stub(testMessage);
-        sinon.stub(messenger);
+        sinon.stub(messenger, 'request');
+        sinon.stub(messenger, 'publish');
+    });
+
+    beforeEach(function() {
+        messenger.request.reset();
+        messenger.publish.reset();
+    });
+
+    after(function() {
+        messenger.request.restore();
+        messenger.publish.restore();
     });
 
     helper.after();
@@ -233,6 +244,44 @@ describe("Event protocol subscribers", function () {
             messenger.publish.resolves();
             return events.publishBlockedEventLoop(function(err) {
                 expect(err).to.equal(testError);
+            });
+        });
+    });
+
+    describe("publish node alert", function () {
+        it("should fail because nodeId is not string", function () {
+            var nodeId = 2;
+            var alertData = {
+                nodeId: '47bd8fb80abc5a6b5e7b10df',
+                nodeType: 'compute',
+                state: 'discovered'
+            };
+
+            return expect(function(){ events.publishNodeAlert(nodeId, alertData); })
+            .to.throw(Error.AssertionError);
+        });
+
+        it("should fail because data is not object", function () {
+            var nodeId = '47bd8fb80abc5a6b5e7b10df';
+            var alertData = 'abc';
+
+            return expect(function(){ events.publishNodeAlert(nodeId, alertData); })
+            .to.throw(Error.AssertionError);
+        });
+
+        it("should publish pass", function () {
+            var nodeId = '47bd8fb80abc5a6b5e7b10df';
+            var alertData = {
+                nodeId: '47bd8fb80abc5a6b5e7b10df',
+                nodeType: 'compute',
+                state: 'discovered'
+            };
+
+            messenger.publish.resolves();
+
+            return events.publishNodeAlert(nodeId, alertData)
+            .then(function () {
+                expect(messenger.publish).to.have.been.calledOnce;
             });
         });
     });
