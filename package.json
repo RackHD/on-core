@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/RackHD/on-core",
   "dependencies": {
+    "ajv": "^4.1.0",
     "always-tail": "^0.2.0",
     "amqp": "0.2.3",
     "anchor": "^0.10.2",
