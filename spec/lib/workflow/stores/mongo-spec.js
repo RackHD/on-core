@@ -123,7 +123,7 @@ describe('Task Graph mongo store interface', function () {
                 expect(waterline.graphobjects.findAndModifyMongo.args[0][2].$set).to.have
                     .property('tasks.' + data.taskId + '.state').to.deep.equal('succeeded');
                 expect(waterline.graphobjects.findAndModifyMongo.args[0][2].$set).to.have
-                    .property('taskEndTime').that.is.an.instanceof(Date);
+                    .property('tasks.' + data.taskId + '.taskEndTime').that.is.an.instanceof(Date);
             });
         });
 
@@ -152,7 +152,7 @@ describe('Task Graph mongo store interface', function () {
                 expect(waterline.graphobjects.findAndModifyMongo.args[0][2].$set).to.have
                     .property('tasks.' + data.taskId + '.state').to.deep.equal('succeeded');
                 expect(waterline.graphobjects.findAndModifyMongo.args[0][2].$set).to.have
-                    .property('taskEndTime').that.is.an.instanceof(Date);
+                    .property('tasks.' + data.taskId + '.taskEndTime').that.is.an.instanceof(Date);
                 expect(waterline.graphobjects.findAndModifyMongo.args[0][2].$set).to.have
                     .property('tasks.' + data.taskId + '.error').to
                     .deep.equal('Error: test error message');
