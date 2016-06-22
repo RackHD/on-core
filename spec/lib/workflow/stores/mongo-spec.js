@@ -98,6 +98,7 @@ describe('Task Graph mongo store interface', function () {
     });
 
     describe('setTaskStateInGraph', function() {
+        var timeStamp = new Date();
         it('should set a task state within a graph object', function() {
             var data = {
                 state: 'succeeded',
@@ -109,15 +110,20 @@ describe('Task Graph mongo store interface', function () {
             .then(function() {
                 var modify = { $set: {} };
                 modify.$set['tasks.' + data.taskId + '.state'] = 'succeeded';
+                modify.$set.taskEndTime = timeStamp;
+
                 expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledOnce;
-                expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledWith(
-                    {
-                        instanceId: data.graphId
-                    },
-                    {},
-                    modify,
-                    { new: true }
-                );
+                
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][0]).to.deep.equal(
+                    {instanceId: data.graphId});
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][1]).to.deep.equal(
+                    {});
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][3]).to.deep.equal(
+                    {new: true}); 
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][2].$set).to.have
+                    .property('tasks.' + data.taskId + '.state').to.deep.equal('succeeded');
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][2].$set).to.have
+                    .property('tasks.' + data.taskId + '.taskEndTime').that.is.an.instanceof(Date);
             });
         });
 
@@ -133,16 +139,23 @@ describe('Task Graph mongo store interface', function () {
             .then(function() {
                 var modify = { $set: {} };
                 modify.$set['tasks.' + data.taskId + '.state'] = 'succeeded';
-                modify.$set['tasks.' + data.taskId + '.error'] = 'Error: test error message';
+                modify.$set['tasks.' + data.taskId + '.error'] = 'Error: test error message'; 
+                modify.$set.taskEndTime = new Date();
                 expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledOnce;
-                expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledWith(
-                    {
-                        instanceId: data.graphId
-                    },
-                    {},
-                    modify,
-                    { new: true }
-                );
+
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][0]).to.deep.equal(
+                    {instanceId: data.graphId});
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][1]).to.deep.equal(
+                    {});
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][3]).to.deep.equal(
+                    {new: true}); 
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][2].$set).to.have
+                    .property('tasks.' + data.taskId + '.state').to.deep.equal('succeeded');
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][2].$set).to.have
+                    .property('tasks.' + data.taskId + '.taskEndTime').that.is.an.instanceof(Date);
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][2].$set).to.have
+                    .property('tasks.' + data.taskId + '.error').to
+                    .deep.equal('Error: test error message');
             });
         });
     });
@@ -451,6 +464,8 @@ describe('Task Graph mongo store interface', function () {
                 .that.has.property('taskRunnerLease').that.equals(taskRunnerId);
             expect(update).to.have.property('$set')
                 .that.has.property('taskRunnerHeartbeat').that.is.an.instanceof(Date);
+            expect(update).to.have.property('$set')
+                .that.has.property('taskStartTime').that.is.an.instanceof(Date);
             expect(waterline.taskdependencies.findAndModifyMongo.firstCall.args[3]).to.deep.equal(
                 { new: true }
             );
