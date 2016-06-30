@@ -41,6 +41,172 @@ describe('JsonSchemaValidator', function () {
         }
     };
 
+    var testRefSchema1Resolved = {
+        id: '/refschema/r1',
+        definitions: {
+            url: {
+                type: 'string',
+                format: 'uri'
+            }
+        },
+        properties: {
+            repo: {
+                type: 'string',
+                format: 'uri'
+            },
+            index: {
+                type: 'number',
+            }
+        }
+    };
+
+    var testRefSchema2Resolved = {
+        id: '/refschema/r2',
+        properties: {
+            repo: {
+                type: 'string',
+                format: 'uri'
+            }
+        }
+    };
+
+    var testRefSchema3 = {
+        "id": "/refschema/r3",
+        "definitions": {
+            "UserName": {
+                "description": "The user account name",
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_]",
+                "minLength": 1
+            },
+            "UserPassword": {
+                "description": "The account password",
+                "type": "string",
+                "minLength": 5
+            },
+            "SshKey": {
+                "type": "string",
+                "description": "The trusted ssh key for the particular user",
+                "minLength": 1
+            },
+            "UserID": {
+                "description": "The unique user identifier for this user account",
+                "type": "integer",
+                "minimum": 500,
+                "maximum": 65535
+            },
+            "UserAccountInfoSimple": {
+                "type": "object",
+                "description": "The simple information for an user account",
+                "properties": {
+                    "name": {
+                        "$ref": "#/definitions/UserName"
+                    },
+                    "password": {
+                        "$ref": "#/definitions/UserPassword"
+                    },
+                    "sshKey": {
+                        "$ref": "#/definitions/SshKey"
+                    }
+                },
+                "required": ["name", "password"]
+            }
+        },
+        "properties": {
+            "UsersSimple": {
+                "description": "The list of user account created during OS installation",
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                    "$ref": "#/definitions/UserAccountInfoSimple"
+                },
+                "uniqueItems": true
+            }
+        }
+    };
+
+    var testRefSchema3Resolved = {
+        "id": "/refschema/r3",
+        "definitions": {
+            "UserName": {
+                "description": "The user account name",
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_]",
+                "minLength": 1
+            },
+            "UserPassword": {
+                "description": "The account password",
+                "type": "string",
+                "minLength": 5
+            },
+            "SshKey": {
+                "type": "string",
+                "description": "The trusted ssh key for the particular user",
+                "minLength": 1
+            },
+            "UserID": {
+                "description": "The unique user identifier for this user account",
+                "type": "integer",
+                "minimum": 500,
+                "maximum": 65535
+            },
+            "UserAccountInfoSimple": {
+                "type": "object",
+                "description": "The simple information for an user account",
+                "properties": {
+                    "name": {
+                        "description": "The user account name",
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_]",
+                        "minLength": 1
+                    },
+                    "password": {
+                        "description": "The account password",
+                        "type": "string",
+                        "minLength": 5
+                    },
+                    "sshKey": {
+                        "type": "string",
+                        "description": "The trusted ssh key for the particular user",
+                        "minLength": 1
+                    }
+                },
+                "required": ["name", "password"]
+            }
+        },
+        "properties": {
+            "UsersSimple": {
+                "description": "The list of user account created during OS installation",
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                    "type": "object",
+                    "description": "The simple information for an user account",
+                    "properties": {
+                        "name": {
+                            "description": "The user account name",
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9_]",
+                            "minLength": 1
+                        },
+                        "password": {
+                            "description": "The account password",
+                            "type": "string",
+                            "minLength": 5
+                        },
+                        "sshKey": {
+                            "type": "string",
+                            "description": "The trusted ssh key for the particular user",
+                            "minLength": 1
+                        }
+                    },
+                    "required": ["name", "password"]
+                },
+                "uniqueItems": true
+            }
+        }
+    };
+
     helper.before();
 
     before(function() {
@@ -91,6 +257,19 @@ describe('JsonSchemaValidator', function () {
         expect(function () {
             validator.getSchema('/refschema/r2');
         }).to.throw(/can't resolve reference /);
+    });
+
+    it('should get schema with reference resolved', function () {
+        validator.addSchema(testRefSchema1);
+        validator.addSchema(testRefSchema2);
+        validator.addSchema(testRefSchema3);
+
+        expect(validator.getSchemaResolved('/refschema/r1'))
+            .to.deep.equal(testRefSchema1Resolved);
+        expect(validator.getSchemaResolved('/refschema/r2'))
+            .to.deep.equal(testRefSchema2Resolved);
+        expect(validator.getSchemaResolved('/refschema/r3'))
+            .to.deep.equal(testRefSchema3Resolved);
     });
 });
 
