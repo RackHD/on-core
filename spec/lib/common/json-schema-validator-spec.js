@@ -5,7 +5,7 @@
 describe('JsonSchemaValidator', function () {
     var validator;
     var JsonSchemaValidator;
-    var testSchema1 = { 
+    var testSchema1 = {
         properties: {
             repo: {
                 type: 'string',
@@ -219,57 +219,74 @@ describe('JsonSchemaValidator', function () {
 
     helper.after();
 
-    it('should return true when validation pass', function () {
-        var result = validator.validate(testSchema1, { repo : '/172.31.128.1/mirrors' });
-        expect(result).to.be.true;
+    describe('validate' , function () {
+        it('should return true when validation pass', function () {
+            var result = validator.validate(testSchema1, { repo : '/172.31.128.1/mirrors' });
+            expect(result).to.be.true;
+        });
+
+        it('should throw validation error with incorrect data format', function () {
+            expect(function () {
+                validator.validate(testSchema1, { repo : 'abc' });
+            }).to.throw(/JSON schema validation failed/);
+        });
     });
 
-    it('should throw validation error with incorrect data format', function () {
-        expect(function () {
-            validator.validate(testSchema1, { repo : 'abc' });
-        }).to.throw(/JSON schema validation failed/);
-    });
+    describe('addSchema' , function () {
+        it('should add correct schema', function () {
+            expect(validator.addSchema(testSchema1, 'test1')).to.be.empty;
+            expect(validator.addSchema(testRefSchema1)).to.be.empty;
+            expect(validator.addSchema(testRefSchema2)).to.be.empty;
+        });
 
-    it('should add correct schema', function () {
-        expect(validator.addSchema(testSchema1, 'test1')).to.be.empty;
-        expect(validator.addSchema(testRefSchema1)).to.be.empty;
-        expect(validator.addSchema(testRefSchema2)).to.be.empty;
-    });
-
-    it('should throw error when add duplicated key', function () {
-        validator.addSchema(testSchema1, 'test1');
-        expect(function () {
+        it('should throw error when add duplicated key', function () {
             validator.addSchema(testSchema1, 'test1');
-        }).to.throw(/schema with key or id "test1" already exists/);
+            expect(function () {
+                validator.addSchema(testSchema1, 'test1');
+            }).to.throw(/schema with key or id "test1" already exists/);
+        });
     });
 
-    it('should get existing schema', function () {
-        validator.addSchema(testSchema1, 'test1');
-        expect(validator.getSchema('test1')).to.deep.equal(testSchema1);
+    describe('getSchema' , function () {
+        it('should get existing schema', function () {
+            validator.addSchema(testSchema1, 'test1');
+            expect(validator.getSchema('test1')).to.deep.equal(testSchema1);
+        });
+
+        it('should not find not existing schema', function () {
+            expect(validator.getSchema('test2')).to.be.undefined;
+        });
+
+        it('should throw error when referenced schema not added', function () {
+            validator.addSchema(testRefSchema2);
+            expect(function () {
+                validator.getSchema('/refschema/r2');
+            }).to.throw(/can't resolve reference /);
+        });
     });
 
-    it('should not find not existing schema', function () {
-        expect(validator.getSchema('test2')).to.be.undefined;
-    });
+    describe('getSchemaResolved' , function () {
+        it('should get schema with reference resolved', function () {
+            validator.addSchema(testRefSchema1);
+            validator.addSchema(testRefSchema2);
+            validator.addSchema(testRefSchema3);
 
-    it('should throw error when reference schema not added', function () {
-        validator.addSchema(testRefSchema2);
-        expect(function () {
-            validator.getSchema('/refschema/r2');
-        }).to.throw(/can't resolve reference /);
-    });
+            expect(validator.getSchemaResolved('/refschema/r1'))
+                .to.deep.equal(testRefSchema1Resolved);
+            expect(validator.getSchemaResolved('/refschema/r2'))
+                .to.deep.equal(testRefSchema2Resolved);
+            expect(validator.getSchemaResolved('/refschema/r3'))
+                .to.deep.equal(testRefSchema3Resolved);
+        });
 
-    it('should get schema with reference resolved', function () {
-        validator.addSchema(testRefSchema1);
-        validator.addSchema(testRefSchema2);
-        validator.addSchema(testRefSchema3);
+        it('should also get schema with no $ref', function () {
+            validator.addSchema(testSchema1, 'test1');
+            expect(validator.getSchemaResolved('test1')).to.deep.equal(testSchema1);
+        });
 
-        expect(validator.getSchemaResolved('/refschema/r1'))
-            .to.deep.equal(testRefSchema1Resolved);
-        expect(validator.getSchemaResolved('/refschema/r2'))
-            .to.deep.equal(testRefSchema2Resolved);
-        expect(validator.getSchemaResolved('/refschema/r3'))
-            .to.deep.equal(testRefSchema3Resolved);
+        it('should not find not existing schema', function () {
+            expect(validator.getSchemaResolved('test2')).to.be.undefined;
+        });
     });
 });
 
