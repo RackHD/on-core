@@ -191,7 +191,7 @@ describe('Models.Lookup', function () {
                 ).then(function () {
                     expect(waterline.lookups.findAndModifyMongo).to.have.been.calledOnce;
                     var query = { macAddress: 'macAddress' };
-                    var update = { $set: { node: 'node' }};
+                    var update = { $set: { node:  waterline.lookups.mongo.objectId('node') }};
                     expect(waterline.lookups.findAndModifyMongo.firstCall.args[0]).to.deep.equal(query);
                     expect(waterline.lookups.findAndModifyMongo.firstCall.args[2]).to.deep.equal(update);
                 });
