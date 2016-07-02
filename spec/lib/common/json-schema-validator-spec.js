@@ -219,7 +219,7 @@ describe('JsonSchemaValidator', function () {
 
     helper.after();
 
-    describe('validate' , function () {
+    describe('validate', function() {
         it('should return true when validation pass', function () {
             var result = validator.validate(testSchema1, { repo : '/172.31.128.1/mirrors' });
             expect(result).to.be.true;
@@ -286,6 +286,131 @@ describe('JsonSchemaValidator', function () {
 
         it('should not find not existing schema', function () {
             expect(validator.getSchemaResolved('test2')).to.be.undefined;
+        });
+    });
+
+    describe('validatePatternsSkipped', function() {
+        var skipPatterns = [ /\{\{\s*foo.\w+\s*\}\}/, /<%\s*bar.\d+\s*%>/ ];
+
+        it('should return true when validation pass if no skip patterns', function() {
+            expect( validator.validatePatternsSkipped(
+                testSchema1,
+                { repo: '/172.31.128.1/mirrors'}
+            )).to.be.true;
+        });
+
+        it('should throw error when validation fails if no skip patterns', function() {
+            expect( function() {
+                validator.validatePatternsSkipped(
+                    testSchema1,
+                    { repo: 123 }
+                );
+            }).to.throw(/JSON schema validation failed/);
+        });
+
+        it('should return true if the error matches any of skip patterns', function() {
+            expect( validator.validatePatternsSkipped(
+                testSchema1,
+                { repo: '{{ foo.abc}}' },
+                skipPatterns
+            )).to.be.true;
+
+            expect( validator.validatePatternsSkipped(
+                testSchema1,
+                { repo: '<%bar.2%>' },
+                skipPatterns
+            )).to.be.true;
+        });
+
+        it('should support the skip pattern if it is not array', function() {
+            expect( validator.validatePatternsSkipped(
+                testSchema1,
+                { repo: '{{ foo.abc}}' },
+                skipPatterns[0]
+            )).to.be.true;
+
+            expect( validator.validatePatternsSkipped(
+                testSchema1,
+                { repo: '<%bar.2%>' },
+                skipPatterns[1]
+            )).to.be.true;
+        });
+
+        it('should throw error if not match any of skip patterns', function() {
+            expect(function () {
+                validator.validatePatternsSkipped(
+                    testSchema1,
+                    { repo: '{{ test.abc}}' },
+                    skipPatterns
+                );
+            }).to.throw(/JSON schema validation failed/);
+        });
+
+        it('should fail if the allErrors option is not enabled', function() {
+            validator = new JsonSchemaValidator({allErrors: false, verbose: true});
+            expect(function () {
+                validator.validatePatternsSkipped(
+                    testSchema1,
+                    { repo: '{{ foo.abc}}' },
+                    skipPatterns
+                );
+            }).to.throw(/allErrors/);
+        });
+
+        it('should fail if the verbose option is not enabled', function() {
+            validator = new JsonSchemaValidator({allErrors: true, verbose: false});
+            expect(function () {
+                validator.validatePatternsSkipped(
+                    testSchema1,
+                    { repo: '{{ foo.abc}}' },
+                    skipPatterns
+                );
+            }).to.throw(/verbose/);
+        });
+
+        it('should fail if the allErrors option is missing', function() {
+            validator = new JsonSchemaValidator({verbose: true});
+            expect(function () {
+                validator.validatePatternsSkipped(
+                    testSchema1,
+                    { repo: '{{ foo.abc}}' },
+                    skipPatterns
+                );
+            }).to.throw(/allErrors/);
+        });
+
+        it('should fail if the verbose option is missing', function() {
+            validator = new JsonSchemaValidator({allErrors: true});
+            expect(function () {
+                validator.validatePatternsSkipped(
+                    testSchema1,
+                    { repo: '{{ foo.abc}}' },
+                    skipPatterns
+                );
+            }).to.throw(/verbose/);
+        });
+
+        it('should throw error is skip pattern is not regex', function() {
+            expect(function () {
+                validator.validatePatternsSkipped(
+                    testSchema1,
+                    { repo: 123 },
+                    123
+                );
+            }).to.throw(/regexp/);
+        });
+    });
+
+    describe('reset', function() {
+        it('should have a reset function', function() {
+            expect(validator.reset).is.a('function').with.length(0);
+        });
+
+        it('should clear validator state after reset', function() {
+            validator.addSchema(testSchema1, 'testid');
+            expect(validator.getSchema('testid')).to.deep.equal(testSchema1);
+            validator.reset();
+            expect(validator.getSchema('testid')).to.be.undefined;
         });
     });
 });
