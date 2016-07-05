@@ -13,6 +13,7 @@ describe('Task Graph mongo store interface', function () {
         return {
             publishRecord: sinon.stub(),
             findMongo: sinon.stub().resolves(),
+            findOneMongo: sinon.stub().resolves(),
             findAndModifyMongo: sinon.stub().resolves(),
             updateMongo: sinon.stub().resolves(),
             removeMongo: sinon.stub().resolves(),
@@ -108,8 +109,8 @@ describe('Task Graph mongo store interface', function () {
             var timeStamp = new Date();
 
             return mongo.setTaskStateInGraph(data).then(function(){
-                var modify = { $set: {} };                                      
-                modify.$set['tasks.' + data.taskId + '.state'] = 'succeeded';   
+                var modify = { $set: {} };
+                modify.$set['tasks.' + data.taskId + '.state'] = 'succeeded';
                 modify.$set.taskEndTime = timeStamp;
                 expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledOnce;
                 expect(waterline.graphobjects.findAndModifyMongo.args[0][0]).to.deep.equal(
@@ -134,8 +135,8 @@ describe('Task Graph mongo store interface', function () {
             var timeStamp = new Date();
 
             return mongo.setTaskStateInGraph(data).then(function(){
-                var modify = { $set: {} };                                      
-                modify.$set['tasks.' + data.taskId + '.state'] = 'succeeded';   
+                var modify = { $set: {} };
+                modify.$set['tasks.' + data.taskId + '.state'] = 'succeeded';
                 modify.$set.taskEndTime = timeStamp;
                 expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledOnce;
                 expect(waterline.graphobjects.findAndModifyMongo.args[0][0]).to.deep.equal(
@@ -165,7 +166,7 @@ describe('Task Graph mongo store interface', function () {
                 );
             });*/
 
-        });    
+        });
     });
 
     it('getTaskDefinition', function() {
@@ -707,6 +708,15 @@ describe('Task Graph mongo store interface', function () {
         .then(function() {
             expect(waterline.taskdependencies.createMongoIndexes).to.be
                 .calledWithExactly({taskId: 1, graphId: 1});
+        });
+    });
+
+    it('findChildGraph', function() {
+        var runGraphTaskId = uuid.v4();
+        return mongo.findChildGraph(runGraphTaskId)
+        .then(function() {
+            expect(waterline.graphobjects.findOneMongo).to.be
+                .calledWithExactly({"parentTaskId": runGraphTaskId});
         });
     });
 });
