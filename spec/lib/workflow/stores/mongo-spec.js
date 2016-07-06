@@ -105,19 +105,22 @@ describe('Task Graph mongo store interface', function () {
                 graphId: uuid.v4()
             };
 
-            return mongo.setTaskStateInGraph(data)
-            .then(function() {
-                var modify = { $set: {} };
-                modify.$set['tasks.' + data.taskId + '.state'] = 'succeeded';
+            var timeStamp = new Date();
+
+            return mongo.setTaskStateInGraph(data).then(function(){
+                var modify = { $set: {} };                                      
+                modify.$set['tasks.' + data.taskId + '.state'] = 'succeeded';   
+                modify.$set.taskEndTime = timeStamp;
                 expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledOnce;
-                expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledWith(
-                    {
-                        instanceId: data.graphId
-                    },
-                    {},
-                    modify,
-                    { new: true }
-                );
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][0]).to.deep.equal(
+                    {instanceId: data.graphId});
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][1]).to.deep.equal({});
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][3]).to.deep.equal(
+                    {new: true});
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][2].$set).to.have
+                .property('tasks.' + data.taskId + '.state').to.deep.equal('succeeded');
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][2].$set).to.have
+                .property('tasks.' + data.taskId + '.taskEndTime').that.is.an.instanceof(Date);
             });
         });
 
@@ -128,8 +131,25 @@ describe('Task Graph mongo store interface', function () {
                 taskId: uuid.v4(),
                 graphId: uuid.v4()
             };
+            var timeStamp = new Date();
 
-            return mongo.setTaskStateInGraph(data)
+            return mongo.setTaskStateInGraph(data).then(function(){
+                var modify = { $set: {} };                                      
+                modify.$set['tasks.' + data.taskId + '.state'] = 'succeeded';   
+                modify.$set.taskEndTime = timeStamp;
+                expect(waterline.graphobjects.findAndModifyMongo).to.have.been.calledOnce;
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][0]).to.deep.equal(
+                    {instanceId: data.graphId});
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][1]).to.deep.equal({});
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][3]).to.deep.equal(
+                    {new: true});
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][2].$set).to.have
+                .property('tasks.' + data.taskId + '.state').to.deep.equal('succeeded');
+                expect(waterline.graphobjects.findAndModifyMongo.args[0][2].$set).to.have
+                .property('tasks.' + data.taskId + '.taskEndTime').that.is.an.instanceof(Date);
+            });
+
+/*            return mongo.setTaskStateInGraph(data)
             .then(function() {
                 var modify = { $set: {} };
                 modify.$set['tasks.' + data.taskId + '.state'] = 'succeeded';
@@ -143,8 +163,9 @@ describe('Task Graph mongo store interface', function () {
                     modify,
                     { new: true }
                 );
-            });
-        });
+            });*/
+
+        });    
     });
 
     it('getTaskDefinition', function() {
@@ -449,6 +470,8 @@ describe('Task Graph mongo store interface', function () {
             var update = waterline.taskdependencies.findAndModifyMongo.firstCall.args[2];
             expect(update).to.have.property('$set')
                 .that.has.property('taskRunnerLease').that.equals(taskRunnerId);
+            expect(update).to.have.property('$set')
+                .that.has.property('taskRunnerHeartbeat').that.is.an.instanceof(Date);
             expect(update).to.have.property('$set')
                 .that.has.property('taskRunnerHeartbeat').that.is.an.instanceof(Date);
             expect(waterline.taskdependencies.findAndModifyMongo.firstCall.args[3]).to.deep.equal(
