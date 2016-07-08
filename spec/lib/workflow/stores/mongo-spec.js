@@ -457,19 +457,19 @@ describe('Task Graph mongo store interface', function () {
         });
     });
 
-    it('checkGraphFinished not finished', function() {
+    it('checkGraphSucceeded not succeeded', function() {
         var data = {
             graphId: uuid.v4()
         };
         waterline.taskdependencies.findOne.resolves(data);
 
-        return mongo.checkGraphFinished(data)
+        return mongo.checkGraphSucceeded(data)
         .then(function(result) {
             expect(waterline.taskdependencies.findOne).to.have.been.calledOnce;
             expect(waterline.taskdependencies.findOne).to.have.been.calledWith(
                 {
                     graphId: data.graphId,
-                    state: Constants.Task.States.Pending,
+                    state: { $ne: Constants.Task.States.Succeeded },
                     reachable: true
                 }
             );
@@ -480,12 +480,12 @@ describe('Task Graph mongo store interface', function () {
         });
     });
 
-    it('checkGraphFinished finished', function() {
+    it('checkGraphSucceeded succeeded', function() {
         var data = {
             graphId: uuid.v4()
         };
         waterline.taskdependencies.findOne.resolves(null);
-        return expect(mongo.checkGraphFinished(data)).to.become({
+        return expect(mongo.checkGraphSucceeded(data)).to.become({
             graphId: data.graphId,
             done: true
         });
