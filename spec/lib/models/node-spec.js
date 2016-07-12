@@ -7,6 +7,11 @@ var base = require('./base-spec');
 var  sandbox = sinon.sandbox.create();
 
 describe('Models.Node', function () {
+    var waterline;
+    var obms;
+    var eventsProtocol;
+    var nodes;
+
     helper.before(function (context) {
         context.MessengerServices = function() {
             this.start= sandbox.stub().resolves();
@@ -19,13 +24,24 @@ describe('Models.Node', function () {
     });
 
     base.before(function (context) {
-        context.model = helper.injector.get('Services.Waterline').nodes;
+        eventsProtocol = helper.injector.get('Protocol.Events');
+        waterline = helper.injector.get('Services.Waterline');
+        nodes = waterline.nodes;
         context.modelClass = helper.injector.get('Models.Node');
-        context.catalogModel = helper.injector.get('Services.Waterline').catalogs;
+        context.model = waterline.nodes;
+        context.catalogModel = waterline.catalogs;
         context.attributes = context.model._attributes;
     });
 
     helper.after();
+
+    beforeEach(function() {
+        this.sandbox = sinon.sandbox.create();
+    });
+
+    afterEach(function() {
+        this.sandbox.restore();
+    });
 
     describe('Base', function () {
         base.examples();
@@ -272,6 +288,42 @@ describe('Models.Node', function () {
                     expect(obj.snmpSettings).to.be.an('object');
                     expect(obj.sshSettings).to.be.an('object');
                 });
+            });
+        });
+    });
+
+    describe('publishEvent' , function() {
+        it('should publish managed event', function() {
+            var node = {id: 'aaa', type: 'compute', sku: 'sku'};
+            var obm = {node: 'aaa', id: 'bbb'};
+
+            this.sandbox.stub(waterline.obms, 'find').resolves(obm);
+            this.sandbox.stub(eventsProtocol, 'publishNodeAlert').resolves();
+
+            return nodes.publishEvent(node, function() {})
+            .then(function () {
+                expect(eventsProtocol.publishNodeAlert).to.have.been
+                .calledWith('aaa',
+                    { nodeId : 'aaa',
+                      nodeType: 'compute',
+                      state: 'managed' });
+            });
+        });
+
+        it('should publish identified event', function() {
+            var node = {id: 'aaa', type: 'compute', sku: 'sku'};
+            var obm = {};
+
+            this.sandbox.stub(waterline.obms, 'find').resolves(obm);
+            this.sandbox.stub(eventsProtocol, 'publishNodeAlert').resolves();
+
+            return nodes.publishEvent(node, function() {})
+            .then(function () {
+                expect(eventsProtocol.publishNodeAlert).to.have.been
+                .calledWith('aaa',
+                    { nodeId : 'aaa',
+                      nodeType: 'compute',
+                      state: 'identified' });
             });
         });
     });
