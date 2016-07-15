@@ -285,4 +285,57 @@ describe("Event protocol subscribers", function () {
             });
         });
     });
+
+    describe("publish node attribute event", function () {
+        it('should publish assigned event', function() {
+            var oldNode = {id: 'aaa', type: 'compute', sku: ''};
+            var newNode = {id: 'aaa', type: 'compute', sku: 'bbb'};
+
+            messenger.publish.resolves();
+
+            return events.publishNodeAttrEvent(oldNode, newNode, 'sku')
+            .then(function () {
+                expect(messenger.publish).to.have.been
+                .calledWith('on.events', 'event.node',
+                    { type: 'node',
+                      action: 'sku.assigned',
+                      nodeId : 'aaa',
+                      nodeType: 'compute' });
+            });
+        });
+
+        it('should attribute unassigned event', function() {
+            var oldNode = {id: 'aaa', type: 'compute', sku: 'bbb'};
+            var newNode = {id: 'aaa', type: 'compute', sku: ''};
+
+            messenger.publish.resolves();
+
+            return events.publishNodeAttrEvent(oldNode, newNode, 'sku')
+            .then(function () {
+                expect(messenger.publish).to.have.been
+                .calledWith('on.events', 'event.node',
+                    { type: 'node',
+                      action: 'sku.unassigned',
+                      nodeId : 'aaa',
+                      nodeType: 'compute' });
+            });
+        });
+
+        it('should attribute updated event', function() {
+            var oldNode = {id: 'aaa', type: 'compute', sku: 'bbb'};
+            var newNode = {id: 'aaa', type: 'compute', sku: 'ccc'};
+
+            messenger.publish.resolves();
+
+            return events.publishNodeAttrEvent(oldNode, newNode, 'sku')
+            .then(function () {
+                expect(messenger.publish).to.have.been
+                .calledWith('on.events', 'event.node',
+                    { type: 'node',
+                      action: 'sku.updated',
+                      nodeId : 'aaa',
+                      nodeType: 'compute' });
+            });
+        });
+    });
 });

@@ -423,89 +423,83 @@ describe('Models.WorkItem', function () {
         });
 
         it('should issue node inaccessible alert', function() {
-            this.sandbox.stub(events, "publishNodeAlert").resolves();
+            var nodeObj  = { id: '123' }
+            this.sandbox.stub(events, "publishNodeEvent").resolves();
             return workitems.startNextScheduled(workerId, {}, 10 * 1000)
                 .then(function(workItem){
-                    return workitems.setFailed(null, {"nodeType": "compute"}, workItem);
+                    return workitems.setFailed(null, { node: nodeObj}, workItem);
                 })
                 .then(function(failStatusItems) {
                     var failStatusItem = failStatusItems[0];
                     expect(failStatusItem.state).to.equal('inaccessible');
-                    expect(events.publishNodeAlert)
-                        .to.be.calledWith(failStatusItem.node, {
-                            nodeType: "compute",
-                            nodeId: failStatusItem.node,
-                            state: "inaccessible"
-                            });
+                    expect(events.publishNodeEvent)
+                        .to.be.calledWith(nodeObj, "inaccessible");
                 });
         });
 
         it('should not issue node inaccessible alert if status unchanged', function() {
-            this.sandbox.stub(events, "publishNodeAlert").resolves();
+            this.sandbox.stub(events, "publishNodeEvent").resolves();
             return workitems.startNextScheduled(workerId, {}, 10 * 1000)
                 .then(function(workItem){
                     workItem.state = "accessible";
                     return workitems.setFailed(null, {}, workItem);
                 })
                 .then(function(newWorkitem) {
-                    expect(events.publishNodeAlert).not.to.be.called;
+                    expect(events.publishNodeEvent).not.to.be.called;
                     expect(newWorkitem[0].state).to.equal("inaccessible");
                 });
         });
 
         it('should not issue inaccessible alert if alert message is not delivered', function() {
-            this.sandbox.spy(events, "publishNodeAlert");
+            this.sandbox.spy(events, "publishNodeEvent");
             return workitems.startNextScheduled(workerId, {}, 10 * 1000)
                 .then(function(workItem){
                     workItem.state = "accessible";
                     return workitems.setFailed(null, null, workItem);
                 })
                 .then(function(newWorkItem) {
-                    expect(events.publishNodeAlert).not.to.be.called;
+                    expect(events.publishNodeEvent).not.to.be.called;
                     expect(newWorkItem[0].state).to.equal("accessible");
                 });
         });
 
         it('should issue node accessible alert', function() {
-            this.sandbox.stub(events, "publishNodeAlert").resolves();
+            var nodeObj = { id: '123' };
+            this.sandbox.stub(events, "publishNodeEvent").resolves();
             return workitems.startNextScheduled(workerId, {}, 10 * 1000)
                 .then(function(workItem){
-                    return workitems.setSucceeded(null, {"any":"any"}, workItem);
+                    return workitems.setSucceeded(null, { node: nodeObj}, workItem);
                 })
                 .then(function(successStatusItems) {
                     var successStatusItem = successStatusItems[0];
                     expect(successStatusItem.state).to.equal('accessible');
-                    expect(events.publishNodeAlert)
-                        .to.be.calledWith(successStatusItem.node, {
-                            any: "any",
-                            nodeId: successStatusItem.node,
-                            state: "accessible",
-                            });
+                    expect(events.publishNodeEvent)
+                        .to.be.calledWith(nodeObj, "accessible");
                 });
         });
 
         it('should not issue node accessible alert', function() {
-            this.sandbox.stub(events, "publishNodeAlert").resolves();
+            this.sandbox.stub(events, "publishNodeEvent").resolves();
             return workitems.startNextScheduled(workerId, {}, 10 * 1000)
                 .then(function(workItem){
                     workItem.state = "inaccessible";
                     return workitems.setSucceeded(null, {}, workItem);
                 })
                 .then(function(newWorkitem) {
-                    expect(events.publishNodeAlert).not.to.be.called;
+                    expect(events.publishNodeEvent).not.to.be.called;
                     expect(newWorkitem[0].state).to.equal("accessible");
                 });
         });
 
         it('should not issue accessible alert if alert message is not delivered', function() {
-            this.sandbox.spy(events, "publishNodeAlert");
+            this.sandbox.spy(events, "publishNodeEvent");
             return workitems.startNextScheduled(workerId, {}, 10 * 1000)
                 .then(function(workItem){
                     workItem.state = "inaccessible";
                     return workitems.setSucceeded(null, null, workItem);
                 })
                 .then(function(newWorkItem) {
-                    expect(events.publishNodeAlert).not.to.be.called;
+                    expect(events.publishNodeEvent).not.to.be.called;
                     expect(newWorkItem[0].state).to.equal("inaccessible");
                 });
         });

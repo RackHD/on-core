@@ -11,6 +11,8 @@ describe('Models.Obms', function () {
     var nodes;
     var encryption;
     var Constants;
+    var waterline;
+    var eventProtocol;
 
     helper.before(function (context) {
         context.MessengerServices = function() {
@@ -26,7 +28,9 @@ describe('Models.Obms', function () {
 
     base.before(function (context) {
         obms = context.model = helper.injector.get('Services.Waterline').obms;
-        nodes = helper.injector.get('Services.Waterline').nodes;
+        waterline = helper.injector.get('Services.Waterline');
+        eventProtocol = helper.injector.get('Protocol.Events');
+        nodes = waterline.nodes;
         context.attributes = context.model._attributes;
     });
 
@@ -36,6 +40,14 @@ describe('Models.Obms', function () {
         encryption = helper.injector.get('Services.Encryption');
         Constants = helper.injector.get('Constants');
         return obms.setIndexes();
+    });
+
+    beforeEach(function() {
+        this.sandbox = sinon.sandbox.create();
+    });
+
+    afterEach(function() {
+        this.sandbox.restore();
     });
 
     describe('Base', function () {
@@ -271,6 +283,13 @@ describe('Models.Obms', function () {
         });
 
         it('should create or update an obm', function() {
+            var oldNode = { id: 'aaa', obms: [ { service: 'snmp-obm-service' } ]};
+            var newNode = { id: 'aaa', obms: [ { service: 'ipmi-obm-service' } ]};
+            this.sandbox.stub(eventProtocol, 'publishNodeAttrEvent').resolves();
+            this.sandbox.stub(waterline.nodes, 'getNodeById').resolves();
+            waterline.nodes.getNodeById.onCall(0).resolves(oldNode);
+            waterline.nodes.getNodeById.onCall(1).resolves(newNode);
+
             return nodes.create({name: 'a node'})
             .then(function(node) {
                var deferredObm = obms.upsertByNode(node.id, {
@@ -302,6 +321,8 @@ describe('Models.Obms', function () {
                 expect(obm.id).to.equal(obmId);
                 expect(obm.config.host).to.equal('another-ipmi-host');
                 expect(obm.config.user).to.equal('another-ipmi-user');
+                expect(eventProtocol.publishNodeAttrEvent).to.have.been.calledWith(
+                    oldNode, newNode, 'obms');
                 return obms.count();
             })
             .then(function(count) {
