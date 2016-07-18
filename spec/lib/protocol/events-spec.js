@@ -248,44 +248,6 @@ describe("Event protocol subscribers", function () {
         });
     });
 
-    describe("publish node alert", function () {
-        it("should fail because nodeId is not string", function () {
-            var nodeId = 2;
-            var alertData = {
-                nodeId: '47bd8fb80abc5a6b5e7b10df',
-                nodeType: 'compute',
-                state: 'discovered'
-            };
-
-            return expect(function(){ events.publishNodeAlert(nodeId, alertData); })
-            .to.throw(Error.AssertionError);
-        });
-
-        it("should fail because data is not object", function () {
-            var nodeId = '47bd8fb80abc5a6b5e7b10df';
-            var alertData = 'abc';
-
-            return expect(function(){ events.publishNodeAlert(nodeId, alertData); })
-            .to.throw(Error.AssertionError);
-        });
-
-        it("should publish pass", function () {
-            var nodeId = '47bd8fb80abc5a6b5e7b10df';
-            var alertData = {
-                nodeId: '47bd8fb80abc5a6b5e7b10df',
-                nodeType: 'compute',
-                state: 'discovered'
-            };
-
-            messenger.publish.resolves();
-
-            return events.publishNodeAlert(nodeId, alertData)
-            .then(function () {
-                expect(messenger.publish).to.have.been.calledOnce;
-            });
-        });
-    });
-
     describe("publish node attribute event", function () {
         it('should publish assigned event', function() {
             var oldNode = {id: 'aaa', type: 'compute', sku: ''};
