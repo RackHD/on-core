@@ -266,7 +266,7 @@ describe("Event protocol subscribers", function () {
             });
         });
 
-        it('should attribute unassigned event', function() {
+        it('should publish unassigned event', function() {
             var oldNode = {id: 'aaa', type: 'compute', sku: 'bbb'};
             var newNode = {id: 'aaa', type: 'compute', sku: ''};
 
@@ -283,7 +283,7 @@ describe("Event protocol subscribers", function () {
             });
         });
 
-        it('should attribute updated event', function() {
+        it('should publish updated event', function() {
             var oldNode = {id: 'aaa', type: 'compute', sku: 'bbb'};
             var newNode = {id: 'aaa', type: 'compute', sku: 'ccc'};
 
@@ -299,5 +299,18 @@ describe("Event protocol subscribers", function () {
                       nodeType: 'compute' });
             });
         });
+
+        it('should not publish event if no sku and no change', function() {
+            var oldNode = {id: 'aaa', type: 'compute', sku: ''};
+            var newNode = {id: 'aaa', type: 'compute', sku: ''};
+
+            messenger.publish.resolves();
+
+            return events.publishNodeAttrEvent(oldNode, newNode, 'sku')
+            .then(function () {
+                expect(messenger.publish).to.have.not.been.called;
+            });
+        });
+
     });
 });
