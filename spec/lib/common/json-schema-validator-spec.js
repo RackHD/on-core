@@ -5,6 +5,7 @@
 describe('JsonSchemaValidator', function () {
     var validator;
     var JsonSchemaValidator;
+    var ns = 'http://test.rackhd.org';
     var testSchema1 = {
         properties: {
             repo: {
@@ -42,7 +43,7 @@ describe('JsonSchemaValidator', function () {
     };
 
     var testRefSchema1Resolved = {
-        id: '/refschema/r1',
+        id: ns + '/refschema/r1',
         definitions: {
             url: {
                 type: 'string',
@@ -61,7 +62,7 @@ describe('JsonSchemaValidator', function () {
     };
 
     var testRefSchema2Resolved = {
-        id: '/refschema/r2',
+        id: ns + '/refschema/r2',
         properties: {
             repo: {
                 type: 'string',
@@ -126,7 +127,7 @@ describe('JsonSchemaValidator', function () {
     };
 
     var testRefSchema3Resolved = {
-        "id": "/refschema/r3",
+        "id": ns + "/refschema/r3",
         "definitions": {
             "UserName": {
                 "description": "The user account name",
@@ -214,7 +215,7 @@ describe('JsonSchemaValidator', function () {
     });
 
     beforeEach(function() {
-        validator = new JsonSchemaValidator({allErrors: true, verbose: true});
+        validator = new JsonSchemaValidator({allErrors: true, verbose: true, nameSpace: ns });
     });
 
     helper.after();
@@ -239,11 +240,18 @@ describe('JsonSchemaValidator', function () {
             expect(validator.addSchema(testRefSchema2)).to.be.empty;
         });
 
+        it('should throw assertion error when no name or id passed', function () {
+            expect(function () {
+                delete testSchema1.id;
+                validator.addSchema(testSchema1);
+            }).to.throw(/`name` should not be empty, or `schema` should has an `id` property/);
+        });
+
         it('should throw error when add duplicated key', function () {
             validator.addSchema(testSchema1, 'test1');
             expect(function () {
                 validator.addSchema(testSchema1, 'test1');
-            }).to.throw(/schema with key or id "test1" already exists/);
+            }).to.throw(/schema with key or id ".*\/test1" already exists/);
         });
     });
 
