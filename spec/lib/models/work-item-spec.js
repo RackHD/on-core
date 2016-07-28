@@ -25,11 +25,13 @@ describe('Models.WorkItem', function () {
     var _nodeId;
     var snmpPoller;
     var events;
+    var store;
 
     base.before(function (context) {
         Promise = helper.injector.get('Promise');
         uuid = helper.injector.get('uuid');
         workitems = context.model = helper.injector.get('Services.Waterline').workitems;
+        store = helper.injector.get('TaskGraph.Stores.Mongo');
         context.attributes = context.model._attributes;
         events = helper.injector.get("Protocol.Events");
     });
@@ -256,7 +258,7 @@ describe('Models.WorkItem', function () {
         });
 
         it('should update the database document to increase wait time on  setFailed', function() {
-            this.sandbox.spy(workitems, 'update');
+            this.sandbox.spy(store, 'updatePollerStatus');
             var workItem = {
                 "name": "Will.Fail",
                 "pollInterval": 1000,
@@ -269,14 +271,14 @@ describe('Models.WorkItem', function () {
                 return workitems.setFailed(null, null, workitem);
             })
             .then(function() {
-                expect(workitems.update.firstCall.args[1].nextScheduled.valueOf())
-                .to.equal(workitems.update.firstCall.args[1].lastFinished.valueOf() +
+                expect(store.updatePollerStatus.firstCall.args[1].nextScheduled.valueOf())
+                .to.equal(store.updatePollerStatus.firstCall.args[1].lastFinished.valueOf() +
                         workItem.pollInterval * 2);
             });
         });
 
         it('should reschedule using the poll interval on setSucceeded', function() {
-            this.sandbox.spy(workitems, 'update');
+            this.sandbox.spy(store, 'updatePollerStatus');
             var nodeId = '47bd8fb80abc5a6b5e7b10df';
             var workItem = {
                 "name": "Pollers.IPMI",
@@ -291,14 +293,14 @@ describe('Models.WorkItem', function () {
                 return workitems.setSucceeded(null, null, workitem);
             })
             .then(function() {
-                expect(workitems.update.firstCall.args[1].nextScheduled.valueOf())
-                .to.equal(workitems.update.firstCall.args[1].lastFinished.valueOf() +
+                expect(store.updatePollerStatus.firstCall.args[1].nextScheduled.valueOf())
+                .to.equal(store.updatePollerStatus.firstCall.args[1].lastFinished.valueOf() +
                         workItem.pollInterval);
             });
         });
 
         it('should reschedule with at most a one hour delay', function() {
-            this.sandbox.spy(workitems, 'update');
+            this.sandbox.spy(store, 'updatePollerStatus');
             var nodeId = '47bd8fb80abc5a6b5e7b10df';
             var workItem = {
                 "name": "Pollers.IPMI",
@@ -313,8 +315,8 @@ describe('Models.WorkItem', function () {
                 return workitems.setFailed(null, null, workitem);
             })
             .then(function() {
-                expect(workitems.update.lastCall.args[1].nextScheduled.valueOf())
-                .to.equal(workitems.update.lastCall.args[1].lastFinished.valueOf() +
+                expect(store.updatePollerStatus.lastCall.args[1].nextScheduled.valueOf())
+                .to.equal(store.updatePollerStatus.lastCall.args[1].lastFinished.valueOf() +
                         60 * 60 * 1000);
             });
         });
