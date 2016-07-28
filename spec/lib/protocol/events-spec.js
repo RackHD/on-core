@@ -155,6 +155,29 @@ describe("Event protocol subscribers", function () {
         });
     });
 
+    describe("publish/subscribe TaskNotification", function () {
+        it("should publish and subscribe to TaskNotification messages", function () {
+            var uuid = helper.injector.get('uuid'),
+                taskId = uuid.v4(),
+                data = 'test';
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback(data,testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.publish.resolves();
+
+            return events.subscribeTaskNotification(taskId, function (_data) {
+                expect(_data).to.deep.equal(data);
+            }).then(function (subscription) {
+                expect(subscription).to.be.ok;
+                return events.publishTaskNotification(
+                    taskId,
+                    data
+                );
+            });
+        });
+    });
+
     describe("publish/subscribe GraphStarted", function () {
 
         it("should publish and subscribe to GraphStarted messages", function () {
