@@ -176,6 +176,36 @@ describe("Event protocol subscribers", function () {
                 );
             });
         });
+
+        it("should throw errors with invalid taskId", function () {
+            var uuid = helper.injector.get('uuid'),
+                taskId = uuid.v4(),
+                data = 'test';
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback(data,testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.publish.resolves();
+
+            expect(function(){
+                events.publishTaskNotification('I_am_a_invalid_taskId', data);
+            }).to.throw("Invalid taskId, uuid expected");
+        });
+
+        it("should throw errors with invalid data", function () {
+            var uuid = helper.injector.get('uuid'),
+                taskId = uuid.v4(),
+                data = 'test';
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback(data,testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.publish.resolves();
+
+            expect(function(){
+                events.publishTaskNotification(taskId, 123);
+            }).to.throw("Bad Notification Data");
+        });
     });
 
     describe("publish/subscribe GraphStarted", function () {
