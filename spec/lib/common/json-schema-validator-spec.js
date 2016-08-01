@@ -5,6 +5,7 @@
 describe('JsonSchemaValidator', function () {
     var validator;
     var JsonSchemaValidator;
+    var ns = 'http://test.rackhd.org';
     var testSchema1 = {
         properties: {
             repo: {
@@ -27,7 +28,7 @@ describe('JsonSchemaValidator', function () {
                 $ref: '#/definitions/url'
             },
             index: {
-                type: 'number',
+                type: 'number'
             }
         }
     };
@@ -42,7 +43,7 @@ describe('JsonSchemaValidator', function () {
     };
 
     var testRefSchema1Resolved = {
-        id: '/refschema/r1',
+        id: ns + '/refschema/r1',
         definitions: {
             url: {
                 type: 'string',
@@ -55,13 +56,13 @@ describe('JsonSchemaValidator', function () {
                 format: 'uri'
             },
             index: {
-                type: 'number',
+                type: 'number'
             }
         }
     };
 
     var testRefSchema2Resolved = {
-        id: '/refschema/r2',
+        id: ns + '/refschema/r2',
         properties: {
             repo: {
                 type: 'string',
@@ -126,7 +127,7 @@ describe('JsonSchemaValidator', function () {
     };
 
     var testRefSchema3Resolved = {
-        "id": "/refschema/r3",
+        "id": ns + "/refschema/r3",
         "definitions": {
             "UserName": {
                 "description": "The user account name",
@@ -207,6 +208,30 @@ describe('JsonSchemaValidator', function () {
         }
     };
 
+    var testRefSchema4 = {
+        $schema: 'testMetaSchema.json',
+        test: 'test metaSchema required property',
+        properties: {
+            repo: {
+                $ref: 'testRefSchema1.json#/definitions/url'
+            }
+        }
+    };
+
+    var testMetaSchema = {
+        allOf: [
+            {
+                $ref: 'http://json-schema.org/draft-04/schema'
+            }
+        ],
+        properties: {
+            test: {
+                type: 'string'
+            }
+        },
+        required: ['test']
+    };
+
     helper.before();
 
     before(function() {
@@ -214,7 +239,7 @@ describe('JsonSchemaValidator', function () {
     });
 
     beforeEach(function() {
-        validator = new JsonSchemaValidator({allErrors: true, verbose: true});
+        validator = new JsonSchemaValidator({allErrors: true, verbose: true, nameSpace: ns });
     });
 
     helper.after();
@@ -239,11 +264,154 @@ describe('JsonSchemaValidator', function () {
             expect(validator.addSchema(testRefSchema2)).to.be.empty;
         });
 
+        it('should throw assertion error when no name or id passed', function () {
+            expect(function () {
+                delete testSchema1.id;
+                validator.addSchema(testSchema1);
+            }).to.throw(/`name` should not be empty, or `schema` should has an `id` property/);
+        });
+
         it('should throw error when add duplicated key', function () {
             validator.addSchema(testSchema1, 'test1');
             expect(function () {
                 validator.addSchema(testSchema1, 'test1');
-            }).to.throw(/schema with key or id "test1" already exists/);
+            }).to.throw(/schema with key or id ".*\/test1" already exists/);
+        });
+    });
+
+    describe('addSchemas' , function () {
+        it('should add correct schema', function () {
+            expect(validator.addSchemas([testRefSchema1, testRefSchema2])).to.be.empty;
+        });
+
+        it('should throw assertion error incorrect schema param passed', function () {
+            expect(function () {
+                validator.addSchemas();
+            }).to.throw(/`schemas` should be an array of JSON schema/);
+            expect(function () {
+                validator.addSchemas({});
+            }).to.throw(/`schemas` should be an array of JSON schema/);
+            expect(function () {
+                validator.addSchemas([1,2,3]);
+            }).to.throw(/`schemas` should be an array of JSON schema/);
+        });
+    });
+
+    describe('addSchemasByDir' , function () {
+        var nodeFs;
+        before(function () {
+            nodeFs = helper.injector.get('fs');
+            sinon.stub(nodeFs, 'readdirAsync');
+            sinon.stub(nodeFs, 'readFileAsync');
+        });
+
+        beforeEach(function () {
+            nodeFs.readdirAsync.reset();
+            nodeFs.readFileAsync.reset();
+        });
+
+        it('should add correct schema by directory', function () {
+            nodeFs.readdirAsync.resolves([
+                'testSchema1.json',
+                'nosense',
+                'testRefSchema1.json',
+                'testRefSchema4.json',
+                'testMetaSchema.json'
+            ]);
+            nodeFs.readFileAsync.onCall(0).resolves(JSON.stringify(testSchema1));
+            nodeFs.readFileAsync.onCall(1).resolves(JSON.stringify(testRefSchema1));
+            nodeFs.readFileAsync.onCall(2).resolves(JSON.stringify(testRefSchema4));
+            nodeFs.readFileAsync.onCall(3).resolves(JSON.stringify(testMetaSchema));
+
+            return validator.addSchemasByDir('/testdir', 'testMetaSchema.json')
+            .then(function () {
+                expect(nodeFs.readdirAsync).to.be.calledOnce;
+                expect(nodeFs.readFileAsync).to.have.callCount(4);
+                expect(validator.getSchema('testSchema1.json')).to.have.property('id')
+                    .that.equals(ns + '/testSchema1.json');
+                expect(validator.getSchema('testRefSchema1.json')).to.have.property('id')
+                    .that.equals(ns + '/testRefSchema1.json');
+                expect(validator.getSchema('testRefSchema4.json')).to.have.property('id')
+                    .that.equals(ns + '/testRefSchema4.json');
+            });
+        });
+
+        it('should throw not found error when metaSchema not found', function (done) {
+            nodeFs.readdirAsync
+            .resolves(['testSchema1.json', 'testRefSchema1.json']);
+            nodeFs.readFileAsync.onCall(0).resolves(JSON.stringify(testSchema1));
+            nodeFs.readFileAsync.onCall(1).resolves(JSON.stringify(testRefSchema1));
+
+            return validator.addSchemasByDir('/testdir', 'noMetaSchema.json')
+            .then(function () {
+                done(new Error("Expect addSchemasByDir to fail"));
+            })
+            .catch(function (e) {
+                try {
+                    expect(e).to.have.property('message').that.equals(
+                        'Cannot find the meta schema "noMetaSchema.json" in directory "/testdir"');
+                    done();
+                }
+                catch (e) {
+                    done(e);
+                }
+            });
+        });
+
+        it('should throw assertion error when incorrect schemaDir passed', function (done) {
+            return validator.addSchemasByDir(123)
+            .then(function () {
+                done(new Error("Expect addSchemasByDir to fail"));
+            })
+            .catch(function (e) {
+                try {
+                    expect(e).to.have.property('message')
+                        .that.equals('schemaDir (string) is required');
+                    done();
+                }
+                catch (e) {
+                    done(e);
+                }
+            });
+        });
+
+        it('should throw assertion error when incorrect metaSchemaName passed', function (done) {
+            return validator.addSchemasByDir('testdir3', 456)
+            .then(function () {
+                done(new Error("Expect addSchemasByDir to fail"));
+            })
+            .catch(function (e) {
+                try {
+                    expect(e).to.have.property('message')
+                        .that.equals('metaSchemaName (string) is required');
+                    done();
+                }
+                catch (e) {
+                    done(e);
+                }
+            });
+        });
+
+        after(function () {
+            nodeFs.readdirAsync.restore();
+            nodeFs.readFileAsync.restore();
+        });
+    });
+
+    describe('getAllSchemaNames' , function () {
+        it('should list existing schema names', function () {
+            validator.addSchemas([testRefSchema1, testRefSchema3]);
+            expect(validator.getAllSchemaNames()).to.deep.equal(['r1', 'r3']);
+        });
+
+        it('should list existing schema names with namespace', function () {
+            validator.addSchemas([testRefSchema2, testRefSchema3]);
+            expect(validator.getAllSchemaNames({ includeNameSpace: true }))
+            .to.deep.equal([testRefSchema2Resolved.id, testRefSchema3Resolved.id]);
+        });
+
+        it('should not find any schema name when no schema added', function () {
+            expect(validator.getAllSchemaNames()).to.be.an('Array').with.length(0);
         });
     });
 
