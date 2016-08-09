@@ -105,6 +105,20 @@ describe('Models.Task', function () {
                 expect(this.subject.json).to.equal(true);
             });
         });
+
+        describe('schemaRef', function () {
+            before(function () {
+                this.subject = this.attributes.schemaRef;
+            });
+
+            it('should be optional', function () {
+                expect(this.subject.optional).to.not.be.ok;
+            });
+
+            it('should be string', function () {
+                expect(this.subject.type).to.equal('string');
+            });
+        });
     });
 
     describe('object returned from toJSON()', function () {
