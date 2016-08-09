@@ -112,7 +112,7 @@ describe('Models.Task', function () {
             });
 
             it('should be optional', function () {
-                expect(!this.subject.required).to.equal(true);
+                expect(this.subject.optional).to.not.be.ok;
             });
 
             it('should be string', function () {
