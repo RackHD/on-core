@@ -329,5 +329,56 @@ describe('Models.Obms', function () {
                 expect(count).to.equal(1);
             });
         });
+
+        it('should reveal secrets', function() {
+            var node = { id: 'aaa', obms: [ { service: 'snmp-obm-service' } ]};
+            this.sandbox.stub(eventProtocol, 'publishNodeAttrEvent').resolves();
+            this.sandbox.stub(waterline.nodes, 'getNodeById').resolves();
+            waterline.nodes.getNodeById.resolves(node);
+
+            return nodes.create({name: 'a node'})
+            .then(function(node) {
+               return obms.upsertByNode(
+                    node.id,
+                    {
+                       service: 'ipmi-obm-service',
+                       config: {
+                           host: 'ipmi-host',
+                           user: 'ipmi-user',
+                           password: 'ipmi-password'
+                       }
+                    },
+                    { revealSecrets: true }
+                );
+            })
+            .then(function(obm) {
+                expect(obm.config).to.have.property('password')
+                    .that.equals('ipmi-password');
+            });
+        });
+
+        it('should not reveal secrets', function() {
+            var node = { id: 'aaa', obms: [ { service: 'snmp-obm-service' } ]};
+            this.sandbox.stub(eventProtocol, 'publishNodeAttrEvent').resolves();
+            this.sandbox.stub(waterline.nodes, 'getNodeById').resolves();
+            waterline.nodes.getNodeById.resolves(node);
+
+            return nodes.create({name: 'a node'})
+            .then(function(node) {
+               return obms.upsertByNode(node.id, {
+                    service: 'ipmi-obm-service',
+                    config: {
+                        host: 'ipmi-host',
+                        user: 'ipmi-user',
+                        password: 'ipmi-password'
+                    }
+                });
+            })
+            .then(function(obm) {
+                expect(obm.config).to.have.property('password')
+                    .and.not.equal('ipmi-password');
+                expect(encryption.decrypt(obm.config.password)).to.equal('ipmi-password');
+            });
+        });
     });
 });
