@@ -212,7 +212,7 @@ describe('db-renderable-content', function () {
             waterline.things.find.resolves([ thing ]);
             loader.prototype.get.resolves('test contents');
             return this.subject.get('test thing')
-                .should.be.rejectedWith(/template meta error/);
+                .should.be.rejectedWith(/template hash mismatch/);
         });
 
         it('should get the thing in the right scope', function() {
