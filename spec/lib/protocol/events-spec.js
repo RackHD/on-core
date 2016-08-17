@@ -155,56 +155,48 @@ describe("Event protocol subscribers", function () {
         });
     });
 
-    describe("publish/subscribe TaskNotification", function () {
-        it("should publish and subscribe to TaskNotification messages", function () {
-            var uuid = helper.injector.get('uuid'),
-                taskId = uuid.v4(),
-                data = 'test';
+    describe("publish/subscribe Notification", function () {
+        it("should publish and subscribe to NodeNotification messages", function () {
+            var nodeId = '57a86b5c36ec578876878294',
+                data = {
+                    nodeId: nodeId,
+                    data: 'test data'
+                };
             messenger.subscribe = sinon.spy(function(a,b,callback) {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
             messenger.publish.resolves();
 
-            return events.subscribeTaskNotification(taskId, function (_data) {
+            return events.subscribeNodeNotification(nodeId, function (_data) {
                 expect(_data).to.deep.equal(data);
             }).then(function (subscription) {
                 expect(subscription).to.be.ok;
-                return events.publishTaskNotification(
-                    taskId,
+                return events.publishNodeNotification(
+                    nodeId,
                     data
                 );
             });
         });
 
-        it("should throw errors with invalid taskId", function () {
-            var uuid = helper.injector.get('uuid'),
-                taskId = uuid.v4(),
-                data = 'test';
+        it("should publish and subscribe to BroadcastNotification messages", function () {
+            var data = {
+                    data: 'test data'
+                };
             messenger.subscribe = sinon.spy(function(a,b,callback) {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
             messenger.publish.resolves();
 
-            expect(function(){
-                events.publishTaskNotification('I_am_a_invalid_taskId', data);
-            }).to.throw("Invalid taskId, uuid expected");
-        });
-
-        it("should throw errors with invalid data", function () {
-            var uuid = helper.injector.get('uuid'),
-                taskId = uuid.v4(),
-                data = 'test';
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback(data,testMessage);
-                return Promise.resolve(testSubscription);
+            return events.subscribeBroadcastNotification(function (_data) {
+                expect(_data).to.deep.equal(data);
+            }).then(function (subscription) {
+                expect(subscription).to.be.ok;
+                return events.publishBroadcastNotification(
+                    data
+                );
             });
-            messenger.publish.resolves();
-
-            expect(function(){
-                events.publishTaskNotification(taskId, 123);
-            }).to.throw("Bad Notification Data");
         });
     });
 
