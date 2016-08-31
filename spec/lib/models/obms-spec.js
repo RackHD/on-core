@@ -215,6 +215,27 @@ describe('Models.Obms', function () {
                 expect(obm).to.be.undefined;
             });
         });
+
+        it('should find all nodes for nodeId', function() {
+            return obms.findAllByNode(nodeId, false)
+            .then(function(obms) {
+                expect(obms).to.have.length(testObms.length);
+                obms.forEach(function(obm) {
+                    expect(obm.node).to.equal(nodeId);
+                    expect(obm.toJSON().config).not.to.have.property('password');
+                });
+            });
+        });
+
+        it('should find all nodes for nodeId and reveal passwords', function() {
+            return obms.findAllByNode(nodeId, true, {service: 'ipmi-obm-service'})
+            .then(function(obms) {
+                expect(obms).to.have.length(1);
+                expect(obms[0].node).to.equal(nodeId);
+                expect(obms[0].service).to.equal('ipmi-obm-service');
+                expect(obms[0].config.password).to.equal(testObms[0].config.password);
+            });
+        });
     });
 
     describe('update', function() {
