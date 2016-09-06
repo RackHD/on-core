@@ -636,11 +636,11 @@ describe('Model', function () {
                         cb = (typeof params === 'function') ? params : cb;
                         cb();
                     }
-                }, 
+                },
                 done
             ]);
             this.sandbox.stub(Promise, 'promisifyAll', function() {
-                return { 
+                return {
                     connectAsync: connectAsync
                 };
             });
@@ -725,7 +725,7 @@ describe('Model', function () {
                 expect(waterline.testobjects.runNativeMongo).to.have.been.calledOnce;
                 expect(waterline.testobjects.runNativeMongo).to.have.been.calledWith(
                     'findOne',
-                    [query]
+                    query
                 );
             });
         });

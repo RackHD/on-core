@@ -14,6 +14,7 @@ describe('Task Graph mongo store interface', function () {
             publishRecord: sinon.stub(),
             findMongo: sinon.stub().resolves(),
             findOneMongo: sinon.stub().resolves(),
+            needOneMongo: sinon.stub().resolves(),
             findAndModifyMongo: sinon.stub().resolves(),
             updateMongo: sinon.stub().resolves(),
             removeMongo: sinon.stub().resolves(),
@@ -717,6 +718,22 @@ describe('Task Graph mongo store interface', function () {
         .then(function() {
             expect(waterline.graphobjects.findOneMongo).to.be
                 .calledWithExactly({"parentTaskId": runGraphTaskId});
+        });
+    });
+
+    it('publishRecordByGraphId', function() {
+        var testObj = {};
+
+        waterline.graphobjects.needOneMongo.resolves(testObj);
+        waterline.graphobjects.publishRecord.resolves();
+
+        return mongo.publishRecordByGraphId('testid', 'testevent')
+        .then(function() {
+            expect(waterline.graphobjects.needOneMongo).to.have.been.calledWith(
+                { instanceId: 'testid' }
+            );
+            expect(waterline.graphobjects.publishRecord).to.have.been.calledWith(
+                'testevent', testObj, 'testid');
         });
     });
 });
