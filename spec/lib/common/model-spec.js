@@ -447,6 +447,7 @@ describe('Model', function () {
 
     describe('multiple records', function () {
         var records = [];
+        var beforeTime, midTime, afterTime;
 
         before('reset DB collections', function () {
             return helper.reset();
@@ -457,13 +458,18 @@ describe('Model', function () {
                 dummy: 'magic'
             }).then(function (record) {
                 records.push(record);
-                return bluebird.delay();
+                return bluebird.delay(10);
             }).then(function () {
                 return waterline.testobjects.create({
                     dummy: 'magic'
                 });
             }).then(function (record) {
                 records.push(record);
+                var t0 = records[0].updatedAt.getTime();
+                var t1 = records[1].updatedAt.getTime();
+                beforeTime = new Date(t0 - 100);
+                midTime = new Date((t0 + t1) / 2);
+                afterTime = new Date(t1 + 100);
             });
         });
 
@@ -491,20 +497,25 @@ describe('Model', function () {
         });
 
         it('should find recently updated records with findSinceLastUpdate()', function () {
-            return waterline.testobjects.findSinceLastUpdate(records[0].createdAt)
+            return waterline.testobjects.findSinceLastUpdate(midTime)
             .should.be.fulfilled.and.eventually.have.length(1)
             .and.eventually.have.deep.property('[0].id').that.equals(records[1].id);
         });
 
+        it('should find all recently updated records with findSinceLastUpdate()', function () {
+            return waterline.testobjects.findSinceLastUpdate(beforeTime)
+            .should.be.fulfilled.and.eventually.have.length(2);
+        });
+
         it('should not find previously updated records with findSinceLastUpdate()', function () {
-            return waterline.testobjects.findSinceLastUpdate(records[1].createdAt)
+            return waterline.testobjects.findSinceLastUpdate(afterTime)
             .should.be.fulfilled.and.eventually.have.length(0);
         });
 
         it('should find recently updated records with findSinceLastUpdate() with a query',
            function () {
             return waterline.testobjects.findSinceLastUpdate(
-                records[0].createdAt,
+                midTime,
                 { dummy: 'magic'}
             )
             .should.be.fulfilled.and.eventually.have.length(1)
@@ -514,7 +525,7 @@ describe('Model', function () {
         it('should not find previously updated records with findSinceLastUpdate() with a query',
            function () {
             return waterline.testobjects.findSinceLastUpdate(
-                records[1].createdAt,
+                afterTime,
                 { dummy: 'magic' }
             )
             .should.be.fulfilled.and.eventually.have.length(0);
@@ -523,7 +534,7 @@ describe('Model', function () {
         it('should not find recently updated records with findSinceLastUpdate() with a bad query',
            function () {
             return waterline.testobjects.findSinceLastUpdate(
-                records[0].createdAt,
+                midTime,
                 { dummy: 'notfound' }
             )
             .should.be.fulfilled.and.eventually.have.length(0);
