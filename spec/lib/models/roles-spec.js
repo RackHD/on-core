@@ -75,5 +75,28 @@ describe('Models.Roles', function () {
                 expect(this.subject.type).to.equal('array');
             });
         });
+
+        describe('setIndexes', function () {
+            var waterline;
+
+            before(function () {
+                waterline = helper.injector.get('Services.Waterline');
+            });
+
+            it('should set unique indexes', function() {
+                this.sandbox.stub(waterline.roles, 'createUniqueMongoIndexes').resolves();
+
+                return waterline.roles.setIndexes().then(function () {
+                    expect(waterline.roles.createUniqueMongoIndexes)
+                        .to.have.been.calledOnce;
+                    expect(waterline.roles.createUniqueMongoIndexes)
+                        .to.have.been.calledWith([
+                            {
+                                role: 1
+                            }
+                        ]);
+                });
+            });
+        });
     });
 });
