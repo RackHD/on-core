@@ -269,7 +269,8 @@ describe('Task Graph mongo store interface', function () {
         var taskDependencyItem = {
             taskId: uuid.v4(),
             dependencies: {},
-            terminalOnStates: ['failed', 'timeout', 'cancelled']
+            terminalOnStates: ['failed', 'timeout', 'cancelled'],
+            ignoreFailure: false
         };
 
         return mongo.persistTaskDependencies(taskDependencyItem, graphId)
@@ -281,7 +282,8 @@ describe('Task Graph mongo store interface', function () {
                     graphId: graphId,
                     state: Constants.Task.States.Pending,
                     dependencies: {},
-                    terminalOnStates: ['failed', 'timeout', 'cancelled']
+                    terminalOnStates: ['failed', 'timeout', 'cancelled'],
+                    ignoreFailure: taskDependencyItem.ignoreFailure
                 }
             );
         });
@@ -494,6 +496,7 @@ describe('Task Graph mongo store interface', function () {
                 {
                     graphId: data.graphId,
                     state: { $ne: Constants.Task.States.Succeeded },
+                    ignoreFailure: { $ne: true },
                     reachable: true
                 }
             );
