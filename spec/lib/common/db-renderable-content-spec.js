@@ -198,7 +198,7 @@ describe('db-renderable-content', function () {
                     expect(out[key]).to.equal(thing[key] || 'test contents');
                 });
                 expect(waterline.things.find)
-                    .to.have.been.calledWith({ name: 'test thing'});
+                    .to.have.been.calledWith({ name: 'test thing' });
             });
         });
 
@@ -231,7 +231,7 @@ describe('db-renderable-content', function () {
             .then(function(out) {
                 expect(out.contents).to.equal('b scope');
                 expect(waterline.things.find)
-                    .to.have.been.calledWith({ name: 'thing'});
+                    .to.have.been.calledWith({ name: 'thing' });
             });
         });
 
@@ -252,6 +252,26 @@ describe('db-renderable-content', function () {
                 { name: 'thing', path: 'a scope', scope: 'a'}
             ];
             var scope = ['b', 'a', 'global'];
+            waterline.things.find.resolves(things);
+            _.forEach(things, function(thing) {
+                loader.prototype.get.withArgs(thing.path).resolves(thing.path);
+                thing.hash = crypto.createHash('md5').update(thing.path).digest('base64');
+            });
+            return this.subject.get('thing', scope)
+            .then(function(out) {
+                expect(out.contents).to.equal('a scope');
+                expect(waterline.things.find)
+                    .to.have.been.calledWith({ name: 'thing' });
+            });
+        });
+
+        it('should not get the thing that is not in the scope', function() {
+            var things = [
+                { name: 'thing', path: 'b scope', scope: 'b'},
+                { name: 'thing', path: 'global', scope: 'global'},
+                { name: 'thing', path: 'a scope', scope: 'a'}
+            ];
+            var scope = ['a', 'global'];
             waterline.things.find.resolves(things);
             _.forEach(things, function(thing) {
                 loader.prototype.get.withArgs(thing.path).resolves(thing.path);
