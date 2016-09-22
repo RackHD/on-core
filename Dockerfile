@@ -1,11 +1,10 @@
 # Copyright 2016, EMC, Inc.
 
-FROM mhart/alpine-node:4
+FROM nodesource/wheezy:4.4.6
 
 COPY . /RackHD/on-core/
 
-RUN apk add --update git \
-  && cd /RackHD/on-core \
+RUN cd /RackHD/on-core \
   && npm install --ignore-scripts --production
 
 VOLUME /opt/monorail
