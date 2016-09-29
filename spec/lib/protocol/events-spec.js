@@ -179,6 +179,28 @@ describe("Event protocol subscribers", function () {
             });
         });
 
+        it("should publish and subscribe to NodeNotification messages without data", function(){
+            var nodeId = '57a86b5c36ec578876878294',
+                data = {
+                    nodeId: nodeId,
+                    data: 'test data'
+                };
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback(data,testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.publish.resolves();
+
+            return events.subscribeNodeNotification(nodeId, function (_data) {
+                expect(_data).to.deep.equal(data);
+            }).then(function (subscription) {
+                expect(subscription).to.be.ok;
+                return events.publishNodeNotification(
+                    nodeId
+                );
+            });
+        });
+
         it("should publish and subscribe to BroadcastNotification messages", function () {
             var data = {
                     data: 'test data'
@@ -196,6 +218,24 @@ describe("Event protocol subscribers", function () {
                 return events.publishBroadcastNotification(
                     data
                 );
+            });
+        });
+
+        it("should publish and subscribe to BroadcastNotification messages without data", function(){
+            var data = {
+                    data: 'test data'
+                };
+            messenger.subscribe = sinon.spy(function(a,b,callback) {
+                callback(data,testMessage);
+                return Promise.resolve(testSubscription);
+            });
+            messenger.publish.resolves();
+
+            return events.subscribeBroadcastNotification(function (_data) {
+                expect(_data).to.deep.equal(data);
+            }).then(function (subscription) {
+                expect(subscription).to.be.ok;
+                return events.publishBroadcastNotification();
             });
         });
     });
@@ -293,6 +333,64 @@ describe("Event protocol subscribers", function () {
         });
     });
 
+    describe("publish node event", function(){
+        var testAction = 'discovered',
+            testType = 'compute',
+            testNodeId,
+            testNode = {};
+
+        before(function(){
+            var uuid = helper.injector.get('uuid');
+            testNodeId = uuid.v4();
+
+            testNode = {
+                id: testNodeId,
+                type: testType
+            };
+        });
+
+        it('should publish without additional data', function(){
+            messenger.publish.resolves();
+
+            return events.publishNodeEvent(testNode, testAction)
+            .then(function(){
+                expect(messenger.publish).to.have.been.calledWith(
+                    'on.events',
+                    'event.node',
+                    {
+                        type: 'node',
+                        action: testAction,
+                        nodeId: testNodeId,
+                        nodeType: testType
+                    });
+            });
+        });
+
+        it('should publish with additional data', function(){
+            var testData = {
+                    "test" : "payload",
+                    "for": "publishing"
+                };
+
+            messenger.publish.resolves();
+
+            return events.publishNodeEvent(testNode, testAction, testData)
+            .then(function(){
+                expect(messenger.publish).to.have.been.calledWith(
+                    'on.events',
+                    'event.node',
+                    {
+                        type: 'node',
+                        action: testAction,
+                        nodeId: testNodeId,
+                        nodeType: testType,
+                        data: testData
+                    });
+            });
+        });
+    });
+
+
     describe("publish node attribute event", function () {
         it('should publish assigned event', function() {
             var oldNode = {id: 'aaa', type: 'compute', sku: ''};
@@ -357,5 +455,16 @@ describe("Event protocol subscribers", function () {
             });
         });
 
+        it('should not publish event if ids do not match', function() {
+            var oldNode = {id: 'aaa', type: 'compute', sku: ''};
+            var newNode = {id: 'bbb', type: 'compute', sku: 'abc'};
+
+            messenger.publish.resolves();
+
+            return events.publishNodeAttrEvent(oldNode, newNode, 'sku')
+            .then(function () {
+                expect(messenger.publish).to.have.not.been.called;
+            });
+        });
     });
 });
