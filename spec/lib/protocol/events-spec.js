@@ -172,31 +172,36 @@ describe("Event protocol subscribers", function () {
                 expect(_data).to.deep.equal(data);
             }).then(function (subscription) {
                 expect(subscription).to.be.ok;
-                return events.publishNodeNotification(
+                events.publishNodeNotification(
                     nodeId,
+                    data
+                );
+                expect(messenger.publish).to.have.been.calledWith(
+                    'on.events',
+                    'notification.' + nodeId,
                     data
                 );
             });
         });
 
         it("should publish and subscribe to NodeNotification messages without data", function(){
-            var nodeId = '57a86b5c36ec578876878294',
-                data = {
-                    nodeId: nodeId,
-                    data: 'test data'
-                };
+            var nodeId = '57a86b5c36ec578876878294';
             messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback(data,testMessage);
+                callback(testMessage);
                 return Promise.resolve(testSubscription);
             });
             messenger.publish.resolves();
 
-            return events.subscribeNodeNotification(nodeId, function (_data) {
-                expect(_data).to.deep.equal(data);
+            return events.subscribeNodeNotification(nodeId, function () {
             }).then(function (subscription) {
                 expect(subscription).to.be.ok;
-                return events.publishNodeNotification(
+                events.publishNodeNotification(
                     nodeId
+                );
+                expect(messenger.publish).to.have.been.calledWith(
+                    'on.events',
+                    'notification.' + nodeId,
+                    ''
                 );
             });
         });
@@ -215,27 +220,33 @@ describe("Event protocol subscribers", function () {
                 expect(_data).to.deep.equal(data);
             }).then(function (subscription) {
                 expect(subscription).to.be.ok;
-                return events.publishBroadcastNotification(
+                events.publishBroadcastNotification(
+                    data
+                );
+                expect(messenger.publish).to.have.been.calledWith(
+                    'on.events',
+                    'notification',
                     data
                 );
             });
         });
 
         it("should publish and subscribe to BroadcastNotification messages without data", function(){
-            var data = {
-                    data: 'test data'
-                };
             messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback(data,testMessage);
+                callback(testMessage);
                 return Promise.resolve(testSubscription);
             });
             messenger.publish.resolves();
 
-            return events.subscribeBroadcastNotification(function (_data) {
-                expect(_data).to.deep.equal(data);
+            return events.subscribeBroadcastNotification(function () {
             }).then(function (subscription) {
                 expect(subscription).to.be.ok;
-                return events.publishBroadcastNotification();
+                events.publishBroadcastNotification();
+                expect(messenger.publish).to.have.been.calledWith(
+                    'on.events',
+                    'notification',
+                    ''
+                );
             });
         });
     });
