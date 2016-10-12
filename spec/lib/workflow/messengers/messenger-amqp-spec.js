@@ -18,7 +18,8 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
     };
     var eventsProtocolMock = {
         subscribeTaskFinished: sinon.stub().resolves(),
-        publishTaskFinished: sinon.stub().resolves()
+        publishTaskFinished: sinon.stub().resolves(),
+        publishProgressEvent: sinon.stub().resolves()
     };
     var taskGraphRunnerProtocolMock = {
         subscribeRunTaskGraph: sinon.stub().resolves(),
@@ -137,6 +138,25 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
         .then(function() {
             expect(taskGraphRunnerProtocol.cancelTaskGraph).to.have.been.calledOnce;
             expect(taskGraphRunnerProtocol.cancelTaskGraph).to.have.been.calledWith('testgraphid');
+        });
+    });
+
+    it('should wrap event protocol publishProgressEvent method', function(){
+        var uuid = helper.injector.get('uuid'); 
+        var data = {
+                graphId: uuid.v4(),
+                progress: {
+                    "percentage": "10%",
+                    "description": "anything"
+                },
+                taskProgress: {
+                    taskId: "anything"
+                }
+            };
+        return amqp.publishProgressEvent(data)
+        .then(function() {
+            expect(eventsProtocol.publishProgressEvent).to.have.been.calledOnce;
+            expect(eventsProtocol.publishProgressEvent).to.have.been.calledWith(data);
         });
     });
 
