@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/RackHD/on-core.git"
+    "url": "https://github.com/Dell-SMI/on-core.git"
   },
   "author": "",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/RackHD/on-core/issues"
+    "url": "https://github.com/Dell-SMI/on-core/issues"
   },
-  "homepage": "https://github.com/RackHD/on-core",
+  "homepage": "https://github.com/Dell-SMI/on-core",
   "dependencies": {
     "ajv": "^4.1.0",
     "always-tail": "^0.2.0",
