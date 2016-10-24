@@ -144,15 +144,15 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
     it('should wrap event protocol publishProgressEvent method', function(){
         var uuid = helper.injector.get('uuid'); 
         var data = {
-                graphId: uuid.v4(),
-                progress: {
-                    "percentage": "10%",
-                    "description": "anything"
-                },
-                taskProgress: {
-                    taskId: "anything"
-                }
-            };
+            graphId: uuid.v4(),
+            progress: {
+                "percentage": "10%",
+                "description": "anything"
+            },
+            taskProgress: {
+                taskId: "anything"
+            }
+        };
         return amqp.publishProgressEvent(data)
         .then(function() {
             expect(eventsProtocol.publishProgressEvent).to.have.been.calledOnce;

@@ -749,7 +749,7 @@ describe('Task Graph mongo store interface', function () {
                 percentage: "10%"
             }
         };
-        waterline.graphobjects.find.resolves();
+        waterline.graphobjects.findOne.resolves();
         return mongo.updateGraphProgress(data)
         .then(function(_data){
             expect(_data).to.deep.equals(data);
@@ -774,22 +774,22 @@ describe('Task Graph mongo store interface', function () {
             graphId: uuid.v4(),
             progress: {
                 description: "Unit test info",
-                percentage: "na"
+                percentage: "Not Available"
             }},
-            graphObjects = [{
+            graphObjects = {
                 progress: {
                     description: "Unit test info",
                     percentage: "0%"
                 },
                 definition: {friendlyName: "Friendly name"}
-            }];
-        waterline.graphobjects.find.resolves(graphObjects);
+            };
+        waterline.graphobjects.findOne.resolves(graphObjects);
         return mongo.updateGraphProgress(data)
         .then(function(_data){
-            data.progress.percentage = graphObjects[0].progress.percentage;
-            data.graphName = graphObjects[0].definition.friendlyName;
+            data.progress.percentage = graphObjects.progress.percentage;
+            data.graphName = graphObjects.definition.friendlyName;
             expect(_data).to.deep.equals(data);
-            expect(waterline.graphobjects.find).to.be.calledWith({instanceId: data.graphId});
+            expect(waterline.graphobjects.findOne).to.be.calledWith({instanceId: data.graphId});
             expect(waterline.graphobjects.updateMongo).to.be.calledOnce;
             expect(waterline.graphobjects.updateMongo).to.be.calledWith(
                 {
