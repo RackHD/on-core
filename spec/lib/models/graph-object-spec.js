@@ -99,5 +99,15 @@ describe('Models.GraphObject', function () {
                 expect(this.subject.model).to.equal('nodes');
             });
         });
+        
+        describe('progress', function () {
+            before(function () {
+                this.subject = this.attributes.progress;
+            });
+
+            it('should be json', function () {
+                expect(this.subject.type).to.equal('json');
+            });
+        });
     });
 });

@@ -478,4 +478,29 @@ describe("Event protocol subscribers", function () {
             });
         });
     });
+    
+    describe("publish graph progress event", function () {
+        it("should publish graph progress event", function () {
+            var uuid = helper.injector.get('uuid');
+            var data = {
+                graphId: uuid.v4(),
+                progress: {
+                    "percentage": "10%",
+                    "description": "anything"
+                },
+                taskProgress: {
+                    taskId: "anything"
+                }
+            };
+            messenger.publish.resolves();
+            return events.publishProgressEvent(data)
+            .then(function () {
+                expect(messenger.publish).to.be.calledWith(
+                    'on.events',
+                    'graph.progress' + '.' + data.graphId, 
+                    data);
+            });
+        });
+
+    });
 });

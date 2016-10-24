@@ -739,4 +739,99 @@ describe('Task Graph mongo store interface', function () {
                 'testevent', testObj, 'testid');
         });
     });
+
+    it("updateGraphProgress", function(){
+        var data = {
+            graphId: uuid.v4(),
+            graphName: "anything",
+            progress: {
+                description: "Unit test info",
+                percentage: "10%"
+            }
+        };
+        waterline.graphobjects.findOne.resolves();
+        return mongo.updateGraphProgress(data)
+        .then(function(_data){
+            expect(_data).to.deep.equals(data);
+            expect(waterline.graphobjects.updateMongo).to.be.calledOnce;
+            expect(waterline.graphobjects.updateMongo).to.be.calledWith(
+                {
+                    instanceId: data.graphId,
+                    _status: {$in: Constants.Task.ActiveStates}
+                },
+                {
+                    $set: {progress: data.progress}
+                },
+                {
+                    multi: true
+                }
+            );
+        });
+    });
+
+    it("updateGraphProgress description only", function(){
+        var data = {
+            graphId: uuid.v4(),
+            progress: {
+                description: "Unit test info",
+                percentage: "Not Available"
+            }},
+            graphObjects = {
+                progress: {
+                    description: "Unit test info",
+                    percentage: "0%"
+                },
+                definition: {friendlyName: "Friendly name"}
+            };
+        waterline.graphobjects.findOne.resolves(graphObjects);
+        return mongo.updateGraphProgress(data)
+        .then(function(_data){
+            data.progress.percentage = graphObjects.progress.percentage;
+            data.graphName = graphObjects.definition.friendlyName;
+            expect(_data).to.deep.equals(data);
+            expect(waterline.graphobjects.findOne).to.be.calledWith({instanceId: data.graphId});
+            expect(waterline.graphobjects.updateMongo).to.be.calledOnce;
+            expect(waterline.graphobjects.updateMongo).to.be.calledWith(
+                {
+                    instanceId: data.graphId,
+                    _status: {$in: Constants.Task.ActiveStates}
+                },
+                {
+                    $set: {progress: data.progress}
+                },
+                {
+                    multi: true
+                }
+            );
+        });
+    });
+
+    it("updateTaskProgress", function(){
+        var data = {
+            graphId: uuid.v4(),
+            taskId: uuid.v4(),
+            progress: {
+                description: "Unit test info",
+                percentage: "10%"
+            }
+        };
+        waterline.taskdependencies.updateMongo.resolves();
+        return mongo.updateTaskProgress(data)
+        .then(function(){
+            expect(waterline.taskdependencies.updateMongo).to.be.calledOnce;
+            expect(waterline.taskdependencies.updateMongo).to.be.calledWith(
+                {
+                    graphId: data.graphId,
+                    taskId: data.taskId,
+                    reachable: true
+                },
+                {
+                    $set: {progress: data.progress}
+                },
+                {
+                    multi: true
+                }
+            );
+        });
+    });
 });
