@@ -21,6 +21,7 @@
     "always-tail": "^0.1.1",
     "amqp": "0.2.3",
     "anchor": "^0.10.2",
+    "apache-md5": "1.0.6",
     "apache-crypt": "1.0.9",
     "assert-plus": "^1.0.0",
     "bluebird": "^2.8.0",
