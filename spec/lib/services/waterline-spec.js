@@ -25,13 +25,23 @@ describe('Services.Waterline', function () {
 
     describe('start', function () {
         it('should start service and resolve', function() {
+            var createIndexesStub = this.sandbox.stub().resolves();
             waterline.service.initialize = this.sandbox.spy(function(cfg,callback) {
-                var ontology = {collections:{model:'model'}};
-                callback(undefined,ontology);
+                var ontology = {
+                    collections:{
+                        'testModel': {
+                            identity: 'test',
+                            createIndexes: createIndexesStub
+                        }
+                    }
+                };
+                callback(undefined, ontology);
             });
-            return waterline.start().should.be.resolved;
+            return waterline.start().then(function() {
+                expect(createIndexesStub).to.have.been.called;
+            });
         });
-        
+
         it('should resolve itself if already initialized', function() {
             this.sandbox.stub(waterline, 'isInitialized').returns(true);
             return waterline.start().should.be.resolved;
@@ -45,7 +55,7 @@ describe('Services.Waterline', function () {
             return waterline.start().should.be.rejected;
         });
     });
-  
+
     describe('stop', function () {
         it('should teardown and resolve when initialized', function() {
             waterline.service.teardown = this.sandbox.spy(function(callback) {
@@ -54,12 +64,12 @@ describe('Services.Waterline', function () {
             this.sandbox.stub(waterline, 'isInitialized').returns(true);
             return waterline.stop();
         });
-        
+
         it('should resolve when not initialized', function() {
             this.sandbox.stub(waterline, 'isInitialized').returns(false);
             return waterline.stop();
         });
     });
-    
+
 });
 

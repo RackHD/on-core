@@ -68,6 +68,30 @@ module.exports = {
                     expect(this.subject.type).to.equal('datetime');
                 });
             });
+
+            describe('$indexes', function () {
+                before(function () {
+                    this.subject = this.$indexes;
+                });
+
+                it('should be an array of valid object', function () {
+                    if (!this.subject) { //$indexes is optional
+                        return;
+                    }
+
+                    expect(this.subject).to.be.instanceof(Array);
+                    _.forEach(this.subject, function(item) {
+                        expect(item).to.be.an('Object');
+                        expect(item).to.have.any.keys('keys', 'options'); //not allow others keys
+                        expect(item).to.have.all.keys('keys'); //keys is must-have
+                        expect(item.keys).to.be.an('Object');
+                        expect(item.keys).to.not.deep.equal({}); //cannot be empty object
+                        if (item.options) {
+                            expect(item.options).to.be.an('Object');
+                        }
+                    });
+                });
+            });
         });
 
         describe('Class Methods', function () {
@@ -118,6 +142,16 @@ module.exports = {
 
                 it('should be a function', function () {
                     expect(this.model).to.respondTo('findMostRecent');
+                });
+            });
+
+            describe('createIndexes', function () {
+                it('should exist', function () {
+                    expect(this.model.createIndexes).to.exist;
+                });
+
+                it('should be a function', function () {
+                    expect(this.model).to.respondTo('createIndexes');
                 });
             });
         });
