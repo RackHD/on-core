@@ -816,7 +816,7 @@ describe('Task Graph mongo store interface', function () {
             }
         };
         waterline.taskdependencies.updateMongo.resolves();
-        return mongo.updateTaskProgress(data)
+        return mongo.updateTaskProgress(data, data.graphId)
         .then(function(){
             expect(waterline.taskdependencies.updateMongo).to.be.calledOnce;
             expect(waterline.taskdependencies.updateMongo).to.be.calledWith(
