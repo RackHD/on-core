@@ -24,25 +24,14 @@ describe('Sanitizer', function () {
         };
     });
 
-    it ('it encrypts first level', function () {
-        sanitizer.encrypt(graphObj);
+    it ('it removes passwords at  first level', function () {
+        sanitizer.scrub(graphObj);
         expect(graphObj.password).to.not.equal('testPassword');
     });
 
-    it ('it encrypts nested levels', function () {
-        sanitizer.encrypt(graphObj);
+    it ('it removes passwords at  nested levels', function () {
+        sanitizer.scrub(graphObj);
         expect(graphObj.definition.options.test_task.password).to.not.equal('foo');
     });
 
-    it ('it decrypts as expected first level', function () {
-        sanitizer.encrypt(graphObj);
-        sanitizer.decrypt(graphObj);
-        expect(graphObj.password).to.equal('testPassword');
-    });
-
-    it ('it decrypts as expected nested levels', function () {
-        sanitizer.encrypt(graphObj);
-        sanitizer.decrypt(graphObj);
-        expect(graphObj.definition.options.test_task.password).to.equal('foo');
-    });
 });
