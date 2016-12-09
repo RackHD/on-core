@@ -33,7 +33,7 @@ describe('Lookup Service', function () {
     var node = {
         id: 'node'
     };
- 
+
     helper.before(function(context) {
         context.Core = {
             start: sandbox.stub().resolves(),
@@ -47,13 +47,13 @@ describe('Lookup Service', function () {
             helper.di.simpleWrapper(context.arpCache, 'ARPCache')
         ];
     });
-    
+
     before('Lookup Service before', function () {
         lookupService = helper.injector.get('Services.Lookup');
         WaterlineService = helper.injector.get('Services.Waterline');
         MacAddress = helper.injector.get('MacAddress');
         Errors = helper.injector.get('Errors');
-        
+
         // Mock out the waterline collection methods and initialize them
         var config = {
                 adapters: { mongo: {} },
@@ -71,18 +71,18 @@ describe('Lookup Service', function () {
                 });
             });
         });
-        WaterlineService.start(); 
+        WaterlineService.start();
     });
 
     helper.after();
     after(function() {
         sandbox.restore();
     });
-    
+
     afterEach(function() {
-        this.arpCache.getCurrent.resolves([]);    
+        this.arpCache.getCurrent.resolves([]);
     });
-    
+
     describe('Node ID Cache', function () {
         var spy1 = sinon.spy(),
             spy2 = sinon.spy();
@@ -215,7 +215,7 @@ describe('Lookup Service', function () {
             });
         });
     });
-    
+
     describe('macAddressToIp', function () {
         beforeEach(function () {
           lookupService.resetNodeIdCache();
@@ -230,7 +230,7 @@ describe('Lookup Service', function () {
                 expect(findByTerm).to.have.been.calledWith(ipAddress);
             });
         });
-        
+
         it('should reject with NotFoundError on findOneByTerm', function() {
             var ipAddress = lookup[0].ipAddress;
             this.sandbox.stub(WaterlineService.lookups, 'findByTerm').resolves({ipAddress:null});
@@ -392,11 +392,11 @@ describe('Lookup Service', function () {
 
             this.sandbox.stub(lookupService, 'ipAddressToMacAddress').resolves('00:11:22:33:44:55');
 
-            var req = { 
+            var req = {
                     ip: '10.1.1.1',
                     get: function() {
                         return undefined;
-                    } 
+                    }
                 },
                 next = function () {
                     expect(req.macaddress).to.equal('00:11:22:33:44:55');
@@ -412,12 +412,12 @@ describe('Lookup Service', function () {
 
             this.sandbox.stub(lookupService, 'ipAddressToMacAddress').resolves('00:11:22:33:44:55');
 
-            var req = { 
+            var req = {
                     _remoteAddress: '10.1.1.1',
                     get: function() {
                         return undefined;
                     }
-                }, 
+                },
                 next = function () {
                     expect(req.macaddress).to.equal('00:11:22:33:44:55');
                     expect(req.macAddress).to.equal('00:11:22:33:44:55');
@@ -432,7 +432,7 @@ describe('Lookup Service', function () {
 
             this.sandbox.stub(lookupService, 'ipAddressToMacAddress').resolves('00:11:22:33:44:55');
 
-            var req = { 
+            var req = {
                     connection: { remoteAddress: '10.1.1.1' },
                     get: function() {
                         return undefined;
@@ -521,8 +521,8 @@ describe('Lookup Service', function () {
             expect(WaterlineService.lookups.setIp).to.have.been.calledOnce;
             expect(WaterlineService.lookups.setIp).to.have.been.calledWith('ip', 'mac');
         });
-    });   
-    
+    });
+
     it('validateArpCache', function() {
         this.sandbox.stub(WaterlineService.lookups, 'setIp').resolves();
         this.arpCache.getCurrent.resolves([{mac:'mac', ip:'ip'}]);
@@ -531,5 +531,5 @@ describe('Lookup Service', function () {
             expect(WaterlineService.lookups.setIp).to.have.been.calledOnce;
             expect(WaterlineService.lookups.setIp).to.have.been.calledWith('ip', 'mac');
         });
-    });   
+    });
 });
