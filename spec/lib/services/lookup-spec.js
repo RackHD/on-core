@@ -137,7 +137,7 @@ describe('Lookup Service', function () {
         afterEach(function () {
           var configuration = helper.injector.get('Services.Configuration');
           configuration.set('externalLookupHelper', null);
-        })
+        });
 
         it('should call findByTerm with macAddress', function() {
             var findByTerm = this.sandbox.stub(
@@ -223,13 +223,13 @@ describe('Lookup Service', function () {
             lookupService.resetMacRequests();
 
             var runs = [];
-            for (var i = 0; i < 5; i++) {
+            for (var i = 0; i < 5; i += 1) {
                 runs.push(lookupService.runExternalHelper(helperPath, macAddress));
             }
 
             expect(processHelperResults).to.have.been.calledOnce;
 
-            return Promise.all(runs)
+            return Promise.all(runs);
         });
 
         it('should reject with NotFoundError if no node association exists', function() {
