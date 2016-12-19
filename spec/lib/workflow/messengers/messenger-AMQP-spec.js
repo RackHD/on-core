@@ -170,16 +170,16 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
                 graphName: "Test graph",
                 progress: {
                     description: "task completed",
-                    value: "2",
-                    maximum: "4"
+                    value: 2,
+                    maximum: 4
                 },
                 taskProgress: {
                     taskId: taskId,
                     taskName: "test task",
                     progress: {
                         description: "Task completed",
-                        value: "100",
-                        maximum: "100"
+                        value: 100,
+                        maximum: 100
                     }
                 }
             };
@@ -211,9 +211,10 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
         it('should update graph progress and calculate percentage number', function(){
             _progressData = _.omit(_progressData, ['graphName', 'graphId']);
             _progressData.progress.maximum = '3';
+            _progressData.progress.value = '2';
             delete _progressData.taskProgress.taskId;
             delete _progressData.taskProgress.taskName;
-            progressData.progress.maximum = '3';
+            progressData.progress.maximum = 3;
             progressData.progress.percentage = '67%';
             progressData.taskProgress.progress.percentage = '100%';
             delete progressData.taskProgress.taskId;
