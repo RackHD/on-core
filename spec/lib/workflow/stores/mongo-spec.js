@@ -701,20 +701,6 @@ describe('Task Graph mongo store interface', function () {
         });
     });
 
-    it('setIndexes', function() {
-        var indexObject = {
-            taskdependencies: [
-                {taskId: 1, graphId: 1}
-            ]
-        };
-
-        return mongo.setIndexes(indexObject)
-        .then(function() {
-            expect(waterline.taskdependencies.createMongoIndexes).to.be
-                .calledWithExactly({taskId: 1, graphId: 1});
-        });
-    });
-
     it('findChildGraph', function() {
         var runGraphTaskId = uuid.v4();
         return mongo.findChildGraph(runGraphTaskId)
