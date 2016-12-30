@@ -2,6 +2,8 @@
 
 `on-core` provides common node.js libraries for applications in the RackHD project.
 
+#testing branch functional test support
+
 Copyright 2015, EMC, Inc.
 
 ## CI/testing
