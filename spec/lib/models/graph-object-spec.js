@@ -100,14 +100,5 @@ describe('Models.GraphObject', function () {
             });
         });
         
-        describe('progress', function () {
-            before(function () {
-                this.subject = this.attributes.progress;
-            });
-
-            it('should be json', function () {
-                expect(this.subject.type).to.equal('json');
-            });
-        });
     });
 });

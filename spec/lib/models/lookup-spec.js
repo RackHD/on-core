@@ -49,10 +49,6 @@ describe('Models.Lookup', function () {
             it('should be a string', function () {
                 expect(this.subject.type).to.equal('string');
             });
-
-            it('should be unique', function() {
-                expect(this.subject.unique).to.equal(true);
-            });
         });
 
         describe('macAddress', function () {
@@ -192,8 +188,10 @@ describe('Models.Lookup', function () {
                     expect(waterline.lookups.findAndModifyMongo).to.have.been.calledOnce;
                     var query = { macAddress: 'macAddress' };
                     var update = { $set: { node:  waterline.lookups.mongo.objectId('node') }};
-                    expect(waterline.lookups.findAndModifyMongo.firstCall.args[0]).to.deep.equal(query);
-                    expect(waterline.lookups.findAndModifyMongo.firstCall.args[2]).to.deep.equal(update);
+                    expect(waterline.lookups.findAndModifyMongo.firstCall.args[0])
+                        .to.deep.equal(query);
+                    expect(waterline.lookups.findAndModifyMongo.firstCall.args[2])
+                        .to.deep.equal(update);
                 });
             });
         });
@@ -299,26 +297,5 @@ describe('Models.Lookup', function () {
                 });
             });
         });
-
-        describe('setIndexes', function () {
-            it('should set unique indexes', function() {
-                this.sandbox.stub(waterline.lookups, 'createUniqueMongoIndexes').resolves();
-
-                return waterline.lookups.setIndexes().then(function () {
-                    expect(waterline.lookups.createUniqueMongoIndexes)
-                        .to.have.been.calledOnce;
-                    expect(waterline.lookups.createUniqueMongoIndexes)
-                        .to.have.been.calledWith([
-                            {
-                                macAddress: 1
-                            },
-                            {
-                                macAddress: 1, ipAddress: 1
-                            }
-                        ]);
-                });
-            });
-        });
-
     });
 });
