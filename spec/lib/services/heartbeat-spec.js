@@ -32,7 +32,7 @@ describe('Heartbeat', function () {
         stop: sandbox.stub().returns(
             Promise.resolve()
         ),
-        publish: sandbox.stub().returns(
+        publishExternalEvents: sandbox.stub().returns(
             Promise.resolve()
         )
     };
@@ -40,12 +40,12 @@ describe('Heartbeat', function () {
         lookupServiceAsync: sandbox.stub(),
         lookupAsync: sandbox.stub()
     };
-    
+
     helper.before(function() {
-        return [ 
+        return [
             helper.di.simpleWrapper(messenger, 'Services.Messenger'),
             helper.di.simpleWrapper(rx, 'Rx')
-        ]
+        ];
     });
 
     before(function () {
@@ -53,7 +53,7 @@ describe('Heartbeat', function () {
         constants = helper.injector.get('Constants');
         sandbox.stub(heartbeat, 'requireDns').returns(dns);
     });
-    
+
     beforeEach(function() {
         sandbox.reset();
     });
@@ -71,30 +71,30 @@ describe('Heartbeat', function () {
                 expect(heartbeat.running).to.be.true;
             });
         });
-        
+
         it('should stop', function() {
             return heartbeat.start().then(function() {
                 return heartbeat.stop().then(function() {
                     expect(heartbeat.subscription.dispose).to.have.been.calledOnce;
                     expect(heartbeat.running).to.be.false;
-                })
+                });
             });
         });
-        
+
         it('should send heartbeat message', function() {
             return heartbeat.sendHeartbeat()
             .then(function() {
-                expect(messenger.publish).to.be.calledOnce;
+                expect(messenger.publishExternalEvents).to.be.calledOnce;
             });
         });
-        
+
         it('should resolve hostname', function() {
             dns.lookupServiceAsync.resolves(undefined);
             return heartbeat.getFqdn().then(function(hostname) {
                 expect(hostname).to.equal(constants.Host);
             });
         });
-        
+
         it('should resolve FQDN', function() {
             var testFqdn = constants.Host + '.example.com';
             dns.lookupServiceAsync.resolves([testFqdn]);
