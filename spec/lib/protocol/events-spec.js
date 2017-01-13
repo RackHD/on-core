@@ -493,7 +493,7 @@ describe("Event protocol subscribers", function () {
                 }
             };
             messenger.publish.resolves();
-            return events.publishProgressEvent(data)
+            return events.publishProgressEvent(data.graphId, data)
             .then(function () {
                 expect(messenger.publish).to.be.calledWith(
                     'on.events',
