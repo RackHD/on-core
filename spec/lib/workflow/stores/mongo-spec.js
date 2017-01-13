@@ -486,14 +486,16 @@ describe('Task Graph mongo store interface', function () {
 
     it('checkGraphSucceeded not succeeded', function() {
         var data = {
-            graphId: uuid.v4()
+            graphId: uuid.v4(),
+            terminalOnStates: ['failed'],
+            state: 'failed'
         };
-        waterline.taskdependencies.findOne.resolves(data);
+        waterline.taskdependencies.find.resolves([data]);
 
         return mongo.checkGraphSucceeded(data)
         .then(function(result) {
-            expect(waterline.taskdependencies.findOne).to.have.been.calledOnce;
-            expect(waterline.taskdependencies.findOne).to.have.been.calledWith(
+            expect(waterline.taskdependencies.find).to.have.been.calledOnce;
+            expect(waterline.taskdependencies.find).to.have.been.calledWith(
                 {
                     graphId: data.graphId,
                     state: { $ne: Constants.Task.States.Succeeded },
@@ -503,7 +505,9 @@ describe('Task Graph mongo store interface', function () {
             );
             expect(result).to.deep.equal({
                 graphId: data.graphId,
-                done: false
+                done: false,
+                terminalOnStates: ['failed'],
+                state: 'failed'
             });
         });
     });
@@ -512,10 +516,52 @@ describe('Task Graph mongo store interface', function () {
         var data = {
             graphId: uuid.v4()
         };
-        waterline.taskdependencies.findOne.resolves(null);
+        waterline.taskdependencies.find.resolves([]);
         return expect(mongo.checkGraphSucceeded(data)).to.become({
             graphId: data.graphId,
             done: true
+        });
+    });
+
+    it('checkGraphSucceeded should finish with nonterminal, handled tasks', function() {
+        var graphId = uuid.v4();
+        var data = [
+            {
+                graphId: graphId,
+                terminalOnStates: ['succeded', 'cancelled', 'timeout'],
+                state: 'failed'
+            },
+            {
+                graphId: graphId,
+                terminalOnStates: ['succeded', 'cancelled', 'failed'],
+                state: 'timeout'
+            },
+            {
+                graphId: graphId,
+                terminalOnStates: ['succeded','timeout', 'failed'],
+                state: 'cancelled'
+            },
+            {
+                graphId: graphId,
+                terminalOnStates: ['succeeded'],
+                state: 'failed'
+            }
+        ];
+        waterline.taskdependencies.find.resolves(data);
+
+        return mongo.checkGraphSucceeded(data[0])
+        .then(function(result) {
+            expect(waterline.taskdependencies.find).to.have.been.calledOnce;
+            expect(waterline.taskdependencies.find).to.have.been.calledWith(
+                {
+                    graphId: graphId,
+                    state: { $ne: Constants.Task.States.Succeeded },
+                    ignoreFailure: { $ne: true },
+                    reachable: true
+                }
+            );
+            expect(result).to.have.property('graphId').that.equals(graphId);
+            expect(result).to.have.property('done').that.equals(true);
         });
     });
 
