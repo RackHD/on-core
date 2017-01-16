@@ -103,7 +103,7 @@ describe('Messenger', function () {
     
     describe('publish/subscribe', function () {
         it('should resolve if the published data is an object', function () {
-            return this.subject.publish(
+            return this.subject.publishInternalEvents(
                 Constants.Protocol.Exchanges.Test.Name,
                 'test',
                 { hello: 'world' }
@@ -111,7 +111,7 @@ describe('Messenger', function () {
         });
 
         it('should reject if the published data is invalid', function () {
-            return this.subject.publish(
+            return this.subject.publishInternalEvents(
                 Constants.Protocol.Exchanges.Test.Name,
                 'test',
                 new IpAddress({ value: 'invalid' })
@@ -119,7 +119,7 @@ describe('Messenger', function () {
         });
 
         it('should resolve if the published data is valid', function () {
-            return this.subject.publish(
+            return this.subject.publishInternalEvents(
                 Constants.Protocol.Exchanges.Test.Name,
                 'test',
                 new IpAddress({ value: '10.1.1.1' })
@@ -138,7 +138,7 @@ describe('Messenger', function () {
                 }
             ).then(function (sub) {
                 expect(sub).to.be.ok;
-                return self.subject.publish(
+                return self.subject.publishInternalEvents(
                     Constants.Protocol.Exchanges.Test.Name,
                     'test',
                     { hello: 'world' }
@@ -156,8 +156,8 @@ describe('Messenger', function () {
                         { hello: 'world' }
                     );
                 }
-            ).then(function (sub) {
-                return self.subject.publish(
+            ).then(function () {
+                return self.subject.publishInternalEvents(
                     Constants.Protocol.Exchanges.Test.Name,
                     'test',
                     { hello: 'world' }
@@ -172,7 +172,7 @@ describe('Messenger', function () {
                 function (){}
             ).should.be.rejectedWith(Error);
         });
-        
+
         it('should throw if subscribed with an invalid type', function () {
             testData = { hello: 'world' };
             var self = this;
@@ -182,21 +182,21 @@ describe('Messenger', function () {
                 function(){},
                 function(){}
             ).then(function() {
-                expect(self.subject.receive.queue).to.throw(Error);
+                expect(self.subject.messenger.receive.queue).to.throw(Error);
             });
         });
 
         it('should reject if published to an invalid exchange', function () {
-            return this.subject.publish(
+            return this.subject.publishInternalEvents(
                 'invalid',
                 'invalid',
                 { hello: 'invalid' }
             ).should.be.rejectedWith(Error);
         });
-        
+
         it('should reject if no transmit connection established', function () {
-            this.subject.transmit = undefined;
-            return this.subject.publish(
+            this.subject.messenger.transmit = undefined;
+            return this.subject.publishInternalEvents(
                 Constants.Protocol.Exchanges.Test.Name,
                 'test',
                 { hello: 'world' }

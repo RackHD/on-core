@@ -21,17 +21,20 @@ describe("Event protocol subscribers", function () {
         testMessage = new Message({},{},{});
         sinon.stub(testMessage);
         sinon.stub(messenger, 'request');
-        sinon.stub(messenger, 'publish');
+        sinon.stub(messenger, 'publishExternalEvents');
+        sinon.stub(messenger, 'publishInternalEvents');
     });
 
     beforeEach(function() {
         messenger.request.reset();
-        messenger.publish.reset();
+        messenger.publishInternalEvents.reset();
+        messenger.publishExternalEvents.reset();
     });
 
     after(function() {
         messenger.request.restore();
-        messenger.publish.restore();
+        messenger.publishInternalEvents.restore();
+        messenger.publishExternalEvents.restore();
     });
 
     helper.after();
@@ -46,7 +49,7 @@ describe("Event protocol subscribers", function () {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
             return events.subscribeTftpSuccess(nodeId, function (_data) {
                 expect(_data).to.equal(data);
                 return data;
@@ -67,7 +70,7 @@ describe("Event protocol subscribers", function () {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
             return events.subscribeTftpFailure(nodeId, function (_data) {
                 expect(_data).to.equal(data);
                 return data;
@@ -88,7 +91,7 @@ describe("Event protocol subscribers", function () {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
             return events.subscribeHttpResponse(nodeId, function (_data) {
                 expect(_data).to.equal(data);
                 return data;
@@ -109,7 +112,7 @@ describe("Event protocol subscribers", function () {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
             return events.subscribeDhcpBoundLease(nodeId, function (_data) {
                 expect(_data).to.equal(data);
                 return data;
@@ -136,7 +139,7 @@ describe("Event protocol subscribers", function () {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
 
             return events.subscribeTaskFinished(domain, function (_data) {
                 expect(_data).to.deep.equal(data);
@@ -166,7 +169,7 @@ describe("Event protocol subscribers", function () {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
 
             return events.subscribeNodeNotification(nodeId, function (_data) {
                 expect(_data).to.deep.equal(data);
@@ -176,7 +179,7 @@ describe("Event protocol subscribers", function () {
                     nodeId,
                     data
                 );
-                expect(messenger.publish).to.have.been.calledWith(
+                expect(messenger.publishInternalEvents).to.have.been.calledWith(
                     'on.events',
                     'notification.' + nodeId,
                     data
@@ -190,7 +193,7 @@ describe("Event protocol subscribers", function () {
                 callback(testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
 
             return events.subscribeNodeNotification(nodeId, function () {
             }).then(function (subscription) {
@@ -198,7 +201,7 @@ describe("Event protocol subscribers", function () {
                 events.publishNodeNotification(
                     nodeId
                 );
-                expect(messenger.publish).to.have.been.calledWith(
+                expect(messenger.publishInternalEvents).to.have.been.calledWith(
                     'on.events',
                     'notification.' + nodeId,
                     ''
@@ -214,7 +217,7 @@ describe("Event protocol subscribers", function () {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
 
             return events.subscribeBroadcastNotification(function (_data) {
                 expect(_data).to.deep.equal(data);
@@ -223,7 +226,7 @@ describe("Event protocol subscribers", function () {
                 events.publishBroadcastNotification(
                     data
                 );
-                expect(messenger.publish).to.have.been.calledWith(
+                expect(messenger.publishInternalEvents).to.have.been.calledWith(
                     'on.events',
                     'notification',
                     data
@@ -231,18 +234,19 @@ describe("Event protocol subscribers", function () {
             });
         });
 
-        it("should publish and subscribe to BroadcastNotification messages without data", function(){
+        it("should publish and subscribe to BroadcastNotification messages without data",
+           function(){
             messenger.subscribe = sinon.spy(function(a,b,callback) {
                 callback(testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
 
             return events.subscribeBroadcastNotification(function () {
             }).then(function (subscription) {
                 expect(subscription).to.be.ok;
                 events.publishBroadcastNotification();
-                expect(messenger.publish).to.have.been.calledWith(
+                expect(messenger.publishInternalEvents).to.have.been.calledWith(
                     'on.events',
                     'notification',
                     ''
@@ -262,7 +266,7 @@ describe("Event protocol subscribers", function () {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
             return events.subscribeGraphStarted(graphId, function (_data) {
                 expect(_data).to.equal(data);
                 return data;
@@ -287,7 +291,7 @@ describe("Event protocol subscribers", function () {
                 callback({status:status},testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
             return events.subscribeGraphFinished(graphId, function (_data) {
                 expect(_data).to.equal(status);
                 return status;
@@ -309,7 +313,7 @@ describe("Event protocol subscribers", function () {
                 callback({sku:skuId},testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
             return events.subscribeSkuAssigned(nodeId, function (sku) {
                 expect(sku).to.equal(skuId);
                 return skuId;
@@ -330,14 +334,14 @@ describe("Event protocol subscribers", function () {
         });
        it("should publish an unhandled error", function () {
             var testError = Error('unhandled');
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
             return events.publishUnhandledError(function(err) {
                 expect(err).to.equal(testError);
             });
         });
        it("should publish a blocked event", function () {
             var testError = Error('blockedEvent');
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
             return events.publishBlockedEventLoop(function(err) {
                 expect(err).to.equal(testError);
             });
@@ -361,18 +365,20 @@ describe("Event protocol subscribers", function () {
         });
 
         it('should publish without additional data', function(){
-            messenger.publish.resolves();
+            messenger.publishExternalEvents.resolves();
 
             return events.publishNodeEvent(testNode, testAction)
             .then(function(){
-                expect(messenger.publish).to.have.been.calledWith(
+                expect(messenger.publishExternalEvents).to.have.been.calledWith(
                     'on.events',
                     'event.node',
                     {
                         type: 'node',
                         action: testAction,
                         nodeId: testNodeId,
-                        nodeType: testType
+                        nodeType: testType,
+                        typeId: testNodeId,
+                        payload: null
                     });
             });
         });
@@ -383,11 +389,11 @@ describe("Event protocol subscribers", function () {
                     "for": "publishing"
                 };
 
-            messenger.publish.resolves();
+            messenger.publishExternalEvents.resolves();
 
             return events.publishNodeEvent(testNode, testAction, testData)
             .then(function(){
-                expect(messenger.publish).to.have.been.calledWith(
+                expect(messenger.publishExternalEvents).to.have.been.calledWith(
                     'on.events',
                     'event.node',
                     {
@@ -395,7 +401,8 @@ describe("Event protocol subscribers", function () {
                         action: testAction,
                         nodeId: testNodeId,
                         nodeType: testType,
-                        data: testData
+                        typeId: testNodeId,
+                        payload: testData
                     });
             });
         });
@@ -407,16 +414,18 @@ describe("Event protocol subscribers", function () {
             var oldNode = {id: 'aaa', type: 'compute', sku: ''};
             var newNode = {id: 'aaa', type: 'compute', sku: 'bbb'};
 
-            messenger.publish.resolves();
+            messenger.publishExternalEvents.resolves();
 
             return events.publishNodeAttrEvent(oldNode, newNode, 'sku')
             .then(function () {
-                expect(messenger.publish).to.have.been
+                expect(messenger.publishExternalEvents).to.have.been
                 .calledWith('on.events', 'event.node',
                     { type: 'node',
                       action: 'sku.assigned',
                       nodeId : 'aaa',
-                      nodeType: 'compute' });
+                      nodeType: 'compute',
+                      typeId: 'aaa',
+                      payload: null});
             });
         });
 
@@ -424,16 +433,18 @@ describe("Event protocol subscribers", function () {
             var oldNode = {id: 'aaa', type: 'compute', sku: 'bbb'};
             var newNode = {id: 'aaa', type: 'compute', sku: ''};
 
-            messenger.publish.resolves();
+            messenger.publishExternalEvents.resolves();
 
             return events.publishNodeAttrEvent(oldNode, newNode, 'sku')
             .then(function () {
-                expect(messenger.publish).to.have.been
+                expect(messenger.publishExternalEvents).to.have.been
                 .calledWith('on.events', 'event.node',
                     { type: 'node',
                       action: 'sku.unassigned',
                       nodeId : 'aaa',
-                      nodeType: 'compute' });
+                      nodeType: 'compute',
+                      typeId: 'aaa',
+                      payload: null});
             });
         });
 
@@ -441,16 +452,18 @@ describe("Event protocol subscribers", function () {
             var oldNode = {id: 'aaa', type: 'compute', sku: 'bbb'};
             var newNode = {id: 'aaa', type: 'compute', sku: 'ccc'};
 
-            messenger.publish.resolves();
+            messenger.publishExternalEvents.resolves();
 
             return events.publishNodeAttrEvent(oldNode, newNode, 'sku')
             .then(function () {
-                expect(messenger.publish).to.have.been
+                expect(messenger.publishExternalEvents).to.have.been
                 .calledWith('on.events', 'event.node',
                     { type: 'node',
                       action: 'sku.updated',
                       nodeId : 'aaa',
-                      nodeType: 'compute' });
+                      nodeType: 'compute',
+                      typeId: 'aaa',
+                      payload: null});
             });
         });
 
@@ -458,11 +471,11 @@ describe("Event protocol subscribers", function () {
             var oldNode = {id: 'aaa', type: 'compute', sku: ''};
             var newNode = {id: 'aaa', type: 'compute', sku: ''};
 
-            messenger.publish.resolves();
+            messenger.publishExternalEvents.resolves();
 
             return events.publishNodeAttrEvent(oldNode, newNode, 'sku')
             .then(function () {
-                expect(messenger.publish).to.have.not.been.called;
+                expect(messenger.publishExternalEvents).to.have.not.been.called;
             });
         });
 
@@ -470,15 +483,15 @@ describe("Event protocol subscribers", function () {
             var oldNode = {id: 'aaa', type: 'compute', sku: ''};
             var newNode = {id: 'bbb', type: 'compute', sku: 'abc'};
 
-            messenger.publish.resolves();
+            messenger.publishExternalEvents.resolves();
 
             return events.publishNodeAttrEvent(oldNode, newNode, 'sku')
             .then(function () {
-                expect(messenger.publish).to.have.not.been.called;
+                expect(messenger.publishExternalEvents).to.have.not.been.called;
             });
         });
     });
-    
+
     describe("publish graph progress event", function () {
         it("should publish graph progress event", function () {
             var uuid = helper.injector.get('uuid');
@@ -492,15 +505,16 @@ describe("Event protocol subscribers", function () {
                     taskId: "anything"
                 }
             };
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
             return events.publishProgressEvent(data)
             .then(function () {
-                expect(messenger.publish).to.be.calledWith(
+                expect(messenger.publishInternalEvents).to.be.calledWith(
                     'on.events',
-                    'graph.progress' + '.' + data.graphId, 
+                    'graph.progress' + '.' + data.graphId,
                     data);
             });
         });
 
     });
 });
+

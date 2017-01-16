@@ -38,7 +38,8 @@ describe("Task protocol functions", function() {
                 callback(args,testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishExternalEvents.resolves();
+            messenger.publishInternalEvents.resolves();
             messenger.request.resolves(args);
             return task.subscribeRun(taskId, function(_data) {
                 expect(_data).to.be.ok;
@@ -63,7 +64,8 @@ describe("Task protocol functions", function() {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
+            messenger.publishExternalEvents.resolves();
             task.subscribeCancel(function(_data) {
                 expect(_data).to.be.an.instanceof(Error);
                 expect(_data).to.have.property('message').that.equals(data.errMessage);
@@ -84,7 +86,8 @@ describe("Task protocol functions", function() {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
+            messenger.publishExternalEvents.resolves();
             return task.subscribeCancel(function(_data) {
                 expect(_data).to.be.an.instanceof(Errors.TaskTimeoutError);
                 expect(_data).to.have.property('message').that.equals(data.errMessage);
@@ -264,7 +267,8 @@ describe("Task protocol functions", function() {
                 callback({value:testData},testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
+            messenger.publishExternalEvents.resolves();
             task.subscribeRespondCommands(taskId, function(data) {
                 expect(data).to.deep.equal(testData);
             }).then(function(subscription) {
@@ -410,7 +414,8 @@ describe("Task protocol functions", function() {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
+            messenger.publishExternalEvents.resolves();
             return task.subscribeHttpResponse(id, function(_data) {
                 expect(_data).to.deep.equal(data);
             })
@@ -430,7 +435,8 @@ describe("Task protocol functions", function() {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
+            messenger.publishExternalEvents.resolves();
             return task.subscribeTftpSuccess(id, function(_data) {
                 expect(_data).to.deep.equal(data);
             })
@@ -450,7 +456,8 @@ describe("Task protocol functions", function() {
                 callback;
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
+            messenger.publishExternalEvents.resolves();
             return task.subscribeDhcpBoundLease(id, function(_data) {
                 expect(_data).to.deep.equal(data);
             })
@@ -469,7 +476,8 @@ describe("Task protocol functions", function() {
                 callback({value:otherId},testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
+            messenger.publishExternalEvents.resolves();
             return task.subscribeHttpResponse(otherId, function () {
                 return;
             }).then(function (sub) {
@@ -498,7 +506,8 @@ describe("Task protocol functions", function() {
                 callback({value:testData},testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
+            messenger.publishExternalEvents.resolves();
             return task.subscribeRunIpmiCommand(testUuid, testCommand, function(_data) {
                 expect(_data).to.deep.equal(testData);
             }).then(function(subscription) {
@@ -519,7 +528,8 @@ describe("Task protocol functions", function() {
                 callback({value:testData},testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
+            messenger.publishExternalEvents.resolves();
             return task.subscribeIpmiCommandResult(testUuid, testCommand, function(_data) {
                 expect(_data).to.deep.equal(testData);
             }).then(function(subscription) {
@@ -539,7 +549,8 @@ describe("Task protocol functions", function() {
                 callback({value:testData},testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
+            messenger.publishExternalEvents.resolves();
             return task.subscribeRunSnmpCommand(testUuid, function(_data) {
                 expect(_data).to.deep.equal(testData);
             }).then(function(subscription) {
@@ -559,7 +570,8 @@ describe("Task protocol functions", function() {
                 callback({value:testData},testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
+            messenger.publishExternalEvents.resolves();
             return task.subscribeSnmpCommandResult(testUuid, function(_data) {
                 expect(_data).to.deep.equal(testData);
             }).then(function(subscription) {
@@ -579,7 +591,8 @@ describe("Task protocol functions", function() {
                 callback({value:testData},{deliveryInfo:{routingKey:'test.key'}});
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
+            messenger.publishExternalEvents.resolves();
             return task.subscribeMetricResult(testUuid, 'testmetric', function(_data) {
                 expect(_data).to.deep.equal(testData);
             }).then(function(subscription) {
@@ -596,7 +609,8 @@ describe("Task protocol functions", function() {
                 uuid = helper.injector.get('uuid'),
                 testUuid = uuid.v4(),
                 pollerName = 'sdr';
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
+            messenger.publishExternalEvents.resolves();
             return task.publishPollerAlert(testUuid, pollerName, data);
         });
     });
@@ -661,7 +675,8 @@ describe("Task protocol functions", function() {
                 callback({value:testData},testMessage);
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
+            messenger.publishExternalEvents.resolves();
             return task.subscribeAnsibleCommand(testUuid, function(_data) {
                 expect(_data).to.deep.equal(testData);
             }).then(function(subscription) {
@@ -682,7 +697,8 @@ describe("Task protocol functions", function() {
                 callback();
                 return Promise.resolve(testSubscription);
             });
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
+            messenger.publishExternalEvents.resolves();
             return task.subscribeTrigger(testUuid, triggerType, triggerGroup, function() {
                 return;
             }).then(function(subscription) {
