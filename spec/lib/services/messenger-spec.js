@@ -7,18 +7,18 @@ describe('Messenger', function () {
     var Errors, ErrorEvent, IpAddress, Constants,
         testData = { hello: 'world' },
         sandbox = sinon.sandbox.create();
-    
+
     helper.before(function(context) {
         function MockPromise () {
             this.addCallback = sandbox.spy(function(callback) {
                 callback({});
             });
         }
-        
+
         var exchange = {
             publish: sandbox.stub().resolves()
         };
-        
+
         var queue = {
             subscribe: sandbox.spy(function(a,callback) {
                 callback(testData,{},{});
@@ -28,18 +28,18 @@ describe('Messenger', function () {
                 callback();
             })
         };
-        
+
         context.statsd = {
             stop: sandbox.stub().resolves(),
             start: sandbox.stub().resolves(),
             sanitize: sandbox.stub().resolves(),
             timing: sandbox.stub().resolves()
         };
-        
+
         context.Subscription = function () {
             this.dispose = sandbox.stub();
         };
-        
+
         context.Connection = function () {
             this.start = sandbox.stub().resolves();
             this.stop = sandbox.stub().resolves();
@@ -50,7 +50,7 @@ describe('Messenger', function () {
             this.exchanges = {'on.test':{}};
             this.initialConnection = true;
         };
-        
+
         context.Message = function (data) {
             this.data = data;
             this.resolve = sandbox.stub().resolves();
@@ -58,17 +58,17 @@ describe('Messenger', function () {
             this.isRequest = sandbox.stub().resolves();
             this.reject = sandbox.stub().resolves();
         };
-        
+
         context.Timer = function () {
             this.stop = sandbox.stub().resolves();
             this.start = sandbox.stub().resolves();
         };
-        
+
         context.Core = {
             start: sandbox.stub().resolves(),
             stop: sandbox.stub().resolves()
         };
-        
+
         return [
             helper.di.simpleWrapper(context.Message, 'Message'),
             helper.di.simpleWrapper(context.Connection, 'Connection'),
@@ -78,7 +78,7 @@ describe('Messenger', function () {
             helper.di.simpleWrapper(context.Core, 'Services.Core' )
         ];
     });
-    
+
 
     before(function () {
         this.subject = helper.injector.get('Services.Messenger');
@@ -87,23 +87,23 @@ describe('Messenger', function () {
         IpAddress = helper.injector.get('IpAddress');
         Constants = helper.injector.get('Constants');
     });
-    
+
     helper.after();
     after(function() {
         sandbox.restore();
     });
-    
+
     beforeEach(function() {
         this.subject.start();
     });
-    
+
     afterEach(function() {
         this.subject.stop();
     });
-    
-    describe('publish/subscribe', function () {
+
+    describe('publishInternalEvents/subscribe', function () {
         it('should resolve if the published data is an object', function () {
-            return this.subject.publish(
+            return this.subject.publishInternalEvents(
                 Constants.Protocol.Exchanges.Test.Name,
                 'test',
                 { hello: 'world' }
@@ -111,7 +111,7 @@ describe('Messenger', function () {
         });
 
         it('should reject if the published data is invalid', function () {
-            return this.subject.publish(
+            return this.subject.publishInternalEvents(
                 Constants.Protocol.Exchanges.Test.Name,
                 'test',
                 new IpAddress({ value: 'invalid' })
@@ -119,7 +119,7 @@ describe('Messenger', function () {
         });
 
         it('should resolve if the published data is valid', function () {
-            return this.subject.publish(
+            return this.subject.publishInternalEvents(
                 Constants.Protocol.Exchanges.Test.Name,
                 'test',
                 new IpAddress({ value: '10.1.1.1' })
@@ -138,7 +138,7 @@ describe('Messenger', function () {
                 }
             ).then(function (sub) {
                 expect(sub).to.be.ok;
-                return self.subject.publish(
+                return self.subject.publishInternalEvents(
                     Constants.Protocol.Exchanges.Test.Name,
                     'test',
                     { hello: 'world' }
@@ -156,8 +156,8 @@ describe('Messenger', function () {
                         { hello: 'world' }
                     );
                 }
-            ).then(function (sub) {
-                return self.subject.publish(
+            ).then(function () {
+                return self.subject.publishInternalEvents(
                     Constants.Protocol.Exchanges.Test.Name,
                     'test',
                     { hello: 'world' }
@@ -172,7 +172,7 @@ describe('Messenger', function () {
                 function (){}
             ).should.be.rejectedWith(Error);
         });
-        
+
         it('should throw if subscribed with an invalid type', function () {
             testData = { hello: 'world' };
             var self = this;
@@ -182,27 +182,81 @@ describe('Messenger', function () {
                 function(){},
                 function(){}
             ).then(function() {
-                expect(self.subject.receive.queue).to.throw(Error);
+                expect(self.subject.messenger.receive.queue).to.throw(Error);
             });
         });
 
         it('should reject if published to an invalid exchange', function () {
-            return this.subject.publish(
+            return this.subject.publishInternalEvents(
                 'invalid',
                 'invalid',
                 { hello: 'invalid' }
             ).should.be.rejectedWith(Error);
         });
-        
+
         it('should reject if no transmit connection established', function () {
-            this.subject.transmit = undefined;
-            return this.subject.publish(
+            this.subject.messenger.transmit = undefined;
+            return this.subject.publishInternalEvents(
                 Constants.Protocol.Exchanges.Test.Name,
                 'test',
                 { hello: 'world' }
             ).should.be.rejectedWith(Error);
         });
     });
+
+    /*
+    describe('publishExternal/subscribe', function () {
+        it('should resolve if the published data is an object', function () {
+            expect (function (){
+	        this.subject.publishExternalEvents(
+		    Constants.Protocol.Exchanges.Test.Name,
+		    'test',
+		    { hello: 'world' });}).to.throw(Error.AssertionError);
+        });
+
+        it('should resolve if the published data contains valid field', function () {
+            return this.subject.publishExternalEvents(
+                Constants.Protocol.Exchanges.Test.Name,
+                'test',
+                { type: "aaa",
+                    nodeId: "bbb",
+                    typeId: "ccc",
+                    payload: {},
+                    action: "eee",
+                    severity:"fff",
+                }).should.be.fulfilled;
+        });
+
+        it('should send proper data to the proper routing key', function () {
+            var self = this;
+            return this.subject.subscribe(
+                Constants.Protocol.Exchanges.Test.Name,
+                'test',
+                function (data) {
+                    data.should.have.property("createdAt");
+                    data.should.deep.equal(
+                        { type: 'aaa',
+                           nodeId: "bbb",
+                           typeId: "ccc",
+                           payload: {},
+                           action: "eee",
+                           severity:"fff",
+                           version : "1.0"
+                        });
+                }).then(function () {
+                return self.subject.publishExternalEvents(
+                    Constants.Protocol.Exchanges.Test.Name,
+                    'test',
+                    { type: 'aaa',
+                        nodeId: "bbb",
+                        typeId: "ccc",
+                        payload: {},
+                        action: "eee",
+                        severity:"fff"}
+                ).should.be.fulfilled;
+            });
+        });
+    }); */
 
     describe('request', function () {
         it('should resolve on a successful response', function () {
@@ -289,7 +343,7 @@ describe('Messenger', function () {
                 ).should.be.rejectedWith(Error);
             });
         });
-    
+
         it('should only call subscription.dispose once', function (done) {
             var self = this;
             var mockOptions = {};
@@ -311,8 +365,8 @@ describe('Messenger', function () {
             self.subject.timeout = 0;
             var stub = sinon.spy(function() {this._disposed = true;});
             Subscription.create = function () {
-                return {    
-                    dispose: stub, 
+                return {
+                    dispose: stub,
                    _disposed: false
                 };
             };

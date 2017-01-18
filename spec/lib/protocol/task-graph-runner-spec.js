@@ -33,12 +33,12 @@ describe("TaskGraph Runner protocol functions", function () {
     describe("runTaskGraph", function() {
         it("should publish to runTaskGraph", function() {
             var graphId = uuid.v4();
-            messenger.publish.resolves();
+            messenger.publishInternalEvents.resolves();
 
             return taskgraphrunner.runTaskGraph(graphId, 'default')
             .then(function() {
-                expect(messenger.publish).to.have.been.calledOnce;
-                expect(messenger.publish).to.have.been.calledWith(
+                expect(messenger.publishInternalEvents).to.have.been.calledOnce;
+                expect(messenger.publishInternalEvents).to.have.been.calledWith(
                     Constants.Protocol.Exchanges.TaskGraphRunner.Name,
                     'methods.runTaskGraph.default',
                     { graphId: graphId }
