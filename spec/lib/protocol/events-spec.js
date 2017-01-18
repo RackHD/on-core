@@ -9,6 +9,9 @@ describe("Event protocol subscribers", function () {
         messenger,
         events;
 
+    var clock;
+    var createTime;
+
     helper.before();
 
     before(function () {
@@ -27,6 +30,12 @@ describe("Event protocol subscribers", function () {
     beforeEach(function() {
         messenger.request.reset();
         messenger.publish.reset();
+	clock = sinon.useFakeTimers(new Date(2011,9,1).getTime());
+	createTime = new Date();
+    });
+
+    afterEach(function() {
+        clock.restore();
     });
 
     after(function() {
@@ -349,6 +358,7 @@ describe("Event protocol subscribers", function () {
             testType = 'compute',
             testNodeId,
             testNode = {};
+        var routingKey;
 
         before(function(){
             var uuid = helper.injector.get('uuid');
@@ -358,6 +368,7 @@ describe("Event protocol subscribers", function () {
                 id: testNodeId,
                 type: testType
             };
+            routingKey = 'node.' + testNodeId + '.discovered.information.' + testNodeId;
         });
 
         it('should publish without additional data', function(){
@@ -367,12 +378,17 @@ describe("Event protocol subscribers", function () {
             .then(function(){
                 expect(messenger.publish).to.have.been.calledWith(
                     'on.events',
-                    'event.node',
+                    routingKey,
                     {
                         type: 'node',
                         action: testAction,
                         nodeId: testNodeId,
-                        nodeType: testType
+                        nodeType: testType,
+                        typeId: testNodeId,
+                        severity: "information",
+                        payload: null,
+                        version:'1.0',
+                        createdAt: createTime
                     });
             });
         });
@@ -389,13 +405,17 @@ describe("Event protocol subscribers", function () {
             .then(function(){
                 expect(messenger.publish).to.have.been.calledWith(
                     'on.events',
-                    'event.node',
+                    routingKey,
                     {
                         type: 'node',
                         action: testAction,
                         nodeId: testNodeId,
                         nodeType: testType,
-                        data: testData
+                        typeId: testNodeId,
+                        severity: "information",
+                        payload: testData,
+                        version:'1.0',
+                        createdAt: createTime
                     });
             });
         });
@@ -406,51 +426,73 @@ describe("Event protocol subscribers", function () {
         it('should publish assigned event', function() {
             var oldNode = {id: 'aaa', type: 'compute', sku: ''};
             var newNode = {id: 'aaa', type: 'compute', sku: 'bbb'};
+            var routingKey = 'node.' + oldNode.id +
+                             '.sku.assigned.information.' + oldNode.id;
 
             messenger.publish.resolves();
 
             return events.publishNodeAttrEvent(oldNode, newNode, 'sku')
             .then(function () {
                 expect(messenger.publish).to.have.been
-                .calledWith('on.events', 'event.node',
+                .calledWith('on.events', routingKey,
                     { type: 'node',
                       action: 'sku.assigned',
                       nodeId : 'aaa',
-                      nodeType: 'compute' });
+                      nodeType: 'compute',
+                      typeId: 'aaa',
+                      severity: "information",
+                      payload: null,
+                      version:'1.0',
+                      createdAt: createTime});
             });
         });
 
         it('should publish unassigned event', function() {
             var oldNode = {id: 'aaa', type: 'compute', sku: 'bbb'};
             var newNode = {id: 'aaa', type: 'compute', sku: ''};
+            var routingKey = 'node.' + oldNode.id +
+                             '.sku.unassigned.information.' + oldNode.id;
 
             messenger.publish.resolves();
 
             return events.publishNodeAttrEvent(oldNode, newNode, 'sku')
             .then(function () {
                 expect(messenger.publish).to.have.been
-                .calledWith('on.events', 'event.node',
+                .calledWith('on.events', routingKey,
                     { type: 'node',
                       action: 'sku.unassigned',
                       nodeId : 'aaa',
-                      nodeType: 'compute' });
+                      nodeType: 'compute',
+                      typeId: 'aaa',
+                      severity: "information",
+                      payload: null,
+                      version:'1.0',
+                      createdAt: createTime
+                     });
             });
         });
 
         it('should publish updated event', function() {
             var oldNode = {id: 'aaa', type: 'compute', sku: 'bbb'};
             var newNode = {id: 'aaa', type: 'compute', sku: 'ccc'};
+            var routingKey = 'node.' + oldNode.id + '.sku.updated.information.' + oldNode.id;
 
             messenger.publish.resolves();
 
             return events.publishNodeAttrEvent(oldNode, newNode, 'sku')
             .then(function () {
                 expect(messenger.publish).to.have.been
-                .calledWith('on.events', 'event.node',
+                .calledWith('on.events', routingKey,
                     { type: 'node',
                       action: 'sku.updated',
                       nodeId : 'aaa',
-                      nodeType: 'compute' });
+                      nodeType: 'compute',
+                      typeId: 'aaa',
+                      severity: "information",
+                      payload: null,
+                      version:'1.0',
+                      createdAt: createTime
+                    });
             });
         });
 
@@ -477,5 +519,30 @@ describe("Event protocol subscribers", function () {
                 expect(messenger.publish).to.have.not.been.called;
             });
         });
+    });
+
+    describe("publish graph progress event", function () {
+        it("should publish graph progress event", function () {
+            var uuid = helper.injector.get('uuid');
+            var data = {
+                graphId: uuid.v4(),
+                progress: {
+                    "percentage": "10%",
+                    "description": "anything"
+                },
+                taskProgress: {
+                    taskId: "anything"
+                }
+            };
+            messenger.publish.resolves();
+            return events.publishProgressEvent(data.graphId, data)
+            .then(function () {
+                expect(messenger.publish).to.be.calledWith(
+                    'on.events',
+                    'graph.progress' + '.' + data.graphId,
+                    data);
+            });
+        });
+
     });
 });

@@ -99,5 +99,6 @@ describe('Models.GraphObject', function () {
                 expect(this.subject.model).to.equal('nodes');
             });
         });
+        
     });
 });
