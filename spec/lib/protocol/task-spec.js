@@ -597,7 +597,7 @@ describe("Task protocol functions", function() {
                 testUuid = uuid.v4(),
                 pollerName = 'sdr';
             messenger.publish.resolves();
-            return task.publishPollerAlert(testUuid, pollerName, data);
+            return task.publishPollerAlertLegacy(testUuid, pollerName, data);
         });
     });
 
