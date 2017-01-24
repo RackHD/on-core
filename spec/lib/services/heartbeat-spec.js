@@ -26,7 +26,7 @@ describe('Heartbeat', function () {
         }
     };
     var events = {
-        publishExternalEvent: sandbox.stub().returns(
+        publishHeartbeatEvent: sandbox.stub().returns(
             Promise.resolve()
         )
     };
@@ -78,7 +78,7 @@ describe('Heartbeat', function () {
         it('should send heartbeat message', function() {
             return heartbeat.sendHeartbeat()
             .then(function() {
-                expect(events.publishExternalEvent).to.be.calledOnce;
+                expect(events.publishHeartbeatEvent).to.be.calledOnce;
             });
         });
 
