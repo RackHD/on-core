@@ -22,8 +22,24 @@ describe('Model', function () {
             attributes: {
                 dummy: {
                     type: 'string'
+                },
+                foo: {
+                    type: 'string',
+                    unique: true
+                },
+                bar: {
+                    type: 'string',
                 }
-            }
+            },
+            $indexes: [
+                {
+                    keys: { foo: 1, bar: 1 },
+                },
+                {
+                    keys: { foo: 1 },
+                    options: { unique: false }
+                }
+            ]
         });
     }
 
@@ -768,6 +784,21 @@ describe('Model', function () {
                 expect(waterline.testobjects.runNativeMongo).to.have.been.calledWith(
                     'createIndex',
                     [ indexes[1], { unique: true } ]
+                );
+            });
+        });
+
+        it('should have a createIndexes method that calls the runNativeMongo method', function() {
+            return waterline.testobjects.createIndexes()
+            .then(function() {
+                expect(waterline.testobjects.runNativeMongo).to.have.been.calledTwice;
+                expect(waterline.testobjects.runNativeMongo).to.have.been.calledWith(
+                    'createIndex',
+                    [ { foo: 1, bar: 1 }, { } ]
+                );
+                expect(waterline.testobjects.runNativeMongo).to.have.been.calledWith(
+                    'createIndex',
+                    [ { foo: 1 }, { unique: false } ] //index in $indexes will take precedent
                 );
             });
         });

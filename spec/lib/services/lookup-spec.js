@@ -4,10 +4,11 @@
 'use strict';
 
 describe('Lookup Service', function () {
-    var lookupService, 
-        MacAddress, 
-        Errors, 
+    var lookupService,
+        MacAddress,
+        Errors,
         WaterlineService,
+        ChildProcess,
         sandbox = sinon.sandbox.create();
 
     var lookup = [{
@@ -33,7 +34,7 @@ describe('Lookup Service', function () {
     var node = {
         id: 'node'
     };
- 
+
     helper.before(function(context) {
         context.Core = {
             start: sandbox.stub().resolves(),
@@ -42,18 +43,19 @@ describe('Lookup Service', function () {
         context.arpCache = {
             getCurrent: sandbox.stub().resolves()
         };
+
         return [
             helper.di.simpleWrapper(context.Core, 'Services.Core'),
             helper.di.simpleWrapper(context.arpCache, 'ARPCache')
         ];
     });
-    
+
     before('Lookup Service before', function () {
         lookupService = helper.injector.get('Services.Lookup');
         WaterlineService = helper.injector.get('Services.Waterline');
         MacAddress = helper.injector.get('MacAddress');
         Errors = helper.injector.get('Errors');
-        
+
         // Mock out the waterline collection methods and initialize them
         var config = {
                 adapters: { mongo: {} },
@@ -71,18 +73,18 @@ describe('Lookup Service', function () {
                 });
             });
         });
-        WaterlineService.start(); 
+        WaterlineService.start();
     });
 
     helper.after();
     after(function() {
         sandbox.restore();
     });
-    
+
     afterEach(function() {
-        this.arpCache.getCurrent.resolves([]);    
+        this.arpCache.getCurrent.resolves([]);
     });
-    
+
     describe('Node ID Cache', function () {
         var spy1 = sinon.spy(),
             spy2 = sinon.spy();
@@ -129,6 +131,12 @@ describe('Lookup Service', function () {
     describe('macAddressToNodeId', function () {
         beforeEach(function () {
           lookupService.resetNodeIdCache();
+          lookupService.resetMacRequests();
+        });
+
+        afterEach(function () {
+          var configuration = helper.injector.get('Services.Configuration');
+          configuration.set('externalLookupHelper', null);
         });
 
         it('should call findByTerm with macAddress', function() {
@@ -150,6 +158,78 @@ describe('Lookup Service', function () {
             ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
                 expect(findByTerm).to.have.been.calledWith('00:11:22:33:44:55');
             });
+        });
+
+        it('should run helper script if no lookup record exists', function() {
+            var helperPath = 'some-magic-script';
+            var macAddress = '00:11:22:33:44:55'
+            var findByTerm = this.sandbox.stub(
+                    WaterlineService.lookups, 'findByTerm').resolves();
+            var runExternalHelper = this.sandbox.stub(
+                    lookupService, 'runExternalHelper').resolves();
+            var configuration = helper.injector.get('Services.Configuration');
+            configuration.set('externalLookupHelper', helperPath);
+
+            expect(
+                lookupService.macAddressToNodeId(macAddress)
+            ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
+                expect(findByTerm).to.have.been.calledWith(macAddress);
+                expect(runExternalHelper).to.have.been.calledWith(helperPath, macAddress);
+            });
+        });
+
+        it('use helper script output to fill in associations', function() {
+            var helperPath = 'some-magic-script';
+            var macAddress = lookup[0].macAddress;
+            var ipAddress = lookup[0].ipAddress;
+            var findByTerm = this.sandbox.stub(WaterlineService.lookups, 'findByTerm');
+            findByTerm.onCall(0).resolves();
+            findByTerm.onCall(1).resolves(lookup);
+            var setIp = this.sandbox.stub(
+                    WaterlineService.lookups, 'setIp').resolves();
+            var configuration = helper.injector.get('Services.Configuration');
+            configuration.set('externalLookupHelper', helperPath);
+            lookupService.resetMacRequests();
+
+            var fakeHelper = {
+                run: this.sandbox.stub().resolves({
+                    stdout: macAddress + ' ' + ipAddress + '\n'
+                })
+            };
+            var runExternalHelper = this.sandbox.stub(lookupService, 'runExternalHelper', function () {
+                return this.processHelperResults(fakeHelper);
+            });
+
+            return lookupService.macAddressToNodeId(macAddress).then(function (result) {
+                expect(result).to.equal(lookup[0].node);
+                expect(findByTerm).to.have.been.calledWith(macAddress);
+                expect(runExternalHelper).to.have.been.calledWith(helperPath, macAddress);
+                expect(setIp).to.have.been.calledWith(ipAddress, macAddress);
+                expect(findByTerm).to.have.been.calledWith(macAddress);
+            });
+        });
+
+        it('should only run the helper once per missing MAC address', function () {
+            var helperPath = 'some-magic-script';
+            var macAddress = lookup[0].macAddress;
+
+            ChildProcess = helper.injector.get('ChildProcess');
+            this.sandbox.stub(ChildProcess.prototype, '_parseCommandPath').returns(helperPath);
+
+            var processHelperResults = this.sandbox.stub(lookupService, 'processHelperResults').resolves();
+
+            var configuration = helper.injector.get('Services.Configuration');
+            configuration.set('externalLookupHelper', helperPath);
+            lookupService.resetMacRequests();
+
+            var runs = [];
+            for (var i = 0; i < 5; i += 1) {
+                runs.push(lookupService.runExternalHelper(helperPath, macAddress));
+            }
+
+            expect(processHelperResults).to.have.been.calledOnce;
+
+            return Promise.all(runs);
         });
 
         it('should reject with NotFoundError if no node association exists', function() {
@@ -215,7 +295,7 @@ describe('Lookup Service', function () {
             });
         });
     });
-    
+
     describe('macAddressToIp', function () {
         beforeEach(function () {
           lookupService.resetNodeIdCache();
@@ -230,7 +310,7 @@ describe('Lookup Service', function () {
                 expect(findByTerm).to.have.been.calledWith(ipAddress);
             });
         });
-        
+
         it('should reject with NotFoundError on findOneByTerm', function() {
             var ipAddress = lookup[0].ipAddress;
             this.sandbox.stub(WaterlineService.lookups, 'findByTerm').resolves({ipAddress:null});
@@ -392,11 +472,11 @@ describe('Lookup Service', function () {
 
             this.sandbox.stub(lookupService, 'ipAddressToMacAddress').resolves('00:11:22:33:44:55');
 
-            var req = { 
+            var req = {
                     ip: '10.1.1.1',
                     get: function() {
                         return undefined;
-                    } 
+                    }
                 },
                 next = function () {
                     expect(req.macaddress).to.equal('00:11:22:33:44:55');
@@ -412,12 +492,12 @@ describe('Lookup Service', function () {
 
             this.sandbox.stub(lookupService, 'ipAddressToMacAddress').resolves('00:11:22:33:44:55');
 
-            var req = { 
+            var req = {
                     _remoteAddress: '10.1.1.1',
                     get: function() {
                         return undefined;
                     }
-                }, 
+                },
                 next = function () {
                     expect(req.macaddress).to.equal('00:11:22:33:44:55');
                     expect(req.macAddress).to.equal('00:11:22:33:44:55');
@@ -432,7 +512,7 @@ describe('Lookup Service', function () {
 
             this.sandbox.stub(lookupService, 'ipAddressToMacAddress').resolves('00:11:22:33:44:55');
 
-            var req = { 
+            var req = {
                     connection: { remoteAddress: '10.1.1.1' },
                     get: function() {
                         return undefined;
@@ -521,8 +601,8 @@ describe('Lookup Service', function () {
             expect(WaterlineService.lookups.setIp).to.have.been.calledOnce;
             expect(WaterlineService.lookups.setIp).to.have.been.calledWith('ip', 'mac');
         });
-    });   
-    
+    });
+
     it('validateArpCache', function() {
         this.sandbox.stub(WaterlineService.lookups, 'setIp').resolves();
         this.arpCache.getCurrent.resolves([{mac:'mac', ip:'ip'}]);
@@ -531,5 +611,5 @@ describe('Lookup Service', function () {
             expect(WaterlineService.lookups.setIp).to.have.been.calledOnce;
             expect(WaterlineService.lookups.setIp).to.have.been.calledWith('ip', 'mac');
         });
-    });   
+    });
 });

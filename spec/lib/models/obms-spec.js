@@ -39,7 +39,6 @@ describe('Models.Obms', function () {
     before(function() {
         encryption = helper.injector.get('Services.Encryption');
         Constants = helper.injector.get('Constants');
-        return obms.setIndexes();
     });
 
     beforeEach(function() {

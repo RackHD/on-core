@@ -25,14 +25,8 @@ describe('Heartbeat', function () {
             })
         }
     };
-    var messenger = {
-        start: sandbox.stub().returns(
-            Promise.resolve()
-        ),
-        stop: sandbox.stub().returns(
-            Promise.resolve()
-        ),
-        publish: sandbox.stub().returns(
+    var events = {
+        publishHeartbeatEvent: sandbox.stub().returns(
             Promise.resolve()
         )
     };
@@ -43,9 +37,9 @@ describe('Heartbeat', function () {
     
     helper.before(function() {
         return [ 
-            helper.di.simpleWrapper(messenger, 'Services.Messenger'),
+            helper.di.simpleWrapper(events, 'Protocol.Events'),
             helper.di.simpleWrapper(rx, 'Rx')
-        ]
+        ];
     });
 
     before(function () {
@@ -77,24 +71,24 @@ describe('Heartbeat', function () {
                 return heartbeat.stop().then(function() {
                     expect(heartbeat.subscription.dispose).to.have.been.calledOnce;
                     expect(heartbeat.running).to.be.false;
-                })
+                });
             });
         });
         
         it('should send heartbeat message', function() {
             return heartbeat.sendHeartbeat()
             .then(function() {
-                expect(messenger.publish).to.be.calledOnce;
+                expect(events.publishHeartbeatEvent).to.be.calledOnce;
             });
         });
-        
+
         it('should resolve hostname', function() {
             dns.lookupServiceAsync.resolves(undefined);
             return heartbeat.getFqdn().then(function(hostname) {
                 expect(hostname).to.equal(constants.Host);
             });
         });
-        
+
         it('should resolve FQDN', function() {
             var testFqdn = constants.Host + '.example.com';
             dns.lookupServiceAsync.resolves([testFqdn]);
