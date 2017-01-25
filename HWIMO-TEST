@@ -6,6 +6,7 @@ set -e
 set -x
 
 rm -rf node_modules
+
 npm install
 
 # Checks the code against the jshint options
