@@ -157,16 +157,19 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
     describe('Graph progress update', function() {
         var graphId = uuid.v4(),
             taskId = uuid.v4(),
+            nodeId = uuid.v4(),
             _progressData,
             progressData,
             graphObject = {
             definition: {friendlyName: 'Test graph'},
-            tasks: {}
+            tasks: {},
+            node: nodeId
         };
 
         beforeEach(function() {
             progressData = {
                 graphId: graphId,
+                nodeId: nodeId,
                 graphName: "Test graph",
                 progress: {
                     description: "task completed",
@@ -187,10 +190,6 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
             graphObject.tasks[taskId] = {friendlyName: "test task"};
         });
         
-        afterEach(function(){
-            waterline.graphobjects.findOne.reset();
-        });
-
         it('should update graph progress normally', function(){
             progressData.taskProgress.progress.percentage = 'any';
             _progressData.progress.percentage = '50%';
@@ -202,51 +201,54 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
             return amqp.publishProgressEvent(graphId, progressData)
             .then(function(){
                 expect(eventsProtocol.publishProgressEvent).to.be.calledOnce;
-                expect(eventsProtocol.publishProgressEvent).to.be.calledWith(_progressData);
+                expect(eventsProtocol.publishProgressEvent)
+                    .to.be.calledWith(graphId, _progressData);
                 expect(waterline.graphobjects.findOne).to.be.calledOnce;
                 expect(waterline.graphobjects.findOne).to.be.calledWith({instanceId: graphId});
             });
         });
 
         it('should update graph progress and calculate percentage number', function(){
+            waterline.graphobjects.findOne.reset();
             _progressData = _.omit(_progressData, ['graphName', 'graphId']);
-            _progressData.progress.maximum = '3';
-            _progressData.progress.value = '2';
+            _progressData.progress.maximum = 3;
+            _progressData.progress.value = 2;
             delete _progressData.taskProgress.taskId;
-            delete _progressData.taskProgress.taskName;
+            delete _progressData.nodeId;
             progressData.progress.maximum = 3;
             progressData.progress.percentage = '67%';
             progressData.taskProgress.progress.percentage = '100%';
             delete progressData.taskProgress.taskId;
-            delete progressData.taskProgress.taskName;
             waterline.graphobjects.findOne.resolves(graphObject);
             
             return amqp.publishProgressEvent(graphId, _progressData)
             .then(function(){
                 expect(eventsProtocol.publishProgressEvent).to.be.calledOnce;
-                expect(eventsProtocol.publishProgressEvent).to.be.calledWith(progressData);
+                expect(eventsProtocol.publishProgressEvent).to.be.calledWith(graphId, progressData);
                 expect(waterline.graphobjects.findOne).to.be.calledOnce;
                 expect(waterline.graphobjects.findOne).to.be.calledWith({instanceId: graphId});
             });
         });
 
-        it('should graph progress with percentage Not Available', function(){
+        it('should graph update progress with percentage Not Available', function(){
+            waterline.graphobjects.findOne.reset();
             _progressData.progress.maximum = null;
             delete _progressData.taskProgress.taskName;
             progressData.progress.maximum = null;
-            progressData.progress.percentage = 'Not Available';
+            progressData.progress.percentage = 'Not available';
             progressData.taskProgress.progress.percentage = '100%';
             waterline.graphobjects.findOne.resolves(graphObject);
             return amqp.publishProgressEvent(graphId, _progressData)
             .then(function(){
                 expect(eventsProtocol.publishProgressEvent).to.be.calledOnce;
-                expect(eventsProtocol.publishProgressEvent).to.be.calledWith(progressData);
+                expect(eventsProtocol.publishProgressEvent).to.be.calledWith(graphId, progressData);
                 expect(waterline.graphobjects.findOne).to.be.calledOnce;
                 expect(waterline.graphobjects.findOne).to.be.calledWith({instanceId: graphId});
             });
         });
 
-        it('should graph progress without taskProgress', function(){
+        it('should graph update progress without taskProgress', function(){
+            waterline.graphobjects.findOne.reset();
             delete _progressData.taskProgress;
             delete progressData.taskProgress;
             progressData.progress.percentage = '50%';
@@ -254,22 +256,23 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
             return amqp.publishProgressEvent(graphId, _progressData)
             .then(function(){
                 expect(eventsProtocol.publishProgressEvent).to.be.calledOnce;
-                expect(eventsProtocol.publishProgressEvent).to.be.calledWith(progressData);
+                expect(eventsProtocol.publishProgressEvent).to.be.calledWith(graphId, progressData);
             });
         });
 
-        it('should graph progress without taskName and graphName', function(){
+        it('should graph update progress without taskName and graphName', function(){
+            waterline.graphobjects.findOne.reset();
             delete _progressData.taskProgress.taskName;
             delete _progressData.graphName;
-            delete progressData.taskProgress.taskName;
-            delete progressData.graphName;
+            progressData.graphName = 'Not available';
             progressData.progress.percentage = '50%';
+            progressData.taskProgress.taskName = 'Not available';
             progressData.taskProgress.progress.percentage = '100%';
             waterline.graphobjects.findOne.resolves();
             return amqp.publishProgressEvent(graphId, _progressData)
             .then(function(){
                 expect(eventsProtocol.publishProgressEvent).to.be.calledOnce;
-                expect(eventsProtocol.publishProgressEvent).to.be.calledWith(progressData);
+                expect(eventsProtocol.publishProgressEvent).to.be.calledWith(graphId, progressData);
             });
         });
     });

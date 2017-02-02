@@ -106,17 +106,17 @@ describe('Models.Task', function () {
             });
         });
 
-        describe('schemaRef', function () {
+        describe('optionsSchema', function () {
             before(function () {
-                this.subject = this.attributes.schemaRef;
+                this.subject = this.attributes.optionsSchema;
             });
 
             it('should be optional', function () {
                 expect(this.subject.optional).to.not.be.ok;
             });
 
-            it('should be string', function () {
-                expect(this.subject.type).to.equal('string');
+            it('should be json', function () {
+                expect(this.subject.type).to.equal('json');
             });
         });
     });
