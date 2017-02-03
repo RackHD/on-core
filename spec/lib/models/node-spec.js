@@ -94,21 +94,6 @@ describe('Models.Node', function () {
             });
         });
 
-        describe('snmpSettings', function() {
-            before(function (){
-                this.subject = this.attributes.snmpSettings;
-            });
-
-            it('should be json', function () {
-                expect(this.subject.type).to.equal('json');
-                expect(this.subject.json).to.equal(true);
-            });
-
-            it('should not be required', function () {
-                expect(this.subject.required).to.equal(false);
-            });
-        });
-
         describe('bootSettings', function() {
             before(function (){
                 this.subject = this.attributes.bootSettings;
@@ -269,8 +254,6 @@ describe('Models.Node', function () {
                     expect( validator.isMongoId(obj.id) ).is.true;
                     expect(obj.obmSettings).to.be.an('array').with.length(0);
                     expect(obj.bootSettings).to.be.an('object');
-                    expect(obj.snmpSettings).to.be.an('object');
-                    expect(obj.sshSettings).to.be.an('object');
                 });
             });
         });
