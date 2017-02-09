@@ -7,7 +7,8 @@ describe("Event protocol subscribers", function () {
     var testSubscription,
         testMessage,
         messenger,
-        events;
+        events,
+        hook;
 
     var clock;
     var createTime;
@@ -17,6 +18,7 @@ describe("Event protocol subscribers", function () {
     before(function () {
         events = helper.injector.get('Protocol.Events');
         messenger = helper.injector.get('Services.Messenger');
+        hook = helper.injector.get('Services.Hook');
         var Message = helper.injector.get('Message');
         var Subscription = helper.injector.get('Subscription');
 
@@ -25,13 +27,15 @@ describe("Event protocol subscribers", function () {
         sinon.stub(testMessage);
         sinon.stub(messenger, 'request');
         sinon.stub(messenger, 'publish');
+        sinon.stub(hook, 'publish').resolves();
     });
 
     beforeEach(function() {
         messenger.request.reset();
         messenger.publish.reset();
-	clock = sinon.useFakeTimers(new Date(2011,9,1).getTime());
-	createTime = new Date();
+        hook.publish.reset();
+	    clock = sinon.useFakeTimers(new Date(2011,9,1).getTime());
+	    createTime = new Date();
     });
 
     afterEach(function() {
@@ -41,6 +45,7 @@ describe("Event protocol subscribers", function () {
     after(function() {
         messenger.request.restore();
         messenger.publish.restore();
+        hook.publish.restore();
     });
 
     helper.after();
@@ -280,7 +285,7 @@ describe("Event protocol subscribers", function () {
                 expect(subscription).to.be.ok;
                 return events.publishGraphStarted(graphId, data, nodeId);
             }).then(function (subscription) {
-                expect(subscription).to.not.be.ok;
+                expect(subscription[0]).to.not.be.ok;
                 return events.publishGraphStarted(graphId, undefined, nodeId);
             });
         });
@@ -402,6 +407,17 @@ describe("Event protocol subscribers", function () {
                         action: testAction,
                         nodeId: testNodeId,
                         nodeType: 'compute'
+                    });
+                expect(hook.publish).to.have.been.calledOnce;
+                expect(hook.publish).to.have.been.calledWith({
+                        type: 'node',
+                        action: testAction,
+                        nodeId: testNodeId,
+                        typeId: testNodeId,
+                        severity: "information",
+                        data: { nodeType: 'compute'},
+                        version:'1.0',
+                        createdAt: createTime
                     });
             });
         });
