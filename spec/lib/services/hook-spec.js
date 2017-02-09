@@ -11,9 +11,9 @@ describe('Hook', function () {
         {url: 'https://172.1.1.0:8080/test', id: 'id2'}
     ];
     var payload = {"hello": "world", "routingKey": "test"};
-    
+
     helper.before();
-    
+
     before("Before hookService  test", function(){
         helper.setupInjector([
             helper.require('/lib/services/hook'),
