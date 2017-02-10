@@ -13,7 +13,7 @@ describe('Hook', function () {
     var payload = {"hello": "world", "routingKey": "test"};
 
     helper.before();
-
+    
     before("Before hookService  test", function(){
         helper.setupInjector([
             helper.require('/lib/services/hook'),
@@ -95,6 +95,33 @@ describe('Hook', function () {
         return hookService .publish(payload)
         .then(function(){
             expect(hookService ._publish).to.have.not.been.called;
+        });
+    });
+    
+    it('should post data to hook url only after passed filter', function (done) {
+        var _hooks = _.cloneDeep(hooks);
+        var scope = nock('https://172.1.1.0:8080')
+            .post('/test')
+            .reply(201, 'OK');
+        nock('http://172.1.1.1:8080')
+            .filteringRequestBody(function(body){
+                if (!_.isEqual(payload, JSON.parse(body))) {
+                    done(new Error('body is not matched'));
+                }
+            })
+            .post('/test')
+            .reply(201, 'OK');
+        _hooks[0].filters = [{hello: "world|anything"}, {routingKey: "anything"}];
+        _hooks[1].filters = [
+            {hello: "world", routingKey: "anything"}, 
+            {routingKey: "[^(anything|test)]"}
+        ];
+        findStub.withArgs({}).resolves(_hooks);
+        return hookService.publish(payload)
+        .then(function(){
+            expect(hookService._publish).to.have.been.calledTwice;
+            expect(scope.isDone()).to.equal(false);
+            done();
         });
     });
 
