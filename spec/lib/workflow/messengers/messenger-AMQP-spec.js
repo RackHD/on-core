@@ -161,10 +161,24 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
             _progressData,
             progressData,
             graphObject = {
-            definition: {friendlyName: 'Test graph'},
-            tasks: {},
-            node: nodeId
-        };
+                definition: {
+                    friendlyName: 'Test graph'
+                },
+                tasks: {},
+                node: nodeId
+            };
+            graphObject.tasks[uuid.v4()] = {
+                friendlyName: "test task 2",
+                state: "succeeded"
+            };
+            graphObject.tasks[uuid.v4()] = {
+                friendlyName: "test task 3",
+                state: "pending"
+            };
+            graphObject.tasks[uuid.v4()] = {
+                friendlyName: "test task 4",
+                state: "pending"
+            };
 
         beforeEach(function() {
             progressData = {
@@ -187,9 +201,13 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
                 }
             };
             _progressData = _.cloneDeep(progressData);
-            graphObject.tasks[taskId] = {friendlyName: "test task"};
+            graphObject.tasks[taskId] = {
+                friendlyName: "test task",
+                state: "succeeded"
+            };
+            graphObject._status = "running";
         });
-        
+
         it('should update graph progress normally', function(){
             progressData.taskProgress.progress.percentage = 'any';
             _progressData.progress.percentage = '50%';
@@ -208,19 +226,22 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
             });
         });
 
-        it('should update graph progress and calculate percentage number', function(){
+        it('should update graph progress and calculate percentage number' +
+            ' when graph succeeds', function(){
             waterline.graphobjects.findOne.reset();
             _progressData = _.omit(_progressData, ['graphName', 'graphId']);
-            _progressData.progress.maximum = 3;
-            _progressData.progress.value = 2;
+            _progressData.progress.maximum = null;
+            _progressData.progress.value = null;
             delete _progressData.taskProgress.taskId;
             delete _progressData.nodeId;
-            progressData.progress.maximum = 3;
-            progressData.progress.percentage = '67%';
+            progressData.progress.maximum = 4;
+            progressData.progress.value = 4;
+            progressData.progress.percentage = '100%';
             progressData.taskProgress.progress.percentage = '100%';
             delete progressData.taskProgress.taskId;
+            graphObject._status = "succeeded";
             waterline.graphobjects.findOne.resolves(graphObject);
-            
+
             return amqp.publishProgressEvent(graphId, _progressData)
             .then(function(){
                 expect(eventsProtocol.publishProgressEvent).to.be.calledOnce;
@@ -230,14 +251,17 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
             });
         });
 
-        it('should graph update progress with percentage Not Available', function(){
+        it('should graph update progress with percentage Not Available' +
+           ' if no tasks in the graph', function(){
             waterline.graphobjects.findOne.reset();
             _progressData.progress.maximum = null;
-            delete _progressData.taskProgress.taskName;
+            _progressData.progress.value = null;
+            delete _progressData.taskProgress;
             progressData.progress.maximum = null;
+            progressData.progress.value = null;
             progressData.progress.percentage = 'Not available';
-            progressData.taskProgress.progress.percentage = '100%';
-            waterline.graphobjects.findOne.resolves(graphObject);
+            delete progressData.taskProgress;
+            waterline.graphobjects.findOne.resolves({});
             return amqp.publishProgressEvent(graphId, _progressData)
             .then(function(){
                 expect(eventsProtocol.publishProgressEvent).to.be.calledOnce;
