@@ -599,9 +599,9 @@ describe('Task Graph mongo store interface', function () {
         });
     });
 
-    it('updates dependent tasks under either key', function() {
+    it('updates dependent tasks under anyOf key', function() {
 
-        var waterlineUnderEither = {
+        var waterlineUnderAnyOf = {
             taskdependencies:{
                 find: sinon.stub().returns([]).resolves(),
                 updateMongo: sinon.stub()
@@ -610,7 +610,7 @@ describe('Task Graph mongo store interface', function () {
 
         helper.setupInjector([
             helper.require('/lib/workflow/stores/mongo'),
-            helper.di.simpleWrapper(waterlineUnderEither, 'Services.Waterline')
+            helper.di.simpleWrapper(waterlineUnderAnyOf, 'Services.Waterline')
         ]);
 
         mongo = helper.injector.get('TaskGraph.Stores.Mongo');
@@ -629,18 +629,18 @@ describe('Task Graph mongo store interface', function () {
                 reachable: true
             };
 
-            query['dependencies.either.' + data.taskId] = {
+            query['dependencies.anyOf.' + data.taskId] = {
                 $in: [data.state, Constants.Task.States.Finished]
             };
 
-            var updateEither = {
+            var updateAny = {
                 $unset:{}
             };
-            updateEither.$unset['dependencies.either'] = '';
+            updateAny.$unset['dependencies.anyOf'] = '';
 
             expect(waterline.taskdependencies.updateMongo).to.have.been.calledOnce;
             expect(waterline.taskdependencies.updateMongo).to.have.been.calledWith(
-                query, updateEither, {multi: true});
+                query, updateAny, {multi: true});
         });
     });
 
@@ -663,7 +663,7 @@ describe('Task Graph mongo store interface', function () {
         query.$or.push(dependenciesItr);
         
         delete dependenciesItr['dependencies.' + data.taskId];
-        dependenciesItr['dependencies.either.' + data.taskId] = {
+        dependenciesItr['dependencies.anyOf.' + data.taskId] = {
             $in: _.difference(Constants.Task.FinishedStates, [data.state])
         };
         query.$or.push(dependenciesItr);
