@@ -663,11 +663,7 @@ describe('Task Graph mongo store interface', function () {
         query.$or.push(dependenciesItr);
         
         delete dependenciesItr['dependencies.' + data.taskId];
-<<<<<<< HEAD
         dependenciesItr['dependencies.anyOf.' + data.taskId] = {
-=======
-        dependenciesItr['dependencies.either.' + data.taskId] = {
->>>>>>> 5fa4cb10050ae150a13431ed4b86be47d37da0f7
             $in: _.difference(Constants.Task.FinishedStates, [data.state])
         };
         query.$or.push(dependenciesItr);
