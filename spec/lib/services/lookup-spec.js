@@ -58,9 +58,9 @@ describe('Lookup Service', function () {
 
         // Mock out the waterline collection methods and initialize them
         var config = {
-                adapters: { mongo: {} },
-                connections: { mongo: { adapter: 'mongo', url: '' }}
-            };
+            adapters: { mongo: {} },
+            connections: { mongo: { adapter: 'mongo', url: '' }}
+        };
         WaterlineService.start = sinon.spy(function() {
             var Waterline = helper.injector.get('Waterline');
             WaterlineService.service = new Waterline();
@@ -130,18 +130,18 @@ describe('Lookup Service', function () {
 
     describe('macAddressToNodeId', function () {
         beforeEach(function () {
-          lookupService.resetNodeIdCache();
-          lookupService.resetMacRequests();
+            lookupService.resetNodeIdCache();
+            lookupService.resetMacRequests();
         });
 
         afterEach(function () {
-          var configuration = helper.injector.get('Services.Configuration');
-          configuration.set('externalLookupHelper', null);
+            var configuration = helper.injector.get('Services.Configuration');
+            configuration.set('externalLookupHelper', null);
         });
 
         it('should call findByTerm with macAddress', function() {
             var findByTerm = this.sandbox.stub(
-                    WaterlineService.lookups, 'findByTerm').resolves(lookup);
+                WaterlineService.lookups, 'findByTerm').resolves(lookup);
 
             return lookupService.macAddressToNodeId('127.0.0.1').then(function (result) {
                 expect(result).to.equal(lookup[0].node);
@@ -151,31 +151,31 @@ describe('Lookup Service', function () {
 
         it('should reject with NotFoundError if no lookup record exists', function() {
             var findByTerm = this.sandbox.stub(
-                    WaterlineService.lookups, 'findByTerm').resolves();
+                WaterlineService.lookups, 'findByTerm').resolves();
 
             return expect(
                 lookupService.macAddressToNodeId('00:11:22:33:44:55')
             ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
-                expect(findByTerm).to.have.been.calledWith('00:11:22:33:44:55');
-            });
+                    expect(findByTerm).to.have.been.calledWith('00:11:22:33:44:55');
+                });
         });
 
         it('should run helper script if no lookup record exists', function() {
             var helperPath = 'some-magic-script';
             var macAddress = '00:11:22:33:44:55'
             var findByTerm = this.sandbox.stub(
-                    WaterlineService.lookups, 'findByTerm').resolves();
+                WaterlineService.lookups, 'findByTerm').resolves();
             var runExternalHelper = this.sandbox.stub(
-                    lookupService, 'runExternalHelper').resolves();
+                lookupService, 'runExternalHelper').resolves();
             var configuration = helper.injector.get('Services.Configuration');
             configuration.set('externalLookupHelper', helperPath);
 
             expect(
                 lookupService.macAddressToNodeId(macAddress)
             ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
-                expect(findByTerm).to.have.been.calledWith(macAddress);
-                expect(runExternalHelper).to.have.been.calledWith(helperPath, macAddress);
-            });
+                    expect(findByTerm).to.have.been.calledWith(macAddress);
+                    expect(runExternalHelper).to.have.been.calledWith(helperPath, macAddress);
+                });
         });
 
         it('use helper script output to fill in associations', function() {
@@ -186,7 +186,7 @@ describe('Lookup Service', function () {
             findByTerm.onCall(0).resolves();
             findByTerm.onCall(1).resolves(lookup);
             var setIp = this.sandbox.stub(
-                    WaterlineService.lookups, 'setIp').resolves();
+                WaterlineService.lookups, 'setIp').resolves();
             var configuration = helper.injector.get('Services.Configuration');
             configuration.set('externalLookupHelper', helperPath);
             lookupService.resetMacRequests();
@@ -234,13 +234,13 @@ describe('Lookup Service', function () {
 
         it('should reject with NotFoundError if no node association exists', function() {
             var findByTerm = this.sandbox.stub(
-                    WaterlineService.lookups, 'findByTerm').resolves(noNode);
+                WaterlineService.lookups, 'findByTerm').resolves(noNode);
 
             return expect(
                 lookupService.macAddressToNodeId('00:11:22:33:44:55')
             ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
-                expect(findByTerm).to.have.been.calledWith('00:11:22:33:44:55');
-            });
+                    expect(findByTerm).to.have.been.calledWith('00:11:22:33:44:55');
+                });
         });
     });
 
@@ -260,13 +260,13 @@ describe('Lookup Service', function () {
 
         it('should reject with NotFoundError if no lookup record exists', function() {
             var findByTerm = this.sandbox.stub(
-                    WaterlineService.lookups, 'findByTerm').resolves();
+                WaterlineService.lookups, 'findByTerm').resolves();
 
             return expect(
                 lookupService.macAddressToNode('00:11:22:33:44:55')
             ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
-                expect(findByTerm).to.have.been.calledWith('00:11:22:33:44:55');
-            });
+                    expect(findByTerm).to.have.been.calledWith('00:11:22:33:44:55');
+                });
         });
 
         it('should reject with NotFoundError if no node association exists', function() {
@@ -276,8 +276,8 @@ describe('Lookup Service', function () {
             return expect(
                 lookupService.macAddressToNode('00:11:22:33:44:55')
             ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
-                expect(findByTerm).to.have.been.calledWith('00:11:22:33:44:55');
-            });
+                    expect(findByTerm).to.have.been.calledWith('00:11:22:33:44:55');
+                });
         });
 
         it('should reject with NotFoundError if no node record exists', function() {
@@ -290,15 +290,15 @@ describe('Lookup Service', function () {
             return expect(
                 lookupService.macAddressToNode('00:11:22:33:44:55')
             ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
-                expect(findByTerm).to.have.been.calledWith('00:11:22:33:44:55');
-                expect(needOneById).to.have.been.calledWith('node');
-            });
+                    expect(findByTerm).to.have.been.calledWith('00:11:22:33:44:55');
+                    expect(needOneById).to.have.been.calledWith('node');
+                });
         });
     });
 
     describe('macAddressToIp', function () {
         beforeEach(function () {
-          lookupService.resetNodeIdCache();
+            lookupService.resetNodeIdCache();
         });
 
         it('should call findByTerm with macAddress', function() {
@@ -337,8 +337,8 @@ describe('Lookup Service', function () {
             return expect(
                 lookupService.ipAddressToMacAddress('127.0.0.1')
             ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
-                expect(findByTerm).to.have.been.calledWith('127.0.0.1');
-            });
+                    expect(findByTerm).to.have.been.calledWith('127.0.0.1');
+                });
         });
     });
 
@@ -362,8 +362,8 @@ describe('Lookup Service', function () {
             return expect(
                 lookupService.ipAddressToNode('127.0.0.1')
             ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
-                expect(findByTerm).to.have.been.calledWith('127.0.0.1');
-            });
+                    expect(findByTerm).to.have.been.calledWith('127.0.0.1');
+                });
         });
 
         it('should reject with NotFoundError if no node association exists', function() {
@@ -373,13 +373,13 @@ describe('Lookup Service', function () {
             return expect(
                 lookupService.ipAddressToNode('127.0.0.1')
             ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
-                expect(findByTerm).to.have.been.calledWith('127.0.0.1');
-            });
+                    expect(findByTerm).to.have.been.calledWith('127.0.0.1');
+                });
         });
 
         it('should reject with NotFoundError if no node record exists', function() {
             var findByTerm = this.sandbox.stub(
-                WaterlineService.lookups, 'findByTerm').resolves(lookup),
+                    WaterlineService.lookups, 'findByTerm').resolves(lookup),
                 needOneById = this.sandbox.stub(WaterlineService.nodes, 'needOneById').rejects(
                     new Errors.NotFoundError()
                 );
@@ -387,15 +387,15 @@ describe('Lookup Service', function () {
             return expect(
                 lookupService.ipAddressToNode('127.0.0.1')
             ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
-                expect(findByTerm).to.have.been.calledWith('127.0.0.1');
-                expect(needOneById).to.have.been.calledWith('node');
-            });
+                    expect(findByTerm).to.have.been.calledWith('127.0.0.1');
+                    expect(needOneById).to.have.been.calledWith('node');
+                });
         });
     });
 
     describe('ipAddressToNodeId', function () {
         beforeEach(function () {
-          lookupService.resetNodeIdCache();
+            lookupService.resetNodeIdCache();
         });
 
         it('should call findByTerm with ipAddress', function() {
@@ -414,8 +414,8 @@ describe('Lookup Service', function () {
             return expect(
                 lookupService.ipAddressToNodeId('127.0.0.1')
             ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
-                expect(findByTerm).to.have.been.calledWith('127.0.0.1');
-            });
+                    expect(findByTerm).to.have.been.calledWith('127.0.0.1');
+                });
         });
 
         it('should reject with NotFoundError if no node association exists', function() {
@@ -425,14 +425,14 @@ describe('Lookup Service', function () {
             return expect(
                 lookupService.ipAddressToNodeId('127.0.0.1')
             ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
-                expect(findByTerm).to.have.been.calledWith('127.0.0.1');
-            });
+                    expect(findByTerm).to.have.been.calledWith('127.0.0.1');
+                });
         });
     });
 
-   describe('nodeIdToProxy', function () {
+    describe('nodeIdToProxy', function () {
         beforeEach(function () {
-          lookupService.resetNodeIdCache();
+            lookupService.resetNodeIdCache();
         });
 
         it('should call findByTerm with nodeId', function() {
@@ -451,8 +451,8 @@ describe('Lookup Service', function () {
             return expect(
                 lookupService.nodeIdToProxy('node')
             ).to.be.rejectedWith(Errors.NotFoundError).then(function () {
-                expect(findByTerm).to.have.been.calledWith('node');
-            });
+                    expect(findByTerm).to.have.been.calledWith('node');
+                });
         });
 
         it('should return undefined if no proxy association exists', function() {
@@ -597,19 +597,40 @@ describe('Lookup Service', function () {
     it('setIpAddress', function() {
         this.sandbox.stub(WaterlineService.lookups, 'setIp').resolves();
         return lookupService.setIpAddress('ip', 'mac')
-        .then(function() {
-            expect(WaterlineService.lookups.setIp).to.have.been.calledOnce;
-            expect(WaterlineService.lookups.setIp).to.have.been.calledWith('ip', 'mac');
-        });
+            .then(function() {
+                expect(WaterlineService.lookups.setIp).to.have.been.calledOnce;
+                expect(WaterlineService.lookups.setIp).to.have.been.calledWith('ip', 'mac');
+            });
     });
 
     it('validateArpCache', function() {
         this.sandbox.stub(WaterlineService.lookups, 'setIp').resolves();
         this.arpCache.getCurrent.resolves([{mac:'mac', ip:'ip'}]);
         return lookupService.validateArpCache()
-        .then(function() {
-            expect(WaterlineService.lookups.setIp).to.have.been.calledOnce;
-            expect(WaterlineService.lookups.setIp).to.have.been.calledWith('ip', 'mac');
-        });
+            .then(function() {
+                expect(WaterlineService.lookups.setIp).to.have.been.calledOnce;
+                expect(WaterlineService.lookups.setIp).to.have.been.calledWith('ip', 'mac');
+            });
     });
+
+    it('should return an array with all Ip Mac adress pair', function() {
+        this.sandbox.stub(WaterlineService.lookups, 'findByTerm').resolves([
+            { ipAddress: '1.1.1.1', macAddress: "aa:bb:cc:dd" },
+            { macAddress: "ee:ff:gg:hh" },
+            { macAddress: "ii:jj:kk:hh"}
+        ]);
+
+        return lookupService.findIpMacAddresses(
+            '507f1f77bcf86cd799439011'
+        ).should.eventually.deep.equal([
+                { ipAddress: '1.1.1.1', macAddress: "aa:bb:cc:dd" },
+                { ipAddress:undefined, macAddress: "ee:ff:gg:hh" },
+                { ipAddress:undefined, macAddress: "ii:jj:kk:hh"}]);
+    });
+
 });
+
+
+
+
+
