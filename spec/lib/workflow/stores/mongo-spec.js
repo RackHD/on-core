@@ -323,6 +323,33 @@ describe('Task Graph mongo store interface', function () {
         });
     });
 
+    it('getActiveGraphById', function() {
+        var graphId = uuid.v4();
+        waterline.graphobjects.findOne.resolves();
+        return mongo.getActiveGraphById(graphId)
+        .then(function() {
+            expect(waterline.graphobjects.findOne).to.have.been.calledOnce;
+            expect(waterline.graphobjects.findOne).to.have.been.calledWith(
+                {
+                    instanceId: graphId,
+                    _status: {$in: Constants.Task.ActiveStates}
+                }
+            );
+        });
+    });
+
+    it('getGraphById', function() {
+        var graphId = uuid.v4();
+        waterline.graphobjects.findOne.resolves();
+        return mongo.getGraphById(graphId)
+        .then(function() {
+            expect(waterline.graphobjects.findOne).to.have.been.calledOnce;
+            expect(waterline.graphobjects.findOne).to.have.been.calledWith(
+                { instanceId: graphId}
+            );
+        });
+    });
+
     it('heartbeatTasksForRunner', function() {
         var leaseId = uuid.v4();
 
