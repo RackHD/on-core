@@ -162,7 +162,7 @@ describe('Lookup Service', function () {
 
         it('should run helper script if no lookup record exists', function() {
             var helperPath = 'some-magic-script';
-            var macAddress = '00:11:22:33:44:55'
+            var macAddress = '00:11:22:33:44:55';
             var findByTerm = this.sandbox.stub(
                 WaterlineService.lookups, 'findByTerm').resolves();
             var runExternalHelper = this.sandbox.stub(
@@ -613,8 +613,8 @@ describe('Lookup Service', function () {
             });
     });
 
-    it('should return an array with all Ip Mac adress pair', function() {
-        this.sandbox.stub(WaterlineService.lookups, 'findByTerm').resolves([
+    it('should return an array with all Ip Mac address pair', function() {
+        this.sandbox.stub(WaterlineService.lookups, 'find').resolves([
             { ipAddress: '1.1.1.1', macAddress: "aa:bb:cc:dd" },
             { macAddress: "ee:ff:gg:hh" },
             { macAddress: "ii:jj:kk:hh"}
@@ -624,8 +624,8 @@ describe('Lookup Service', function () {
             '507f1f77bcf86cd799439011'
         ).should.eventually.deep.equal([
                 { ipAddress: '1.1.1.1', macAddress: "aa:bb:cc:dd" },
-                { ipAddress:undefined, macAddress: "ee:ff:gg:hh" },
-                { ipAddress:undefined, macAddress: "ii:jj:kk:hh"}]);
+                { macAddress: "ee:ff:gg:hh" },
+                { macAddress: "ii:jj:kk:hh"}]);
     });
 
 });
