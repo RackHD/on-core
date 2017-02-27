@@ -112,12 +112,28 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
     });
 
     it('should wrap the events protocol publishTaskFinished method', function() {
-        return amqp.publishTaskFinished(
-            'default', 'testtaskid', 'testgraphid', 'succeeded', null, ['failed', 'timeout'])
+        var task = {
+            instanceId: 'testtaskid',
+            state: 'succeeded',
+            context: {
+                graphId: 'testgraphid',
+            },
+            definition: {
+                terminalOnStates: ['failed', 'timeout']
+            },
+            error: 'error message'
+        };
+        return amqp.publishTaskFinished('default', task)
         .then(function() {
             expect(eventsProtocol.publishTaskFinished).to.have.been.calledOnce;
             expect(eventsProtocol.publishTaskFinished).to.have.been.calledWith(
-                'default', 'testtaskid', 'testgraphid', 'succeeded', null, ['failed', 'timeout']
+                'default',
+                'testtaskid',
+                'testgraphid',
+                'succeeded',
+                'error message',
+                {graphId: 'testgraphid' },
+                ['failed', 'timeout']
             );
         });
     });
@@ -152,5 +168,75 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
 
     it('should return a promise from start method', function() {
         return expect(amqp.start()).to.be.fulfilled;
+    });
+
+    it('should wrap the events protocol publishGraphFinished method', function() {
+        eventsProtocol.publishGraphFinished = sinon.stub().resolves();
+        var graph = { instanceId: 'testgraphid', _status: 'succeeded', node: 'nodeId' };
+        return amqp.publishGraphFinished(graph)
+        .then(function() {
+            expect(eventsProtocol.publishGraphFinished).to.have.been.calledOnce;
+            expect(eventsProtocol.publishGraphFinished)
+                .to.have.been.calledWith('testgraphid', 'succeeded', 'nodeId');
+        });
+    });
+
+    describe('publishTaskFinished', function() {
+        var finishedTask;
+        before(function() {
+            finishedTask = {
+                instanceId: 'aTaskId',
+                context: { graphId: 'aGraphId'},
+                state: 'finished',
+                definition: { terminalOnStates: ['succeeded'], friendlyName: 'Test Task' }};
+        });
+
+        it('should wrap the events protocol publishTaskFinished method', function() {
+            eventsProtocol.publishTaskFinished = sinon.stub().resolves();
+            return amqp.publishTaskFinished('default', finishedTask)
+            .then(function() {
+                expect(eventsProtocol.publishTaskFinished).to.have.been.calledOnce;
+                expect(eventsProtocol.publishTaskFinished).to.have.been.calledWith(
+                    'default',
+                    finishedTask.instanceId,
+                    finishedTask.context.graphId,
+                    finishedTask.state,
+                    undefined,
+                    finishedTask.context,
+                    finishedTask.definition.terminalOnStates
+                );
+            });
+        });
+
+        it('should call publishTaskFinished with an error message string', function() {
+            eventsProtocol.publishTaskFinished = sinon.stub().resolves();
+            finishedTask.error = new Error('test error');
+            return amqp.publishTaskFinished('default', finishedTask)
+            .then(function() {
+                expect(eventsProtocol.publishTaskFinished).to.have.been.calledOnce;
+                expect(eventsProtocol.publishTaskFinished.firstCall.args[4])
+                    .to.contain('test error');
+            });
+        });
+
+        it('should call publishTaskFinished with an Rx error stack string', function() {
+            eventsProtocol.publishTaskFinished = sinon.stub().resolves();
+            eventsProtocol.publishProgressEvent = sinon.stub().resolves();
+            var error = new Error('test error');
+            error.stack = error.toString();
+            var finishedTask = {
+                taskId: 'aTaskId',
+                context: { graphId: 'aGraphId'},
+                state: 'finished',
+                error: error,
+                definition: { terminalOnStates: ['succeeded'] }
+            };
+
+            return amqp.publishTaskFinished('default', finishedTask)
+            .then(function() {
+                expect(eventsProtocol.publishTaskFinished).to.have.been.calledOnce;
+                expect(eventsProtocol.publishTaskFinished.firstCall.args[4]).to.equal(error.stack);
+            });
+        });
     });
 });
