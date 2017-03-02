@@ -271,22 +271,22 @@ describe("Event protocol subscribers", function () {
             //NOTE: no matching internal code to listen for these events
             var uuid = helper.injector.get('uuid'),
                 graphId = uuid.v4(),
-                data = { test: 'data' },
+                status = 'testStatus',
                 nodeId = 'abc';
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
-                callback(data,testMessage);
+            messenger.subscribe = sinon.spy(function(a, b, callback) {
+                callback({status: status}, testMessage);
                 return Promise.resolve(testSubscription);
             });
             messenger.publish.resolves();
             return events.subscribeGraphStarted(graphId, function (_data) {
-                expect(_data).to.equal(data);
-                return data;
+                expect(_data).to.equal(status);
+                return status;
             }).then(function (subscription) {
                 expect(subscription).to.be.ok;
-                return events.publishGraphStarted(graphId, data, nodeId);
+                return events.publishGraphStarted(graphId, status, nodeId);
             }).then(function (subscription) {
                 expect(subscription[0]).to.not.be.ok;
-                return events.publishGraphStarted(graphId, undefined, nodeId);
+                return Promise.resolve();
             });
         });
     });

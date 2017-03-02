@@ -35,7 +35,6 @@ describe('GraphProgress', function() {
         taskProgress = {
             value: 1,
             maximum: 4,
-            percentage: '25%',
             description: 'test task description'
         };
         progressData = {
@@ -63,24 +62,15 @@ describe('GraphProgress', function() {
 
     it('should get progress without taskProgress', function() {
         var progress = GraphProgress.create(graph, graphDescription);
-        var progressData = progress.getProgressEventData();
+        var data = progress.getProgressEventData();
         delete progressData.taskProgress;
-        expect(progressData).to.be.equal(progressData);
+        expect(data).to.deep.equal(progressData);
     });
 
     it('should get progress with taskProgress and updated task percentage', function() {
         var progress = GraphProgress.create(graph, graphDescription);
-        delete taskProgress.percentage;
-        progress.updateTaskProgress(taskId, taskProgress, true);
-        var progressData = progress.getProgressEventData();
-        expect(progressData).to.be.equal(progressData);
-    });
-
-    it('should get progress with taskProgress and not updated task percentage', function() {
-        var progress = GraphProgress.create(graph, graphDescription);
-        taskProgress.value = 2;
-        progress.updateTaskProgress(taskId, taskProgress, false);
-        var progressData = progress.getProgressEventData();
-        expect(progressData).to.be.equal(progressData);
+        progress.updateTaskProgress(taskId, taskProgress);
+        var data = progress.getProgressEventData();
+        expect(data).to.deep.equal(progressData);
     });
 });
