@@ -398,16 +398,6 @@ describe("Event protocol subscribers", function () {
                         version:'1.0',
                         createdAt: createTime
                     });
-                /* be compatible with legacy node event format */
-                expect(messenger.publish.secondCall).to.have.been.calledWith(
-                    'on.events',
-                    'event.node',
-                    {
-                        type: 'node',
-                        action: testAction,
-                        nodeId: testNodeId,
-                        nodeType: 'compute'
-                    });
                 expect(hook.publish).to.have.been.calledOnce;
                 expect(hook.publish).to.have.been.calledWith({
                         type: 'node',
@@ -444,17 +434,6 @@ describe("Event protocol subscribers", function () {
                         data: testData,
                         version:'1.0',
                         createdAt: createTime
-                    });
-                /* be compatible with legacy node event format */
-                expect(messenger.publish.secondCall).to.have.been.calledWith(
-                    'on.events',
-                    'event.node',
-                    {
-                        type: 'node',
-                        action: testAction,
-                        nodeId: testNodeId,
-                        nodeType: 'compute',
-                        data: testData
                     });
             });
         });
@@ -601,7 +580,6 @@ describe("Event protocol subscribers", function () {
     describe("publish heartbeat event", function () {
         it("should publish heartbeat event", function () {
             var eventTypeId = 'rackhd.on-tftp';
-            var legacyRoutingKey = eventTypeId;
             var data = {};
 
             var eventData = {
@@ -621,10 +599,6 @@ describe("Event protocol subscribers", function () {
                     'on.events',
                     'heartbeat.updated.information.' + eventTypeId,
                     eventData);
-                expect(messenger.publish.secondCall).to.be.calledWith(
-                    'on.heartbeat',
-                    legacyRoutingKey,
-                    { value: data });
             });
         });
     });

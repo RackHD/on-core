@@ -589,18 +589,6 @@ describe("Task protocol functions", function() {
         });
     });
 
-    describe("publishPollerAlert", function() {
-        //NOTE: no matching internal code to listen for these events
-        it("should publish a poller alert event", function() {
-            var data = { foo: 'bar' },
-                uuid = helper.injector.get('uuid'),
-                testUuid = uuid.v4(),
-                pollerName = 'sdr';
-            messenger.publish.resolves();
-            return task.publishPollerAlertLegacy(testUuid, pollerName, data);
-        });
-    });
-
     describe("requestPollerCache", function() {
         it("should subscribe and receive requestPollerCache results", function() {
             var testWorkitemId = 'somestring',
