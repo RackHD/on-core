@@ -43,53 +43,42 @@ describe('Services.GraphProgress', function() {
         };
     });
 
-    describe('test publishTaskFinished', function() {
+    describe('test publishGraphStarted', function() {
         it('should publish with the events protocol', function() {
-            graph.tasks[taskId].state = 'succeeded';
-
             this.sandbox.stub(eventsProtocol, 'publishProgressEvent').resolves();
-            waterline.graphobjects.findOne = sinon.stub().resolves(graph);
 
-            var taskFriendlyName = 'test task name';
             var progressData = {
                 graphId: graph.instanceId,
                 graphName: graph.name,
-                nodeId: 'nodeId',
+                nodeId: graph.node,
                 progress: {
-                    value: 1,
                     maximum: 1,
-                    percentage: '100%',
-                    description: 'Task "' + taskFriendlyName + '" finished',
-                },
-                taskProgress: {
-                    taskId: task.taskId,
-                    taskName: taskFriendlyName,
-                    progress: {
-                        value: 100,
-                        maximum: 100,
-                        percentage: '100%',
-                        description: 'Task finished'
-                    }
+                    value: 0,
+                    percentage: '0%',
+                    description: 'Graph "' + graph.name + '" ' + 'started'
                 }
             };
 
-            return graphProgressService.publishTaskFinished(task)
+            return graphProgressService.publishGraphStarted(graph)
             .then(function() {
                 expect(eventsProtocol.publishProgressEvent).to.have.been.calledOnce;
                 expect(eventsProtocol.publishProgressEvent)
-                    .to.have.been.calledWith(task.graphId, progressData);
+                    .to.have.been.calledWith(graph.instanceId, progressData);
             });
         });
 
         it('should swallow the Errors', function() {
-            this.sandbox.stub(eventsProtocol, 'publishProgressEvent').resolves();
-            var error = new Error('graphobjects findOne error');
-            waterline.graphobjects.findOne = sinon.stub().rejects(error);
+            var error = new Error('eventsProtocol publishProgressEvent error');
+            this.sandbox.stub(eventsProtocol, 'publishProgressEvent').rejects(error);
+            var graph = {
+                instanceId: 'testgraphid',
+                _status: 'succeeded',
+                node: 'nodeId',
+                name: 'test graph name',
+                tasks: {}
+            };
 
-            return graphProgressService.publishTaskFinished(task)
-            .then(function() {
-                expect(eventsProtocol.publishProgressEvent).to.not.be.called;
-            });
+            return graphProgressService.publishGraphStarted(graph).should.be.fulfilled;
         });
     });
 
@@ -131,10 +120,10 @@ describe('Services.GraphProgress', function() {
                 tasks: {}
             };
 
-            return graphProgressService.publishGraphFinished(graph, 'succeeded')
-            .then(function() {
-                expect(eventsProtocol.publishProgressEvent).to.have.been.calledOnce;
-            });
+            return graphProgressService.publishGraphFinished(
+                graph,
+                'succeeded'
+            ).should.be.fulfilled;
         });
     });
 
@@ -180,8 +169,8 @@ describe('Services.GraphProgress', function() {
                     }
                 }
             };
-            this.sandbox.restore();
         });
+
         it("should publish with the events protocol", function() {
             eventsProtocol.publishProgressEvent = this.sandbox.stub().resolves();
             waterline.graphobjects.findOne = sinon.stub().resolves(graph);
@@ -197,14 +186,57 @@ describe('Services.GraphProgress', function() {
             eventsProtocol.publishProgressEvent = this.sandbox.stub().resolves();
             var error = new Error('graphobjects findOne error');
             waterline.graphobjects.findOne = sinon.stub().rejects(error);
-            return graphProgressService.publishTaskStarted(task)
-            .then(function(){
-                expect(eventsProtocol.publishProgressEvent).to.not.be.called;
-            });
+            return graphProgressService.publishTaskStarted(task).should.be.fulfilled;
         });
     });
 
-    describe('test updateGraphProgress', function() {
+    describe('test publishTaskFinished', function() {
+        it('should publish with the events protocol', function() {
+            graph.tasks[taskId].state = 'succeeded';
+
+            eventsProtocol.publishProgressEvent = this.sandbox.stub().resolves();
+            waterline.graphobjects.findOne = sinon.stub().resolves(graph);
+
+            var taskFriendlyName = 'test task name';
+            var progressData = {
+                graphId: graph.instanceId,
+                graphName: graph.name,
+                nodeId: 'nodeId',
+                progress: {
+                    value: 1,
+                    maximum: 1,
+                    percentage: '100%',
+                    description: 'Task "' + taskFriendlyName + '" finished',
+                },
+                taskProgress: {
+                    taskId: task.taskId,
+                    taskName: taskFriendlyName,
+                    progress: {
+                        value: 100,
+                        maximum: 100,
+                        percentage: '100%',
+                        description: 'Task finished'
+                    }
+                }
+            };
+
+            return graphProgressService.publishTaskFinished(task)
+            .then(function() {
+                expect(eventsProtocol.publishProgressEvent).to.have.been.calledOnce;
+                expect(eventsProtocol.publishProgressEvent)
+                    .to.have.been.calledWith(task.graphId, progressData);
+            });
+        });
+
+        it('should swallow the Errors', function() {
+            eventsProtocol.publishProgressEvent = this.sandbox.stub().resolves();
+            var error = new Error('graphobjects findOne error');
+            waterline.graphobjects.findOne = sinon.stub().rejects(error);
+            return graphProgressService.publishTaskFinished(task).should.be.fulfilled;
+        });
+    });
+
+    describe('test publishTaskProgress', function() {
         it('should publish with the events protocol', function () {
             var milestone = {
                 value: 1,
@@ -214,7 +246,7 @@ describe('Services.GraphProgress', function() {
 
             waterline.graphobjects.findOne = sinon.stub().resolves(graph);
             eventsProtocol.publishProgressEvent.reset();
-            return graphProgressService.updateGraphProgress(graphId, taskId, milestone)
+            return graphProgressService.publishTaskProgress(graphId, taskId, milestone)
             .then(function(){
                 expect(eventsProtocol.publishProgressEvent).to.have.been.calledOnce;
                 expect(eventsProtocol.publishProgressEvent.firstCall.args[0]).to.equal(graphId);
@@ -240,10 +272,51 @@ describe('Services.GraphProgress', function() {
             };
             waterline.graphobjects.findOne = sinon.stub().rejects(error);
             eventsProtocol.publishProgressEvent.reset();
-            return graphProgressService.updateGraphProgress(graphId, taskId, milestone)
+            return graphProgressService.publishTaskProgress(
+                graphId, taskId, milestone
+            ).should.be.fulfilled;
+        });
+    });
+
+    describe('test publishTaskProgressNotCatch', function() {
+        it('should publish with the events protocol', function () {
+            var milestone = {
+                value: 1,
+                maximum: 4,
+                description: 'foo bar'
+            };
+
+            waterline.graphobjects.findOne = sinon.stub().resolves(graph);
+            eventsProtocol.publishProgressEvent.reset();
+            return graphProgressService.publishTaskProgressNotCatch(graphId, taskId, milestone)
             .then(function(){
-                expect(eventsProtocol.publishProgressEvent).not.to.be.called;
+                expect(eventsProtocol.publishProgressEvent).to.have.been.calledOnce;
+                expect(eventsProtocol.publishProgressEvent.firstCall.args[0]).to.equal(graphId);
+                expect(eventsProtocol.publishProgressEvent.firstCall.args[1]).
+                    to.have.property('graphId').and.equal(graphId);
+                expect(eventsProtocol.publishProgressEvent.firstCall.args[1]).
+                    to.have.deep.property('taskProgress.taskId').and.equal(taskId);
+                expect(eventsProtocol.publishProgressEvent.firstCall.args[1]).
+                    to.have.deep.property('taskProgress.progress.value').and.equal(1);
+                expect(eventsProtocol.publishProgressEvent.firstCall.args[1]).
+                    to.have.deep.property('taskProgress.progress.maximum').and.equal(4);
+                expect(eventsProtocol.publishProgressEvent.firstCall.args[1]).
+                    to.have.deep.property('taskProgress.progress.description').and.equal('foo bar');
             });
+        });
+
+        it('should not swallow the Errors', function () {
+            var error = new Error('test update graph progress error');
+            var milestone = {
+                value: 1,
+                maximum: 4,
+                description: 'foo bar'
+            };
+            waterline.graphobjects.findOne = sinon.stub().rejects(error);
+            eventsProtocol.publishProgressEvent.reset();
+            return graphProgressService.publishTaskProgressNotCatch(
+                graphId, taskId, milestone
+            ).should.be.rejectedWith(error);
         });
     });
 });
