@@ -9,6 +9,7 @@ describe('Lookup Service', function () {
         Errors,
         WaterlineService,
         ChildProcess,
+        Promise,
         sandbox = sinon.sandbox.create();
 
     var lookup = [{
@@ -55,6 +56,7 @@ describe('Lookup Service', function () {
         WaterlineService = helper.injector.get('Services.Waterline');
         MacAddress = helper.injector.get('MacAddress');
         Errors = helper.injector.get('Errors');
+        Promise = helper.injector.get('Promise');
 
         // Mock out the waterline collection methods and initialize them
         var config = {
@@ -86,8 +88,7 @@ describe('Lookup Service', function () {
     });
 
     describe('Node ID Cache', function () {
-        var spy1 = sinon.spy(),
-            spy2 = sinon.spy();
+        var promise1, promise2;
 
         function assertEmptyNodeIdCacheObject() {
             expect(lookupService.nodeIdCache).to.be.ok;
@@ -100,17 +101,16 @@ describe('Lookup Service', function () {
 
         it('should allow multple simultaneous cache checks', function () {
             expect(lookupService.checkNodeIdCache('testAddress')).to.be.null;
-            lookupService.checkNodeIdCache('testAddress').then(spy1, spy1);
-            lookupService.checkNodeIdCache('testAddress').then(spy2, spy2);
+            promise1 = lookupService.checkNodeIdCache('testAddress');
+            promise2 = lookupService.checkNodeIdCache('testAddress');
         });
 
-        it('should resolve pending cache checks once a value is assigned', function (done) {
+        it('should resolve pending cache checks once a value is assigned', function () {
             lookupService.assignNodeIdCache('testAddress', 'nodeId');
-            setTimeout(function () {
-                expect(spy1.called).to.be.ok;
-                expect(spy2.called).to.be.ok;
-                done();
-            }, 0);
+            return Promise.all([
+                expect(promise1).to.become('nodeId'),
+                expect(promise2).to.become('nodeId')
+            ]);
         });
 
         it('should immediately resolve from cache', function (done) {
