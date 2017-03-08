@@ -67,6 +67,21 @@ describe('Services.GraphProgress', function() {
             });
         });
 
+        it('should throw the Errors', function() {
+            var error = new Error('eventsProtocol publishProgressEvent error');
+            this.sandbox.stub(eventsProtocol, 'publishProgressEvent').rejects(error);
+            var graph = {
+                instanceId: 'testgraphid',
+                _status: 'succeeded',
+                node: 'nodeId',
+                name: 'test graph name',
+                tasks: {}
+            };
+
+            return expect(graphProgressService.publishGraphStarted(graph, false))
+                .to.be.rejectedWith(error);
+        });
+
         it('should swallow the Errors', function() {
             var error = new Error('eventsProtocol publishProgressEvent error');
             this.sandbox.stub(eventsProtocol, 'publishProgressEvent').rejects(error);
@@ -78,7 +93,7 @@ describe('Services.GraphProgress', function() {
                 tasks: {}
             };
 
-            return graphProgressService.publishGraphStarted(graph).should.be.fulfilled;
+            return expect(graphProgressService.publishGraphStarted(graph, true)).to.be.fulfilled;
         });
     });
 
@@ -109,6 +124,24 @@ describe('Services.GraphProgress', function() {
             });
         });
 
+        it('should throw the Errors', function() {
+            var error = new Error('eventsProtocol publishProgressEvent error');
+            this.sandbox.stub(eventsProtocol, 'publishProgressEvent').rejects(error);
+            var graph = {
+                instanceId: 'testgraphid',
+                _status: 'succeeded',
+                node: 'nodeId',
+                name: 'test graph name',
+                tasks: {}
+            };
+
+            return expect(graphProgressService.publishGraphFinished(
+                graph,
+                'succeeded',
+                false
+            )).to.be.rejectedWith(error);
+        });
+
         it('should swallow the Errors', function() {
             var error = new Error('eventsProtocol publishProgressEvent error');
             this.sandbox.stub(eventsProtocol, 'publishProgressEvent').rejects(error);
@@ -120,10 +153,11 @@ describe('Services.GraphProgress', function() {
                 tasks: {}
             };
 
-            return graphProgressService.publishGraphFinished(
+            return expect(graphProgressService.publishGraphFinished(
                 graph,
-                'succeeded'
-            ).should.be.fulfilled;
+                'succeeded',
+                true
+            )).to.be.fulfilled;
         });
     });
 
@@ -182,11 +216,19 @@ describe('Services.GraphProgress', function() {
             });
         });
 
+        it("should throw the Errors", function() {
+            eventsProtocol.publishProgressEvent = this.sandbox.stub().resolves();
+            var error = new Error('graphobjects findOne error');
+            waterline.graphobjects.findOne = sinon.stub().rejects(error);
+            return expect(graphProgressService.publishTaskStarted(task, false))
+                .to.be.rejectedWith(error);
+        });
+
         it("should swallow the Errors", function() {
             eventsProtocol.publishProgressEvent = this.sandbox.stub().resolves();
             var error = new Error('graphobjects findOne error');
             waterline.graphobjects.findOne = sinon.stub().rejects(error);
-            return graphProgressService.publishTaskStarted(task).should.be.fulfilled;
+            return expect(graphProgressService.publishTaskStarted(task, true)).to.be.fulfilled;
         });
     });
 
@@ -228,11 +270,19 @@ describe('Services.GraphProgress', function() {
             });
         });
 
+        it('should throw the Errors', function() {
+            eventsProtocol.publishProgressEvent = this.sandbox.stub().resolves();
+            var error = new Error('graphobjects findOne error');
+            waterline.graphobjects.findOne = sinon.stub().rejects(error);
+            return expect(graphProgressService.publishTaskFinished(task, false))
+                .to.be.rejectedWith(error);
+        });
+
         it('should swallow the Errors', function() {
             eventsProtocol.publishProgressEvent = this.sandbox.stub().resolves();
             var error = new Error('graphobjects findOne error');
             waterline.graphobjects.findOne = sinon.stub().rejects(error);
-            return graphProgressService.publishTaskFinished(task).should.be.fulfilled;
+            return expect(graphProgressService.publishTaskFinished(task, true)).to.be.fulfilled;
         });
     });
 
@@ -263,6 +313,20 @@ describe('Services.GraphProgress', function() {
             });
         });
 
+        it('should throw the Errors', function () {
+            var error = new Error('test update graph progress error');
+            var milestone = {
+                value: 1,
+                maximum: 4,
+                description: 'foo bar'
+            };
+            waterline.graphobjects.findOne = sinon.stub().rejects(error);
+            eventsProtocol.publishProgressEvent.reset();
+            return expect(graphProgressService.publishTaskProgress(
+                graphId, taskId, milestone, false
+            )).to.be.rejectedWith(error);
+        });
+
         it('should swallow the Errors', function () {
             var error = new Error('test update graph progress error');
             var milestone = {
@@ -272,51 +336,9 @@ describe('Services.GraphProgress', function() {
             };
             waterline.graphobjects.findOne = sinon.stub().rejects(error);
             eventsProtocol.publishProgressEvent.reset();
-            return graphProgressService.publishTaskProgress(
-                graphId, taskId, milestone
-            ).should.be.fulfilled;
-        });
-    });
-
-    describe('test publishTaskProgressNotCatch', function() {
-        it('should publish with the events protocol', function () {
-            var milestone = {
-                value: 1,
-                maximum: 4,
-                description: 'foo bar'
-            };
-
-            waterline.graphobjects.findOne = sinon.stub().resolves(graph);
-            eventsProtocol.publishProgressEvent.reset();
-            return graphProgressService.publishTaskProgressNotCatch(graphId, taskId, milestone)
-            .then(function(){
-                expect(eventsProtocol.publishProgressEvent).to.have.been.calledOnce;
-                expect(eventsProtocol.publishProgressEvent.firstCall.args[0]).to.equal(graphId);
-                expect(eventsProtocol.publishProgressEvent.firstCall.args[1]).
-                    to.have.property('graphId').and.equal(graphId);
-                expect(eventsProtocol.publishProgressEvent.firstCall.args[1]).
-                    to.have.deep.property('taskProgress.taskId').and.equal(taskId);
-                expect(eventsProtocol.publishProgressEvent.firstCall.args[1]).
-                    to.have.deep.property('taskProgress.progress.value').and.equal(1);
-                expect(eventsProtocol.publishProgressEvent.firstCall.args[1]).
-                    to.have.deep.property('taskProgress.progress.maximum').and.equal(4);
-                expect(eventsProtocol.publishProgressEvent.firstCall.args[1]).
-                    to.have.deep.property('taskProgress.progress.description').and.equal('foo bar');
-            });
-        });
-
-        it('should not swallow the Errors', function () {
-            var error = new Error('test update graph progress error');
-            var milestone = {
-                value: 1,
-                maximum: 4,
-                description: 'foo bar'
-            };
-            waterline.graphobjects.findOne = sinon.stub().rejects(error);
-            eventsProtocol.publishProgressEvent.reset();
-            return graphProgressService.publishTaskProgressNotCatch(
-                graphId, taskId, milestone
-            ).should.be.rejectedWith(error);
+            return expect(graphProgressService.publishTaskProgress(
+                graphId, taskId, milestone, true
+            )).to.be.fulfilled;
         });
     });
 });

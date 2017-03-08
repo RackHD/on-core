@@ -27,7 +27,6 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
         subscribeCancelTaskGraph: sinon.stub().resolves(),
         cancelTaskGraph: sinon.stub().resolves()
     };
-    var uuid = require('node-uuid');
     var waterlineMock = {
         graphobjects: {
             findOne: sinon.stub()
@@ -168,17 +167,6 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
 
     it('should return a promise from start method', function() {
         return expect(amqp.start()).to.be.fulfilled;
-    });
-
-    it('should wrap the events protocol publishGraphFinished method', function() {
-        eventsProtocol.publishGraphFinished = sinon.stub().resolves();
-        var graph = { instanceId: 'testgraphid', _status: 'succeeded', node: 'nodeId' };
-        return amqp.publishGraphFinished(graph)
-        .then(function() {
-            expect(eventsProtocol.publishGraphFinished).to.have.been.calledOnce;
-            expect(eventsProtocol.publishGraphFinished)
-                .to.have.been.calledWith('testgraphid', 'succeeded', 'nodeId');
-        });
     });
 
     describe('publishTaskFinished', function() {
