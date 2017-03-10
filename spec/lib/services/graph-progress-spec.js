@@ -59,7 +59,7 @@ describe('Services.GraphProgress', function() {
                 }
             };
 
-            return graphProgressService.publishGraphStarted(graph)
+            return graphProgressService.publishGraphStarted(graph, {swallowError: true})
             .then(function() {
                 expect(eventsProtocol.publishProgressEvent).to.have.been.calledOnce;
                 expect(eventsProtocol.publishProgressEvent)
@@ -78,7 +78,7 @@ describe('Services.GraphProgress', function() {
                 tasks: {}
             };
 
-            return expect(graphProgressService.publishGraphStarted(graph, false))
+            return expect(graphProgressService.publishGraphStarted(graph, {swallowError: false}))
                 .to.be.rejectedWith(error);
         });
 
@@ -93,7 +93,10 @@ describe('Services.GraphProgress', function() {
                 tasks: {}
             };
 
-            return expect(graphProgressService.publishGraphStarted(graph, true)).to.be.fulfilled;
+            return expect(graphProgressService.publishGraphStarted(
+                graph,
+                {swallowError: true}
+            )).to.be.fulfilled;
         });
     });
 
@@ -138,7 +141,7 @@ describe('Services.GraphProgress', function() {
             return expect(graphProgressService.publishGraphFinished(
                 graph,
                 'succeeded',
-                false
+                {swallowError: false}
             )).to.be.rejectedWith(error);
         });
 
@@ -156,7 +159,7 @@ describe('Services.GraphProgress', function() {
             return expect(graphProgressService.publishGraphFinished(
                 graph,
                 'succeeded',
-                true
+                {swallowError: true}
             )).to.be.fulfilled;
         });
     });
@@ -166,12 +169,12 @@ describe('Services.GraphProgress', function() {
         before(function() {
             task = {
                 instanceId: 'aTaskId',
-                context: { graphId: 'aGraphId'},
+                context: { graphId: graphId},
                 state: 'pending',
                 definition: { terminalOnStates: ['succeeded'], friendlyName: 'Test Task' }
             };
             graph = {
-                instanceId: 'aGraphId',
+                instanceId: graphId,
                 name: 'test graph name',
                 node: 'nodeId',
                 tasks: {
@@ -220,7 +223,7 @@ describe('Services.GraphProgress', function() {
             eventsProtocol.publishProgressEvent = this.sandbox.stub().resolves();
             var error = new Error('graphobjects findOne error');
             waterline.graphobjects.findOne = sinon.stub().rejects(error);
-            return expect(graphProgressService.publishTaskStarted(task, false))
+            return expect(graphProgressService.publishTaskStarted(task, {swallowError: false}))
                 .to.be.rejectedWith(error);
         });
 
@@ -228,7 +231,10 @@ describe('Services.GraphProgress', function() {
             eventsProtocol.publishProgressEvent = this.sandbox.stub().resolves();
             var error = new Error('graphobjects findOne error');
             waterline.graphobjects.findOne = sinon.stub().rejects(error);
-            return expect(graphProgressService.publishTaskStarted(task, true)).to.be.fulfilled;
+            return expect(graphProgressService.publishTaskStarted(
+                task,
+                {swallowError: true}
+            )).to.be.fulfilled;
         });
     });
 
@@ -274,7 +280,7 @@ describe('Services.GraphProgress', function() {
             eventsProtocol.publishProgressEvent = this.sandbox.stub().resolves();
             var error = new Error('graphobjects findOne error');
             waterline.graphobjects.findOne = sinon.stub().rejects(error);
-            return expect(graphProgressService.publishTaskFinished(task, false))
+            return expect(graphProgressService.publishTaskFinished(task, {swallowError: false}))
                 .to.be.rejectedWith(error);
         });
 
@@ -282,7 +288,10 @@ describe('Services.GraphProgress', function() {
             eventsProtocol.publishProgressEvent = this.sandbox.stub().resolves();
             var error = new Error('graphobjects findOne error');
             waterline.graphobjects.findOne = sinon.stub().rejects(error);
-            return expect(graphProgressService.publishTaskFinished(task, true)).to.be.fulfilled;
+            return expect(graphProgressService.publishTaskFinished(
+                task,
+                {swallowError: true}
+            )).to.be.fulfilled;
         });
     });
 
@@ -323,7 +332,10 @@ describe('Services.GraphProgress', function() {
             waterline.graphobjects.findOne = sinon.stub().rejects(error);
             eventsProtocol.publishProgressEvent.reset();
             return expect(graphProgressService.publishTaskProgress(
-                graphId, taskId, milestone, false
+                graphId,
+                taskId,
+                milestone,
+                {swallowError: false}
             )).to.be.rejectedWith(error);
         });
 
@@ -337,7 +349,10 @@ describe('Services.GraphProgress', function() {
             waterline.graphobjects.findOne = sinon.stub().rejects(error);
             eventsProtocol.publishProgressEvent.reset();
             return expect(graphProgressService.publishTaskProgress(
-                graphId, taskId, milestone, true
+                graphId,
+                taskId,
+                milestone,
+                {swallowError: true}
             )).to.be.fulfilled;
         });
     });
