@@ -2,7 +2,6 @@
 
 # Copyright 2015, EMC, Inc.
 
-# test 
 set -e
 set -x
 
