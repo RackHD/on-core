@@ -323,6 +323,28 @@ describe('Task Graph mongo store interface', function () {
         });
     });
 
+    it('getTaskById should return undefined when graph not found', function(){
+        var task1 = uuid.v4();
+
+        var data = {
+            taskId: task1,
+            graphId: uuid.v4()
+        };
+        waterline.graphobjects.findOne.resolves(undefined);
+
+        return mongo.getTaskById(data)
+        .then(function(result) {
+            expect(waterline.graphobjects.findOne).to.have.been.calledOnce;
+            var fields = { fields: { _id: 0, instanceId: 1, context: 1, tasks: {} } };
+            fields.fields.tasks[task1] = 1;
+            expect(waterline.graphobjects.findOne).to.have.been.calledWith(
+                { instanceId: data.graphId },
+                fields
+            );
+            expect(result).to.equal(undefined);
+        });
+    });
+
     it('getActiveGraphById', function() {
         var graphId = uuid.v4();
         waterline.graphobjects.findOne.resolves();
