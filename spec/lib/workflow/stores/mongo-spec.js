@@ -27,6 +27,7 @@ describe('Task Graph mongo store interface', function () {
             mongo: { objectId: sinon.stub() }
         };
     };
+
     var waterlineMock = {
         graphobjects: createMockModel(),
         taskdependencies: createMockModel(),
@@ -34,8 +35,8 @@ describe('Task Graph mongo store interface', function () {
         graphdefinitions: createMockModel()
     };
 
-    before(function() {
-        helper.setupInjector([
+    var resetInjections = function(){
+         helper.setupInjector([
             helper.require('/lib/workflow/stores/mongo'),
             helper.di.simpleWrapper(waterlineMock, 'Services.Waterline')
         ]);
@@ -44,9 +45,14 @@ describe('Task Graph mongo store interface', function () {
         Constants = helper.injector.get('Constants');
         Errors = helper.injector.get('Errors');
         uuid = helper.injector.get('uuid');
+    };
+    
+    before(function() {
+        resetInjections();
     });
 
     afterEach(function() {
+        resetInjections();
         _.forEach(waterline, function(model) {
             _.forEach(model, function(method) {
                 if (method.reset) {
@@ -630,6 +636,7 @@ describe('Task Graph mongo store interface', function () {
             query['dependencies.' + data.taskId] = {
                 $in: [data.state, Constants.Task.States.Finished]
             };
+
             var update = {
                 $unset: {}
             };
@@ -638,6 +645,51 @@ describe('Task Graph mongo store interface', function () {
             expect(waterline.taskdependencies.updateMongo).to.have.been.calledWith(
                 query, update, { multi: true }
             );
+        });
+    });
+
+    it('updates dependent tasks under anyOf key', function() {
+
+        var waterlineUnderAnyOf = {
+            taskdependencies:{
+                find: sinon.stub().returns([]).resolves(),
+                updateMongo: sinon.stub()
+            }
+        };
+
+        helper.setupInjector([
+            helper.require('/lib/workflow/stores/mongo'),
+            helper.di.simpleWrapper(waterlineUnderAnyOf, 'Services.Waterline')
+       ]);
+
+        mongo = helper.injector.get('TaskGraph.Stores.Mongo');
+        waterline = helper.injector.get('Services.Waterline');
+
+        var data = {
+            state: 'succeeded',
+            taskId: uuid.v4(),
+            graphId: uuid.v4()
+        };
+
+        return mongo.updateDependentTasks(data)
+        .then(function() {
+            var query = {
+                graphId: data.graphId,
+                reachable: true
+            };
+
+            query['dependencies.anyOf.' + data.taskId] = {
+                $in: [data.state, Constants.Task.States.Finished]
+            };
+
+            var updateAny = {
+                $unset:{}
+            };
+            updateAny.$unset['dependencies.anyOf'] = '';
+
+            expect(waterline.taskdependencies.updateMongo).to.have.been.calledOnce;
+            expect(waterline.taskdependencies.updateMongo).to.have.been.calledWith(
+                query, updateAny, {multi: true});
         });
     });
 
@@ -650,11 +702,20 @@ describe('Task Graph mongo store interface', function () {
 
         var query = {
             graphId: data.graphId,
-            reachable: true
+            reachable: true,
+            $or:[]
         };
-        query['dependencies.' + data.taskId] = {
+        var dependenciesItr = {};
+        dependenciesItr['dependencies.' + data.taskId] = {
             $in: _.difference(Constants.Task.FinishedStates, [data.state])
         };
+        query.$or.push(dependenciesItr);
+        
+        delete dependenciesItr['dependencies.' + data.taskId];
+        dependenciesItr['dependencies.anyOf.' + data.taskId] = {
+            $in: _.difference(Constants.Task.FinishedStates, [data.state])
+        };
+        query.$or.push(dependenciesItr);
 
         return mongo.updateUnreachableTasks(data)
         .then(function() {
