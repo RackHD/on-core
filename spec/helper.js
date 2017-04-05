@@ -62,6 +62,7 @@ chai.Assertion.addMethod('stringify', function (target) {
  */
 var di = require('di');
 var dihelper = require('../lib/di')(di, __dirname);
+var core = require('../index')(di, '..');
 
 function provider(object) {
     var provides = _.detect(object.annotations, function (annotation) {
@@ -121,8 +122,6 @@ global.helper = {
 
     setupInjector: function (overrides) {
         // Start with the core dependencies.
-        var core = require('../index')(di, '..');
-
         var dependencies = _.flattenDeep([
             core.injectables,
             core.workflowInjectables
