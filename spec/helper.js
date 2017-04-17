@@ -221,11 +221,13 @@ global.helper = {
      * @returns {Promise}
      */
     stop: function () {
-        if (this.core) {
-            return this.core.stop();
-        } else {
-            return bluebird.resolve();
-        }
+      var promises = [new Promise(function (resolve) {
+        setTimeout(resolve);
+      })];
+      if (this.core) {
+        promises.push(this.core.stop());
+      }
+      return Promise.all(promises);
     },
 
     /**
@@ -298,6 +300,7 @@ global.helper = {
      */
     after: function (callback) {
         after("helper.after", function () {
+            this.timeout(10000);
             return bluebird.resolve()
                 .then(function() {
                     if (_.isFunction(callback)) {
