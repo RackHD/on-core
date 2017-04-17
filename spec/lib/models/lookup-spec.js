@@ -64,10 +64,10 @@ describe('Models.Lookup', function () {
                 expect(this.subject.required).to.equal(true);
             });
 
-            it('should regex with /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/', function() {
+            it('should regex with /^([0-9a-fA-F]{2}[:-]){5}([0-9a-fA-F]{2})$|^([0-9a-fA-F]{4}[.]){2}([0-9a-fA-F]{4})$/', function() {
                 expect(
                     this.subject.regex.toString()
-                ).to.equal('/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/');
+                ).to.equal('/^([0-9a-fA-F]{2}[:-]){5}([0-9a-fA-F]{2})$|^([0-9a-fA-F]{4}[.]){2}([0-9a-fA-F]{4})$/');
             });
 
             it('should be unique', function() {
