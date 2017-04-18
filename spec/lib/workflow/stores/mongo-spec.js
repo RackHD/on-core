@@ -239,6 +239,36 @@ describe('Task Graph mongo store interface', function () {
         });
     });
 
+    it('persistTaskDefinition should recursively replace keywords if any', function() {
+        var definition = {
+            injectableName: 'testname',
+            optionsSchema: {
+                version: {
+                    $ref: "abc.json"
+                }
+            }
+        };
+
+        return mongo.persistTaskDefinition(definition)
+        .then(function() {
+            expect(waterline.taskdefinitions.findAndModifyMongo).to.have.been.calledWith(
+                {
+                    injectableName: 'testname',
+                },
+                {},
+                {
+                    injectableName: 'testname',
+                    optionsSchema: {
+                        version: {
+                            ___ref: "abc.json"
+                        }
+                    }
+                },
+                { new: true, upsert: true }
+            );
+        });
+    });
+
     it('getGraphDefinitions', function() {
         return mongo.getGraphDefinitions()
         .then(function() {
@@ -330,6 +360,32 @@ describe('Task Graph mongo store interface', function () {
             expect(result.graphId).to.equal(graph.instanceId);
             expect(result.context).to.equal(graph.context);
             expect(result.task).to.equal(graph.tasks[task1]);
+        });
+    });
+
+    it('getTaskById should replace keywords if any', function() {
+        var task1 = uuid.v4();
+        var task2 = uuid.v4();
+
+        var data = {
+            taskId: task1,
+            graphId: uuid.v4()
+        };
+
+        var graph = {
+            instanceId: 'test',
+            context: {},
+            tasks: {}
+        };
+        graph.tasks[task1] = {___ref: 1};
+        graph.tasks[task2] = {};
+
+        var retTask = {$ref: 1};
+        waterline.graphobjects.findOne.resolves(graph);
+
+        return mongo.getTaskById(data)
+        .then(function(result) {
+            expect(result.task).to.deep.equal(retTask);
         });
     });
 
