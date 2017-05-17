@@ -303,6 +303,79 @@ describe('Model', function () {
         });
     });
 
+    describe('remove from list', function() {
+        var record;
+
+        before('reset DB collections', function () {
+            return helper.reset();
+        });
+
+        before('create the record', function () {
+            return waterline.testobjects.create({
+                identifiers: ["asd", "qwe"],
+                list: [ 'item1', 'item2', 'item3']
+            })
+            .then(function (record_) {
+                record = record_;
+            });
+        });
+
+
+        describe('remove item in list by Id with removeFromListById()', function () {
+            var removed;
+
+            before('set up mocks', function () {
+                waterlineProtocol.publishRecord = sinon.stub().returns(bluebird.resolve());
+            });
+
+            before('update the record', function () {
+                return waterline.testobjects.removeFromListById(record.id, {
+                    list: ['item3']
+                }).then(function (removed_) {
+                    removed = removed_;
+                    removed.id = String(removed_._id);
+                });
+            });
+
+            it('should have the same id', function () {
+                expect(removed).to.have.property('id', record.id);
+            });
+
+            it('should have an updated list', function () {
+                expect(removed.list).to.deep.equal(['item1', 'item2']);
+            });
+        });
+
+        describe('remove item in list by identifier with removeFromListByIdentifier()'\
+        , function () {
+            var removed;
+
+            before('set up mocks', function () {
+                waterlineProtocol.publishRecord = sinon.stub().returns(bluebird.resolve());
+            });
+
+            before('update the record', function () {
+                return waterline.testobjects.removeFromListByIdentifier("qwe", {
+                    list: ['item1', 'item2', 'item3']
+                }).then(function (removed_) {
+                    removed = removed_;
+                    removed.id = String(removed_._id);
+                });
+            });
+
+            it('should have the same id', function () {
+                expect(removed).to.have.property('id', record.id);
+            });
+
+            it('should have an updated list', function () {
+                expect(removed.list).to.deep.equal([]);
+            });
+        });
+
+    });
+
+
+
     describe('model destroying', function () {
         var record;
 
