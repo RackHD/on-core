@@ -303,6 +303,96 @@ describe('Model', function () {
         });
     });
 
+    describe('remove from list', function() {
+        var record;
+
+        before('reset DB collections', function () {
+            return helper.reset();
+        });
+
+        before('create the record', function () {
+            return waterline.testobjects.create({
+                identifiers: ["asd", "qwe"],
+                list: [ 'item1', 'item2', 'item3']
+            })
+            .then(function (record_) {
+                record = record_;
+            });
+        });
+
+
+        describe('remove item in list by Id with removeListItemsById()', function () {
+            var removed;
+
+            before('update the record', function () {
+                return waterline.testobjects.removeListItemsById(record.id, {
+                    list: ['item3']
+                }).then(function (removed_) {
+                    removed = removed_;
+                    removed.id = String(removed_._id);
+                });
+            });
+
+            it('should have the same id', function () {
+                expect(removed).to.have.property('id', record.id);
+            });
+
+            it('should have an updated list', function () {
+                expect(removed.list).to.deep.equal(['item1', 'item2']);
+            });
+
+        });
+
+        describe('remove list items by identifier with removeListItemsByIdentifier()', function () {
+            var removed;
+
+            before('update the record', function () {
+                return waterline.testobjects.removeListItemsByIdentifier("qwe", {
+                    list: ['item1', 'item2', 'item3']
+                }).then(function (removed_) {
+                    removed = removed_;
+                    removed.id = String(removed_._id);
+                });
+            });
+
+            it('should have the same id', function () {
+                expect(removed).to.have.property('id', record.id);
+            });
+
+            it('should have an updated list', function () {
+                expect(removed.list).to.deep.equal([]);
+            });
+
+            it('should return the same doc with blank value', function () {
+                return waterline.testobjects.removeListItemsByIdentifier("qwe", {
+                    list: []
+                }).then(function (removed_) {
+                    removed_.id = String(removed_._id);
+                    expect(removed).to.deep.equal(removed);
+                });
+            });
+        });
+
+        describe('remove list items by bad identifier with removeListItemsByIdentifier()',
+            function () {
+            it('should reject with a not found error', function () {
+                return waterline.testobjects.removeListItemsByIdentifier('invalid id', ["item1"])
+                .should.be.rejectedWith(Errors.NotFoundError);
+            });
+        });
+
+        describe('remove list items by bad value with removeListItemsByIdentifier()',
+            function () {
+            it('should reject with a mongo error', function () {
+                return waterline.testobjects.removeListItemsByIdentifier('qwe', '')
+                .should.be.rejectedWith(Errors.MongoError);
+            });
+        });
+
+    });
+
+
+
     describe('model destroying', function () {
         var record;
 
