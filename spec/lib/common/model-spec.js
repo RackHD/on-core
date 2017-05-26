@@ -327,9 +327,8 @@ describe('Model', function () {
             before('update the record', function () {
                 return waterline.testobjects.removeListItemsById(record.id, {
                     list: ['item3']
-                }).then(function (removed_) {
-                    removed = removed_;
-                    removed.id = String(removed_._id);
+                }).then(function(removed_){
+                        removed = removed_;
                 });
             });
 
@@ -341,39 +340,16 @@ describe('Model', function () {
                 expect(removed.list).to.deep.equal(['item1', 'item2']);
             });
 
-        });
-
-        describe('remove list items by identifier with removeListItemsByIdentifier()', function () {
-            var removed;
-
-            before('update the record', function () {
-                return waterline.testobjects.removeListItemsByIdentifier("qwe", {
-                    list: ['item1', 'item2', 'item3']
-                }).then(function (removed_) {
-                    removed = removed_;
-                    removed.id = String(removed_._id);
-                });
-            });
-
-            it('should have the same id', function () {
-                expect(removed).to.have.property('id', record.id);
-            });
-
-            it('should have an updated list', function () {
-                expect(removed.list).to.deep.equal([]);
-            });
-
             it('should return the same doc with blank value', function () {
-                return waterline.testobjects.removeListItemsByIdentifier("qwe", {
+                return waterline.testobjects.removeListItemsById(record.id, {
                     list: []
-                }).then(function (removed_) {
-                    removed_.id = String(removed_._id);
-                    expect(removed).to.deep.equal(removed);
+                }).then(function(removed_){
+                        expect(removed.list).to.deep.equal(removed_.list);
                 });
             });
         });
 
-        describe('remove list items by bad identifier with removeListItemsByIdentifier()',
+        describe('remove list items by bad id with removeListItemsById()',
             function () {
             it('should reject with a not found error', function () {
                 return waterline.testobjects.removeListItemsByIdentifier('invalid id', ["item1"])
@@ -389,9 +365,235 @@ describe('Model', function () {
             });
         });
 
+        describe('remove list items by identifier with removeListItemsByIdentifier()', function () {
+            var value = { list: ['item1', 'item2', 'item3'] };
+
+            before('set up mocks', function () {
+               waterline.testobjects.removeListItemsById = sinon.stub().returns(bluebird.resolve());
+            });
+
+            it('should called removeListItemsById', function(){
+                return waterline.testobjects.removeListItemsByIdentifier("qwe", value)
+                .tap(function(){
+                    expect(waterline.testobjects.removeListItemsById)
+                    .to.be.calledWith(record.id, value);
+                });
+            });
+        });
+
+        describe('remove list items by bad id with removeListItemsById()',
+            function () {
+            it('should reject with a not found error', function () {
+                return waterline.testobjects.removeListItemsByIdentifier('invalid id', ["item1"])
+                .should.be.rejectedWith(Errors.NotFoundError);
+            });
+        });
     });
 
+    describe('add item to list', function() {
+        var record;
 
+        before('reset DB collections', function () {
+            return helper.reset();
+        });
+
+        before('create the record', function () {
+            return waterline.testobjects.create({
+                identifiers: ["asd", "qwe"],
+                list: [{a: 1}]
+            })
+            .then(function (record_) {
+                record = record_;
+            });
+        });
+
+
+        describe('by Id with addListItemsIfNotExistById()', function () {
+            var added;
+
+            before('update the record', function () {
+                return waterline.testobjects.addListItemsIfNotExistById(record.id, {
+                    list: ['item1']
+                }).then(function(added_){
+                        added = added_;
+                });
+            });
+
+            it('should have the same id', function () {
+                expect(added).to.have.property('id', record.id);
+            });
+
+            it('should have an updated list', function () {
+                expect(added.list).to.deep.equal([{ a: 1 }, 'item1']);
+            });
+
+            it('should return the same doc with blank value', function () {
+                return waterline.testobjects.addListItemsIfNotExistById(record.id, {
+                    list: []
+                }).then(function(added_){
+                         expect(added.list).to.deep.equal(added_.list);
+                });
+            });
+        });
+
+        describe('by signs with addListItemsIfNotExistById()', function () {
+            var added;
+
+            before('update the record', function () {
+                return waterline.testobjects.addListItemsIfNotExistById(record.id, {
+                    list: ['item1', {a:1, b:2}, {c:3}]
+                }, [{a:1}])
+                .then(function(added_){
+                        added = added_;
+                });
+            });
+
+            it('should have an updated list without sign items', function () {
+                expect(added.list).to.deep.equal([{a:1}, 'item1', {c:3}]);
+            });
+        });
+
+        describe('by bad value with addListItemsIfNotExistById()', function () {
+            it('should reject with a mongo error', function () {
+                return waterline.testobjects.addListItemsIfNotExistById(record.id, "")
+                .should.be.rejectedWith(Errors.MongoError);
+            });
+        });
+
+        describe('by identifier with addListItemsIfNotExistByIdentifier()', function () {
+            var value = { list: ['item2', 'item3'] };
+
+            before('set up mocks', function(){
+                waterline.testobjects.addListItemsIfNotExistById = 
+                    sinon.stub().returns(bluebird.resolve());
+            });
+
+            it('should called addListItemsIfNotExistById', function(){
+                return waterline.testobjects.addListItemsIfNotExistByIdentifier("qwe", value)
+                .then(function(){
+                    expect(waterline.testobjects.addListItemsIfNotExistById)
+                    .to.be.calledWith(record.id, value);
+                });
+            });
+        });
+
+        describe('add list items by bad identifier with addListItemsIfNotExistByIdentifier()',
+            function () {
+            it('should reject with a not found error', function () {
+                return waterline.testobjects.addListItemsIfNotExistByIdentifier(
+                    'invalid id', ["item1"]
+                 )
+                .should.be.rejectedWith(Errors.NotFoundError);
+            });
+        });
+
+    });
+
+    describe('add field if not exist', function() {
+        var record;
+
+        before('reset DB collections', function () {
+            return helper.reset();
+        });
+
+        before('create the record', function () {
+            return waterline.testobjects.create({
+                identifiers: ["asd", "qwe"]
+            })
+            .then(function (record_) {
+                record = record_;
+            });
+        });
+
+
+        describe('by Id with addFieldIfNotExistById()', function () {
+            var added;
+
+            before('update the record', function () {
+                return waterline.testobjects.addFieldIfNotExistById(record.id, "relations", [])
+                .then(function(added_){
+                        added = added_;
+                });
+            });
+
+            it('should have the same id', function () {
+                expect(added).to.have.property('id', record.id);
+            });
+
+            it('should have an new relation', function () {
+                expect(added.relations).to.deep.equal([]);
+            });
+
+            it('should remain the current field if field already exists', function () {
+                return waterline.testobjects.addFieldIfNotExistById(record.id, {
+                    relation: ["test"]
+                }).then(function(added_){
+                         expect(added.relation).to.deep.equal(added_.relation);
+                });
+            });
+        });
+
+        describe('by identifier with addFieldIfNotExistByIdentifier()', function () {
+
+            before('set up mocks', function(){
+                waterline.testobjects.addFieldIfNotExistById = 
+                    sinon.stub().returns(bluebird.resolve());
+            });
+
+            it('should called addListItemsIfNotExistById', function(){
+                return waterline.testobjects.addFieldIfNotExistByIdentifier("qwe", "relations", [])
+                .tap(function(){
+                    expect(waterline.testobjects.addFieldIfNotExistById)
+                    .to.be.calledWith(record.id, "relations", []);
+                });
+            });
+        });
+
+        describe('add list items by bad identifier with addFieldIfNotExistById()',
+            function () {
+            it('should reject with a not found error', function () {
+                return waterline.testobjects.addListItemsIfNotExistByIdentifier(
+                    'invalid id', ["item1"]
+                ).should.be.rejectedWith(Errors.NotFoundError);
+            });
+        });
+
+    });
+
+    describe('update and find native mongo methods', function() {
+        var record;
+        var modifiedRecord;
+
+        before('reset DB collections', function () {
+            return helper.reset();
+        });
+
+        before('create the record', function () {
+            return waterline.testobjects.create({
+                placeholder: "placeholder" 
+            })
+            .then(function (record_) {
+                record = record_;
+            }).then(function(){
+                var query = { _id: waterline.nodes.mongo.objectId(record.id) };
+                var update = {
+                    $set: {test: "test"}
+                };
+                return waterline.testobjects.updateAndFindMongo(query, update)
+                .then(function(record_){
+                    modifiedRecord = record_;
+                });
+            });
+        });
+
+        it('should have the same id', function(){
+            expect(record.id).to.equal(modifiedRecord.id);
+        });
+
+        it('should return the updated docs', function(){
+            expect(modifiedRecord.test).to.equal("test");
+        });
+    });
 
     describe('model destroying', function () {
         var record;
@@ -824,6 +1026,49 @@ describe('Model', function () {
             });
         });
 
+        describe("updateAndFindMongo", function(){
+            
+            beforeEach(function(){
+                this.sandbox.stub(waterline.testobjects, 'updateMongo').resolves();
+                this.sandbox.stub(waterline.testobjects, 'findMongo').resolves();
+                this.sandbox.stub(waterline.testobjects, 'findOneMongo').resolves();
+            });
+
+            it('updateAndFindMongo should calls the updateMongo', function(){
+                
+                return waterline.testobjects.updateAndFindMongo(query, update, options)
+                .then(function() {
+                    expect(waterline.testobjects.updateMongo).to.have.been.calledOnce;
+                    expect(waterline.testobjects.updateMongo).to.have.been.calledWith(
+                        query, update, options
+                    );
+                });
+            });
+
+            it('updateAndFindMongo should calls the findMongo if multi in option', function(){
+                var optionsHere = _.cloneDeep(options);
+                optionsHere.multi = true;
+                return waterline.testobjects.updateAndFindMongo(query, update, optionsHere)
+                .then(function() {
+                    expect(waterline.testobjects.findMongo).to.have.been.calledOnce;
+                    expect(waterline.testobjects.findMongo).to.have.been.calledWith(
+                        query
+                    );
+                });
+            });
+
+            it('updateAndFindMongo should calls the findOneMongo if no multi in option', function(){
+                return waterline.testobjects.updateAndFindMongo(query, update, options)
+                .then(function() {
+                    expect(waterline.testobjects.findOneMongo).to.have.been.calledOnce;
+                    expect(waterline.testobjects.findOneMongo).to.have.been.calledWith(
+                        query
+                    );
+                });
+            });
+
+        });
+
         it('should have a findOneMongo method that calls the runNativeMongo method', function() {
 
             return waterline.testobjects.findOneMongo(query)
@@ -893,4 +1138,5 @@ describe('Model', function () {
             });
         });
     });
+
 });
