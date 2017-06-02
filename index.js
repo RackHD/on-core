@@ -2,8 +2,8 @@
 
 'use strict';
 
-var _ = require('lodash'),
-    dependencyInjection = require('di');
+var _ = require('lodash');
+var dependencyInjection = require('di');
 
 require('./lib/extensions');
 
