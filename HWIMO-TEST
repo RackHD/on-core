@@ -2,11 +2,13 @@
 
 # Copyright 2015, EMC, Inc.
 
+# test 
 set -e
 set -x
 
 rm -rf node_modules
 npm install
+
 
 # Checks the code against the jshint options
 ./node_modules/.bin/jshint -c .jshintrc --reporter=checkstyle lib index.js > checkstyle-result.xml || true
