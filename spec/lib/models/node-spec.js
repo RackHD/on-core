@@ -137,6 +137,21 @@ describe('Models.Node', function () {
             });
         });
 
+        describe('miscProperties', function () {
+            before(function (){
+                this.subject = this.attributes.miscProperties;
+            });
+
+            it('should be json', function () {
+                expect(this.subject.type).to.equal('json');
+                expect(this.subject.json).to.equal(true);
+            });
+
+            it('should not be required', function () {
+                expect(this.subject.required).to.equal(false);
+            });
+        });
+
         describe('tags', function() {
             before(function() {
                 this.subject = this.attributes.tags;
