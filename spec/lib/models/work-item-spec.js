@@ -505,6 +505,46 @@ describe('Models.WorkItem', function () {
                     expect(newWorkItem[0].state).to.equal("inaccessible");
                 });
         });
+
+        it('should set poller alert configure', function() {
+            this.sandbox.stub(workitems, 'updateMongo').resolves();
+            this.sandbox.stub(workitems.mongo, 'objectId').returns('test_id');
+            var data = {alerts: [{tests: 'tests'}], isRemove: false};
+            return workitems.updatePollerAlertConfig('test_id', data)
+            .then(function(){
+                expect(workitems.updateMongo).to.be.calledOnce;
+                expect(workitems.updateMongo).to.be.calledWith(
+                    {_id: 'test_id'},
+                    {
+                        $addToSet: {'config.alerts': {$each: [{tests: 'tests'}]}},
+                        $set: {}
+                    },
+                    {}
+                );
+                expect(workitems.mongo.objectId).to.be.calledOnce;
+                expect(workitems.mongo.objectId).to.be.calledWith('test_id');
+            });
+        });
+
+        it('should unset poller alert configure', function() {
+            this.sandbox.stub(workitems, 'updateMongo').resolves();
+            this.sandbox.stub(workitems.mongo, 'objectId').returns('test_id');
+            var data = {isRemove: true, pollInterval: 5000};
+            return workitems.updatePollerAlertConfig('test_id', data)
+            .then(function(){
+                expect(workitems.updateMongo).to.be.calledOnce;
+                expect(workitems.updateMongo).to.be.calledWith(
+                    {_id: 'test_id'},
+                    {
+                        $pullAll: {'config.alerts': []},
+                        $set: {pollInterval: 5000}
+                    },
+                    {}
+                );
+                expect(workitems.mongo.objectId).to.be.calledOnce;
+                expect(workitems.mongo.objectId).to.be.calledWith('test_id');
+            });
+        });
     });
 });
 
