@@ -603,4 +603,20 @@ describe("Event protocol subscribers", function () {
         });
     });
 
+    describe("subscribe SEL event", function () {
+        it("should subscrbe SEl event", function () {
+            var nodeId = "507f191e810c19729de860ea";
+            var pollerId = "507f191e810c19729de860ea";
+            var callbackStub = sinon.stub();
+            return events.subscribeSelEvent(pollerId, nodeId, callbackStub)
+            .then(function(){
+                expect(messenger.subscribe).to.have.been.calledWith(
+                    'on.events',
+                    'polleralert.sel.updated.critical.' + pollerId + '.' + nodeId,
+                    callbackStub
+                );
+            });
+        });
+    });
+
 });
