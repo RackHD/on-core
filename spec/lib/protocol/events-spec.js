@@ -608,11 +608,11 @@ describe("Event protocol subscribers", function () {
             var nodeId = "507f191e810c19729de860ea";
             var pollerId = "507f191e810c19729de860ea";
             var callbackStub = sinon.stub();
-            return events.subscribeSelEvent(pollerId, nodeId, callbackStub)
+            return events.subscribeSelEvent('information', pollerId, nodeId, callbackStub)
             .then(function(){
                 expect(messenger.subscribe).to.have.been.calledWith(
                     'on.events',
-                    'polleralert.sel.updated.critical.' + pollerId + '.' + nodeId,
+                    'polleralert.sel.updated.information.' + pollerId + '.' + nodeId,
                     callbackStub
                 );
             });
