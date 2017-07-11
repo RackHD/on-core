@@ -25,19 +25,22 @@ describe('Services.Waterline', function () {
 
     describe('start', function () {
         it('should start service and resolve', function() {
+            var dropIndexesStub = this.sandbox.stub().resolves();
             var createIndexesStub = this.sandbox.stub().resolves();
             waterline.service.initialize = this.sandbox.spy(function(cfg,callback) {
                 var ontology = {
                     collections:{
                         'testModel': {
                             identity: 'test',
-                            createIndexes: createIndexesStub
+                            createIndexes: createIndexesStub,
+                            dropIndexes: dropIndexesStub
                         }
                     }
                 };
                 callback(undefined, ontology);
             });
             return waterline.start().then(function() {
+                expect(dropIndexesStub).to.have.been.calledOnce;
                 expect(createIndexesStub).to.have.been.calledOnce;
             });
         });
