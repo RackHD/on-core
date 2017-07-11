@@ -9,6 +9,8 @@ describe("ChildProcess", function () {
     var child;
     var _getPaths;
     var _getPathsOrig;
+    var Logger;
+    var log;
 
     helper.before(function (context) {
         // Initial override just yields for core services startup.
@@ -24,18 +26,15 @@ describe("ChildProcess", function () {
     before("ChildProcess before", function () {
         ChildProcess = helper.injector.get('ChildProcess');
         expect(ChildProcess).to.be.a('function');
-
         _getPathsOrig = ChildProcess.prototype._getPaths;
-        _getPaths = sinon.stub(ChildProcess.prototype, '_getPaths');
-        _getPaths.returns([__dirname]);
+        Logger = helper.injector.get('Logger');
     });
 
     beforeEach(function() {
+        _getPaths = this.sandbox.stub(ChildProcess.prototype, '_getPaths');
+        _getPaths.returns([__dirname]);
         child = new ChildProcess('child-process-spec.js', null, null, [1]);
-    });
-
-    after("ChildProcess after", function() {
-        _getPaths.restore();
+        log = this.sandbox.stub(Logger.prototype, 'log');
     });
 
     describe("_getPaths", function () {
@@ -100,7 +99,7 @@ describe("ChildProcess", function () {
 
         it('should return a file if found in the paths from _getPaths', function () {
             // stub ChildProcess._getPaths to return the local directory
-            child._getPaths = sinon.stub().returns([__dirname]);
+            child._getPaths = this.sandbox.stub().returns([__dirname]);
             expect(child._parseCommandPath("child-process-spec.js"))
                 .to.be.a('String')
                 .to.match(/child-process-spec/);
@@ -129,20 +128,8 @@ describe("ChildProcess", function () {
     });
 
     describe("_deferred", function() {
-        var log;
-
-        before('deferred before', function() {
-            var Logger = helper.injector.get('Logger');
-            log = sinon.stub(Logger.prototype, 'log');
-        });
-
         beforeEach('deferred beforeEach', function() {
             child.createOwnDeferred();
-            log.reset();
-        });
-
-        after('deferred after', function() {
-            log.restore();
         });
 
         it("should have a _deferred attribute", function() {
@@ -167,26 +154,11 @@ describe("ChildProcess", function () {
     });
 
     describe("run", function () {
-        var log;
-
-        before("ChildProcess.run before", function () {
-            var Logger = helper.injector.get('Logger');
-            log = sinon.stub(Logger.prototype, 'log');
-        });
-
-        beforeEach("ChildProcess.run beforeEach", function() {
-            log.reset();
-        });
-
-        after("ChildProcess.run after", function() {
-            log.restore();
-        });
-
         it("should work and call inner _run()", function() {
             child._run = function() {
                 child._resolve();
             };
-            var _runSpy = sinon.spy(child, '_run');
+            var _runSpy = this.sandbox.spy(child, '_run');
 
             return child.run({ retries: 1, delay: 0 })
             .then(function() {
@@ -198,7 +170,7 @@ describe("ChildProcess", function () {
             child._run = function() {
                 child._reject(new Error('test failure'));
             };
-            var _runSpy = sinon.spy(child, '_run');
+            var _runSpy = this.sandbox.spy(child, '_run');
 
             return child.run({ retries: 2, delay: 0 })
             .catch(function(e) {
@@ -211,7 +183,7 @@ describe("ChildProcess", function () {
             child._run = function() {
                 child._reject(new Error('test failure'));
             };
-            var _runSpy = sinon.spy(child, '_run');
+            var _runSpy = this.sandbox.spy(child, '_run');
 
             // Use done() because if the promise is fulfilled that is a failure
             // case for this test. Assert that we hit this catch block.
@@ -233,7 +205,7 @@ describe("ChildProcess", function () {
                     child._reject(new Error('test failure'));
                 }
             };
-            var _runSpy = sinon.spy(child, '_run');
+            var _runSpy = this.sandbox.spy(child, '_run');
 
             return child.run({ retries: 2, delay: 0 })
             .then(function() {
@@ -247,8 +219,8 @@ describe("ChildProcess", function () {
             child._run = function() {
                 child._reject(new Error('test failure'));
             };
-            var _runSpy = sinon.spy(child, '_run');
-            var _retrySpy = sinon.spy(child, '_runWithRetries');
+            var _runSpy = this.sandbox.spy(child, '_run');
+            var _retrySpy = this.sandbox.spy(child, '_runWithRetries');
 
             return child.run({ retries: retries, delay: delay })
             .catch(function(e) {
@@ -337,21 +309,6 @@ describe("ChildProcess", function () {
     });
 
     describe("killSafe", function () {
-        var log;
-
-        before("ChildProcess.run before", function () {
-            var Logger = helper.injector.get('Logger');
-            log = sinon.stub(Logger.prototype, 'log');
-        });
-
-        beforeEach("ChildProcess.run beforeEach", function() {
-            log.reset();
-        });
-
-        after("ChildProcess.run after", function() {
-            log.restore();
-        });
-
         it("should not run after killSafe() is called if it is called before " +
                 "run is called", function () {
             child.killSafe('foo');
@@ -361,14 +318,14 @@ describe("ChildProcess", function () {
         it("should not kill the process if it has already been killed", function () {
             child.hasBeenKilled = true;
             child.spawnInstance = {
-                kill: sinon.stub()
+                kill: this.sandbox.stub()
             };
             child.killSafe('foo');
             expect(child.spawnInstance.kill).to.not.have.been.called;
         });
 
         it("should invoke the kill function", function () {
-            var killStub = sinon.stub();
+            var killStub = this.sandbox.stub();
             child.hasBeenKilled = false;
             child.spawnInstance = { kill: killStub };
             child.killSafe('foo');

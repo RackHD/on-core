@@ -12,28 +12,17 @@ describe('FileLoader', function () {
     before(function () {
         FileLoader = helper.injector.get('FileLoader');
         fs = helper.injector.get('fs');
-
         this.subject = new FileLoader();
-
-        sinon.stub(fs, 'writeFileAsync');
-        sinon.stub(fs, 'readFileAsync');
-        sinon.stub(fs, 'readdirAsync');
-        sinon.stub(fs, 'statAsync');
     });
 
     beforeEach(function() {
-        fs.writeFileAsync.reset();
-        fs.readFileAsync.reset();
-        fs.readdirAsync.reset();
-        fs.statAsync.reset();
+        this.sandbox.stub(fs, 'writeFileAsync');
+        this.sandbox.stub(fs, 'readFileAsync');
+        this.sandbox.stub(fs, 'readdirAsync');
+        this.sandbox.stub(fs, 'statAsync');
     });
 
-    helper.after(function () {
-        fs.writeFileAsync.restore();
-        fs.readFileAsync.restore();
-        fs.readdirAsync.restore();
-        fs.statAsync.restore();
-    });
+    helper.after();
 
     describe('put', function () {
         it('should write the contents to the specified file', function () {

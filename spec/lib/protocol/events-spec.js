@@ -24,28 +24,15 @@ describe("Event protocol subscribers", function () {
 
         testSubscription = new Subscription({},{});
         testMessage = new Message({},{},{});
-        sinon.stub(testMessage);
-        sinon.stub(messenger, 'request');
-        sinon.stub(messenger, 'publish');
-        sinon.stub(hook, 'publish').resolves();
     });
 
     beforeEach(function() {
-        messenger.request.reset();
-        messenger.publish.reset();
-        hook.publish.reset();
-	    clock = sinon.useFakeTimers(new Date(2011,9,1).getTime());
-	    createTime = new Date();
-    });
-
-    afterEach(function() {
-        clock.restore();
-    });
-
-    after(function() {
-        messenger.request.restore();
-        messenger.publish.restore();
-        hook.publish.restore();
+        this.sandbox.stub(testMessage);
+        this.sandbox.stub(messenger, 'request');
+        this.sandbox.stub(messenger, 'publish');
+        this.sandbox.stub(hook, 'publish').resolves();
+        clock = this.sandbox.useFakeTimers(new Date(2011,9,1).getTime());
+        createTime = new Date();
     });
 
     helper.after();
@@ -56,7 +43,7 @@ describe("Event protocol subscribers", function () {
             //NOTE: no matching internal code to listen for these events
             var nodeId = "507f191e810c19729de860ea", //mongoId format
                 data = {foo: 'bar'};
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
+            messenger.subscribe = this.sandbox.spy(function(a,b,callback) {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
@@ -77,7 +64,7 @@ describe("Event protocol subscribers", function () {
             //NOTE: no matching internal code to listen for these events
             var nodeId = "507f191e810c19729de860ea", //mongoId format
                 data = {foo: 'bar'};
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
+            messenger.subscribe = this.sandbox.spy(function(a,b,callback) {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
@@ -98,7 +85,7 @@ describe("Event protocol subscribers", function () {
             //NOTE: no matching internal code to listen for these events
             var nodeId = "507f191e810c19729de860ea", //mongoId format
                 data = {foo: 'bar'};
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
+            messenger.subscribe = this.sandbox.spy(function(a,b,callback) {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
@@ -119,7 +106,7 @@ describe("Event protocol subscribers", function () {
             //NOTE: no matching internal code to listen for these events
             var nodeId = "507f191e810c19729de860ea", //mongoId format
                 data = {foo: 'bar'};
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
+            messenger.subscribe = this.sandbox.spy(function(a,b,callback) {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
@@ -146,7 +133,7 @@ describe("Event protocol subscribers", function () {
                     context: {},
                     terminalOnStates: ['failed', 'timeout']
                 };
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
+            messenger.subscribe = this.sandbox.spy(function(a,b,callback) {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
@@ -176,7 +163,7 @@ describe("Event protocol subscribers", function () {
                     nodeId: nodeId,
                     data: 'test data'
                 };
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
+            messenger.subscribe = this.sandbox.spy(function(a,b,callback) {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
@@ -200,7 +187,7 @@ describe("Event protocol subscribers", function () {
 
         it("should publish and subscribe to NodeNotification messages without data", function(){
             var nodeId = '57a86b5c36ec578876878294';
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
+            messenger.subscribe = this.sandbox.spy(function(a,b,callback) {
                 callback(testMessage);
                 return Promise.resolve(testSubscription);
             });
@@ -224,7 +211,7 @@ describe("Event protocol subscribers", function () {
             var data = {
                     data: 'test data'
                 };
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
+            messenger.subscribe = this.sandbox.spy(function(a,b,callback) {
                 callback(data,testMessage);
                 return Promise.resolve(testSubscription);
             });
@@ -246,7 +233,7 @@ describe("Event protocol subscribers", function () {
         });
 
         it("should publish and subscribe to BroadcastNotification messages without data", function(){
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
+            messenger.subscribe = this.sandbox.spy(function(a,b,callback) {
                 callback(testMessage);
                 return Promise.resolve(testSubscription);
             });
@@ -273,7 +260,7 @@ describe("Event protocol subscribers", function () {
                 graphId = uuid.v4(),
                 status = 'testStatus',
                 nodeId = 'abc';
-            messenger.subscribe = sinon.spy(function(a, b, callback) {
+            messenger.subscribe = this.sandbox.spy(function(a, b, callback) {
                 callback({status: status}, testMessage);
                 return Promise.resolve(testSubscription);
             });
@@ -299,7 +286,7 @@ describe("Event protocol subscribers", function () {
                 graphId = uuid.v4(),
                 status = 'testStatus',
                 nodeId = 'abc';
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
+            messenger.subscribe = this.sandbox.spy(function(a,b,callback) {
                 callback({status:status},testMessage);
                 return Promise.resolve(testSubscription);
             });
@@ -321,7 +308,7 @@ describe("Event protocol subscribers", function () {
             var uuid = helper.injector.get('uuid'),
                 skuId = uuid.v4(); // uuid format
             var nodeId = "507f191e810c19729de860ea";
-            messenger.subscribe = sinon.spy(function(a,b,callback) {
+            messenger.subscribe = this.sandbox.spy(function(a,b,callback) {
                 callback({sku:skuId},testMessage);
                 return Promise.resolve(testSubscription);
             });
@@ -607,7 +594,7 @@ describe("Event protocol subscribers", function () {
         it("should subscrbe SEl event", function () {
             var nodeId = "507f191e810c19729de860ea";
             var pollerId = "507f191e810c19729de860ea";
-            var callbackStub = sinon.stub();
+            var callbackStub = this.sandbox.stub();
             return events.subscribeSelEvent('information', pollerId, nodeId, callbackStub)
             .then(function(){
                 expect(messenger.subscribe).to.have.been.calledWith(

@@ -6,7 +6,7 @@ describe("SystemUuid", function() {
     var regEx = /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$/;
     var fs;
     var uuid = '0e2c320f-f29e-47c6-be18-0c833e0f080c';
-    
+
     before(function () {
         helper.setupInjector();
         subject = helper.injector.get('SystemUuid');
@@ -14,10 +14,10 @@ describe("SystemUuid", function() {
         sinon.stub(fs, 'readFileAsync');
     });
 
-    helper.after(function() {
+    after(function() {
         fs.readFileAsync.restore();
     });
-    
+
     beforeEach(function() {
         fs.readFileAsync.reset();
     });

@@ -22,16 +22,13 @@ describe('ARPCache', function () {
     before(function () {
         arpCache = helper.injector.get('ARPCache');
         fs = helper.injector.get('fs');
-        sinon.stub(fs, 'readFileAsync');
     });
 
     beforeEach(function() {
-        fs.readFileAsync.reset();
+        this.sandbox.stub(fs, 'readFileAsync');
     });
 
-    helper.after(function () {
-        fs.readFileAsync.restore();
-    });
+    helper.after();
 
     describe("Handle ARP Entry", function(){
         it('should parse ARP data', function() {

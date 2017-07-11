@@ -38,7 +38,7 @@ describe('Services.Waterline', function () {
                 callback(undefined, ontology);
             });
             return waterline.start().then(function() {
-                expect(createIndexesStub).to.have.been.called;
+                expect(createIndexesStub).to.have.been.calledOnce;
             });
         });
 

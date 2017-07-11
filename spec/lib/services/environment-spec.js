@@ -11,14 +11,13 @@ describe('Services.Environment', function () {
     before(function () {
         this.subject = helper.injector.get('Services.Environment');
         waterline = helper.injector.get('Services.Waterline');
-        sinon.stub(waterline.environment, "findOne");
+    });
+
+    beforeEach('set up mocks', function() {
+        this.sandbox.stub(waterline.environment, "findOne");
     });
 
     helper.after();
-
-    after(function() {
-        waterline.environment.findOne.restore();
-    });
 
     var global = {
         identifier: 'global',
@@ -71,7 +70,7 @@ describe('Services.Environment', function () {
     
     it('should set a key-value', function() {
         var global = {};
-        sinon.stub(waterline.environment, "update", function(where, data) {
+        this.sandbox.stub(waterline.environment, "update", function(where, data) {
             global = data.data;
             return [global];
         });

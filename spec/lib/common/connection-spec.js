@@ -33,7 +33,7 @@ describe('Connection', function () {
         this.subject = new Connection({url: ''}, {}, 'test');
     });
 
-    after(function() {
+    helper.after(function() {
         sandbox.restore();
     });
 

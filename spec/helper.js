@@ -107,7 +107,6 @@ global.helper = {
     injector: undefined,
 
     start: function (overrides) {
-        var self = this;
         // Setup test injector.
         this.setupInjector(overrides);
 
@@ -115,9 +114,8 @@ global.helper = {
         this.setupTestConfig();
 
         // Start the core services.
-        return this.injector.get('Services.Core').start().then(function (core) {
-            self.core = core;
-        });
+        this.core = this.injector.get('Services.Core');
+        return this.core.start();
     },
 
     setupInjector: function (overrides) {
