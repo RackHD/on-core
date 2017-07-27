@@ -71,12 +71,12 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
     });
 
     it('should wrap the task protocol run method', function() {
-        return amqp.publishRunTask('default', 'testtaskid', 'testgraphid')
+        return amqp.publishRunTask('default', 'testtaskid', 'testtaskname', 'testgraphid', 'testgraphname')
         .then(function() {
             expect(taskProtocol.run).to.have.been.calledOnce;
             expect(taskProtocol.run).to.have.been.calledWith(
                 'default',
-                { taskId: 'testtaskid', graphId: 'testgraphid' }
+                { taskId: 'testtaskid', taskName: 'testtaskname', graphId: 'testgraphid', graphName:'testgraphname'}
             );
         });
     });
@@ -116,9 +116,11 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
             state: 'succeeded',
             context: {
                 graphId: 'testgraphid',
+                graphName: 'testgraphname'
             },
             definition: {
-                terminalOnStates: ['failed', 'timeout']
+                terminalOnStates: ['failed', 'timeout'],
+                injectableName: 'testtaskname'
             },
             error: 'error message'
         };
@@ -128,10 +130,12 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
             expect(eventsProtocol.publishTaskFinished).to.have.been.calledWith(
                 'default',
                 'testtaskid',
+                'testtaskname',
                 'testgraphid',
+                'testgraphname',
                 'succeeded',
                 'error message',
-                {graphId: 'testgraphid' },
+                {graphId: 'testgraphid', graphName: 'testgraphname'},
                 ['failed', 'timeout']
             );
         });
@@ -187,7 +191,9 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
                 expect(eventsProtocol.publishTaskFinished).to.have.been.calledWith(
                     'default',
                     finishedTask.instanceId,
+                    finishedTask.definition.taskName,
                     finishedTask.context.graphId,
+                    finishedTask.context.graphName,
                     finishedTask.state,
                     undefined,
                     finishedTask.context,
@@ -202,7 +208,7 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
             return amqp.publishTaskFinished('default', finishedTask)
             .then(function() {
                 expect(eventsProtocol.publishTaskFinished).to.have.been.calledOnce;
-                expect(eventsProtocol.publishTaskFinished.firstCall.args[4])
+                expect(eventsProtocol.publishTaskFinished.firstCall.args[6])
                     .to.contain('test error');
             });
         });
@@ -223,7 +229,7 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
             return amqp.publishTaskFinished('default', finishedTask)
             .then(function() {
                 expect(eventsProtocol.publishTaskFinished).to.have.been.calledOnce;
-                expect(eventsProtocol.publishTaskFinished.firstCall.args[4]).to.equal(error.stack);
+                expect(eventsProtocol.publishTaskFinished.firstCall.args[6]).to.equal(error.stack);
             });
         });
     });
