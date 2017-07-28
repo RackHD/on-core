@@ -71,12 +71,12 @@ describe('Task/TaskGraph AMQP messenger plugin', function () {
     });
 
     it('should wrap the task protocol run method', function() {
-        return amqp.publishRunTask('default', 'testtaskid', 'testtaskname', 'testgraphid', 'testgraphname')
+        return amqp.publishRunTask('default', 'testtaskid', 'testgraphid')
         .then(function() {
             expect(taskProtocol.run).to.have.been.calledOnce;
             expect(taskProtocol.run).to.have.been.calledWith(
                 'default',
-                { taskId: 'testtaskid', taskName: 'testtaskname', graphId: 'testgraphid', graphName:'testgraphname'}
+                { taskId: 'testtaskid', graphId: 'testgraphid'}
             );
         });
     });
