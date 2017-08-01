@@ -140,7 +140,9 @@ describe("Event protocol subscribers", function () {
                 domain = 'default',
                 data = {
                     taskId: uuid.v4(),
+                    taskName: 'taskName',
                     graphId: uuid.v4(),
+                    graphName: 'graphName',
                     state: 'succeeded',
                     error: null,
                     context: {},
@@ -159,7 +161,9 @@ describe("Event protocol subscribers", function () {
                 return events.publishTaskFinished(
                     domain,
                     data.taskId,
+                    data.taskName,
                     data.graphId,
+                    data.graphName,
                     data.state,
                     data.error,
                     data.context,
