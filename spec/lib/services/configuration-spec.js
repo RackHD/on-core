@@ -65,13 +65,13 @@ describe(require('path').basename(__filename), function () {
                         'global', Constants.Configuration.Files.Global
                     );
                 });
-                it('applies defaults from the OnRack configuration file', function() {
+                it('applies defaults from the dell configuration file', function() {
                     fs.existsSync.withArgs(
-                        Constants.Configuration.Files.OnRack
+                        Constants.Configuration.Files.Dell
                     ).returns(true);
                     this.subject.load();
                     nconf.file.should.have.been.calledWith(
-                        'global', Constants.Configuration.Files.OnRack
+                        'dell', Constants.Configuration.Files.Dell
                     );
                 });
             });
