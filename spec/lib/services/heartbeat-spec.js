@@ -26,9 +26,8 @@ describe('Heartbeat', function () {
         }
     };
     var events = {
-        publishHeartbeatEvent: sandbox.stub().returns(
-            Promise.resolve()
-        )
+        publishHeartbeatEvent: sandbox.stub().returns(Promise.resolve()),
+        publishUnhandledError: sandbox.stub()
     };
     var dns = {
         lookupServiceAsync: sandbox.stub(),
