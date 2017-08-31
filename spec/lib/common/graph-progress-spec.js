@@ -24,7 +24,7 @@ describe('GraphProgress', function() {
             instanceId: graphId,
             name: 'test graph name',
             node: 'nodeId',
-            status: 'failed',
+            _status: 'failed',
             tasks: {}
         };
         graphDescription = 'test graph description';
