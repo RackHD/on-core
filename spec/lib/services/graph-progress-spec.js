@@ -51,6 +51,7 @@ describe('Services.GraphProgress', function() {
                 graphId: graph.instanceId,
                 graphName: graph.name,
                 nodeId: graph.node,
+                status: graph._status,
                 progress: {
                     maximum: 1,
                     value: 0,
@@ -111,6 +112,7 @@ describe('Services.GraphProgress', function() {
                 graphId: graph.instanceId,
                 graphName: graph.name,
                 nodeId: graph.node,
+                status: graph._status,
                 progress: {
                     maximum: 1,
                     value: 1,
@@ -177,6 +179,7 @@ describe('Services.GraphProgress', function() {
                 instanceId: graphId,
                 name: 'test graph name',
                 node: 'nodeId',
+                _status: 'running',
                 tasks: {
                     'aTaskId': {
                         friendlyName: task.definition.friendlyName,
@@ -189,6 +192,7 @@ describe('Services.GraphProgress', function() {
                 graphId: graph.instanceId,
                 graphName: graph.name,
                 nodeId: graph.node,
+                status: graph._status,
                 progress: {
                     value: 0,
                     maximum: 1,
@@ -198,6 +202,7 @@ describe('Services.GraphProgress', function() {
                 taskProgress: {
                     taskId: task.instanceId,
                     taskName: task.definition.friendlyName,
+                    state: task.state,
                     progress: {
                         value: 0,
                         maximum: 100,
@@ -250,6 +255,7 @@ describe('Services.GraphProgress', function() {
                 graphId: graph.instanceId,
                 graphName: graph.name,
                 nodeId: 'nodeId',
+                status: graph._status,
                 progress: {
                     value: 1,
                     maximum: 1,
@@ -259,6 +265,7 @@ describe('Services.GraphProgress', function() {
                 taskProgress: {
                     taskId: task.taskId,
                     taskName: taskFriendlyName,
+                    state: graph.tasks[taskId].state,
                     progress: {
                         value: 100,
                         maximum: 100,
