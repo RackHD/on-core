@@ -24,6 +24,7 @@ describe('GraphProgress', function() {
             instanceId: graphId,
             name: 'test graph name',
             node: 'nodeId',
+            _status: 'failed',
             tasks: {}
         };
         graphDescription = 'test graph description';
@@ -41,6 +42,7 @@ describe('GraphProgress', function() {
             graphId: graphId,
             graphName: 'test graph name',
             nodeId: 'nodeId',
+            status: graph._status,
             progress: {
                 value: 0,
                 maximum: 1,
@@ -50,6 +52,7 @@ describe('GraphProgress', function() {
             taskProgress: {
                 taskId: taskId,
                 taskName: 'test task name',
+                state: 'pending',
                 progress: {
                     value: 1,
                     maximum: 4,
