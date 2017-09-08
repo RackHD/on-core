@@ -1,4 +1,4 @@
-# Copyright 2016, EMC, Inc.
+# Copyright 2016, EMC, Inc. 
 
 FROM nodesource/wheezy:4.4.6
 
