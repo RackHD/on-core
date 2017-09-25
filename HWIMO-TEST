@@ -17,7 +17,7 @@ checkDependencies(){
     # mongodb works for version before 2.6
     mongo_status=$(service mongodb status || service mongod status)
     export is_mongo_running=$(echo $mongo_status |grep running)
-    export rabbitmq_status=$(sudo service rabbitmq-server status|grep pid)
+    export rabbitmq_status=$(service rabbitmq-server status|grep pid)
 
 }
 
@@ -30,12 +30,12 @@ handleDependServices(){
     action=$1
     if [ -z "$is_mongo_running" ]; then
         echo "[INFO]: $action mongodb service"
-        sudo service mongodb $action || sudo service mongod $action
+        service mongodb $action || service mongod $action
     fi
 
     if [ -z "$rabbitmq_status" ]; then
         echo "[INFO]: $action rabbitmq service"
-        sudo service rabbitmq-server $action
+        service rabbitmq-server $action
     fi
 }
 
