@@ -327,6 +327,23 @@ describe('db-renderable-content', function () {
             });
         });
 
+        it('should create a new thing from a pre-streamed file', function() {
+            var self = this;
+            var stream = {
+                data:"anydata",
+                req: "streamedDataFromOnhttp"
+            };
+            var promise;
+
+            waterline.things.findOne.resolves(null);
+            waterline.things.create.returnsArg(0).resolves();
+            promise =  self.subject.put('test thing', stream);
+            return promise.then(function(thing) {
+                expect(thing.name).to.equal('test thing');
+                expect(thing.scope).to.equal('global');
+            });
+        });
+
         it('should create a new thing in the specified scope with new path', function() {
             var self = this;
             var stream = new EventEmitter();
