@@ -1,1 +1,1 @@
-Coypright 2017, 
+Coypright 2017, EMC
