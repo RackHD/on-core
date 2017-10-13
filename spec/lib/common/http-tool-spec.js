@@ -60,7 +60,7 @@ describe("HttpTool", function(){
     it('can handle secure http and non-standard port', function(){
         nock('https://mysite.emc.com:12345')
         .get('/non-standard-port/http-secure')
-        .reply(200, 'You are good');
+        .reply(200, '{"result": "You are good"}');
         
         requestSettings.url = 'https://mysite.emc.com:12345/non-standard-port/http-secure';
         requestSettings.method = 'GET';
@@ -70,7 +70,7 @@ describe("HttpTool", function(){
             return httpTool.runRequest();
         })
         .then(function(data){
-            expect(data).to.have.property('body').to.equal('You are good');
+            expect(data).to.have.property('body').to.have.property('result').to.equal('You are good');
         });
     });
 
@@ -132,7 +132,7 @@ describe("HttpTool", function(){
         requestSettings = {};
         
         nock(siteGen)
-        .post('/simple-post').reply(201, 'OK');
+        .post('/simple-post').reply(201, '{"result": "OK"}');
 
         requestSettings.url = siteGen + '/simple-post';
         requestSettings.method = 'POST';
@@ -143,7 +143,7 @@ describe("HttpTool", function(){
             return httpTool.runRequest();
         })
         .then(function(data){
-            expect(data).to.have.property('body').to.equal('OK');
+            expect(data).to.have.property('body').to.have.property('result').to.equal('OK');
         });
     });
 
