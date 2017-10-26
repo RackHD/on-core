@@ -22,7 +22,7 @@
     "always-tail": "^0.2.0",
     "amqp": "0.2.3",
     "anchor": "^0.10.2",
-    "apache-crypt": "1.0.9",
+    "apache-crypt": "1.2.1",
     "assert-plus": "^1.0.0",
     "bluebird": "^2.8.0",
     "bson": "~0.4.22",
@@ -69,11 +69,11 @@
     "jsdoc": "^3.3.0-alpha13",
     "jshint": "^2.5.11",
     "mocha": "^2.1.0",
-    "nock": "~3.5.0",
+    "nock": "~9.0.22",
     "sinon": "1.16.1",
     "sinon-as-promised": "^2.0.3",
     "sinon-chai": "^2.7.0",
-    "supertest": "^0.15.0",
+    "supertest": "^1.2.0",
     "xunit-file": "0.0.6"
   }
 }
