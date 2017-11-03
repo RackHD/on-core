@@ -216,4 +216,38 @@ describe("Errors", function() {
             this.subject.stack.split('\n')[1].should.contain(__filename);
         });
     });
+
+    describe('NotImplementedError', function () {
+        before(function () {
+            this.subject = new Errors.NotImplementedError('message');
+        });
+
+        it('should be an instance of Error', function () {
+            this.subject.should.be.an.instanceof(Error);
+        });
+
+        it('should be an instance of BaseError', function () {
+            this.subject.should.be.an.instanceof(Errors.BaseError);
+        });
+
+        it('should be an instance of NotImplementedError', function () {
+            this.subject.should.be.an.instanceof(Errors.NotImplementedError);
+        });
+
+        it('should have a name of NotImplementedError', function () {
+            this.subject.name.should.be.equal('NotImplementedError');
+        });
+
+        it('should have a message of message', function () {
+            this.subject.message.should.be.equal('message');
+        });
+
+        it('should provide the correct stack trace', function () {
+            this.subject.stack.split('\n')[1].should.contain(__filename);
+        });
+
+        it('should provide a 400 status', function () {
+            this.subject.status.should.equal(501);
+        });
+    });
 });
