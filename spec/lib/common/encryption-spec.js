@@ -85,9 +85,9 @@ describe('Encryption', function () {
             it('should generate correct hash data', function() {
                 var data = "rackhd.github.com";
                 this.subject.createHash(data, 'sha512', '$6$WeJknBPkDab')
-                    .should.equal('$6K02bHzduy/Y'); //jshint ignore:line
+                    .should.equal('$6$WeJknBPkDab$yRRWg5Kr1MCAbKkBtKyKtldb9DFDXidKHj.wQwOKO1TSHUKCvIi7x9QubOenwGfYXoBK0vvwKvNgIlW9Oc6O4.'); //jshint ignore:line
                 this.subject.createHash(data, 'sha256', '$5$WeJknBPkDab')
-                    .should.equal('$5VQYaJCqoZho');
+                    .should.equal('$5$WeJknBPkDab$t4J3IF.tD9H/2HFDjV.CpFN1ay5rmwa7maVkstEiyv9');
             });
         });
 
