@@ -7,6 +7,7 @@ FROM ${repo}/wheezy:${tag}
 COPY . /RackHD/on-core/
 
 RUN cd /RackHD/on-core \
-  && npm install --ignore-scripts --production
+  && npm install \
+  && npm prune --production
 
 VOLUME /opt/monorail
