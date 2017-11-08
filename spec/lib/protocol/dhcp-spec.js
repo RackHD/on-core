@@ -22,12 +22,10 @@ describe("DHCP protocol functions", function () {
         testSubscription = new Subscription({},{});
         testMessage = new Message({},{},{});
         sinon.stub(testMessage);
-        sinon.stub(messenger);
     });
     
     beforeEach(function() {
-        messenger.subscribe.reset();
-        messenger.request.reset();
+        this.sandbox.stub(messenger, 'request');
     });
  
     helper.after();
@@ -292,3 +290,4 @@ describe("DHCP protocol functions", function () {
         });
     });
 });
+
