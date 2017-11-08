@@ -13,7 +13,7 @@ describe('Hook', function () {
     var payload = {"hello": "world", "routingKey": "test"};
 
     helper.before();
-    
+
     before("Before hookService  test", function(){
         helper.setupInjector([
             helper.require('/lib/services/hook'),
@@ -52,7 +52,7 @@ describe('Hook', function () {
             .post('/test')
             .reply(201, 'OK');
         findStub.withArgs({}).resolves([hooks[0]]);
-        return hookService .publish(payload)
+        hookService .publish(payload)
         .then(function(){
             expect(hookService ._publish).to.have.been.calledOnce;
             expect(hookService ._publish).to.have.been.calledWith(hooks[0], payload);
@@ -80,7 +80,7 @@ describe('Hook', function () {
             .reply(201, 'OK');
 
         findStub.withArgs({}).resolves(hooks);
-        return hookService .publish(payload)
+        hookService .publish(payload)
         .then(function(){
             expect(hookService ._publish).to.have.been.calledTwice;
             expect(hookService ._publish).to.have.been.calledWith(hooks[0], payload);
@@ -97,7 +97,7 @@ describe('Hook', function () {
             expect(hookService ._publish).to.have.not.been.called;
         });
     });
-    
+
     it('should post data to hook url only after passed filter', function (done) {
         var _hooks = _.cloneDeep(hooks);
         var scope = nock('https://172.1.1.0:8080')
@@ -113,11 +113,11 @@ describe('Hook', function () {
             .reply(201, 'OK');
         _hooks[0].filters = [{hello: "world|anything"}, {routingKey: "anything"}];
         _hooks[1].filters = [
-            {hello: "world", routingKey: "anything"}, 
+            {hello: "world", routingKey: "anything"},
             {routingKey: "[^(anything|test)]"}
         ];
         findStub.withArgs({}).resolves(_hooks);
-        return hookService.publish(payload)
+        hookService.publish(payload)
         .then(function(){
             expect(hookService._publish).to.have.been.calledTwice;
             expect(scope.isDone()).to.equal(false);
@@ -138,7 +138,7 @@ describe('Hook', function () {
         _publishSpy.restore();
         sinon.stub(hookService , '_publish').withArgs(hooks[0], payload)
             .rejects(new Error('Failed to send data to all hooks'));
-        return hookService .publish(payload)
+        hookService .publish(payload)
         .then(function(){
             done(new Error('Test should fail'));
         })

@@ -17,7 +17,7 @@ describe('Connection', function () {
         context.amqp = function() {
             this.createConnection = sandbox.stub();
         };
-        
+
         return [
             helper.di.simpleWrapper(context.Core, 'Services.Core' ),
             helper.di.simpleWrapper(context.amqp, 'amqp' )
@@ -28,7 +28,7 @@ describe('Connection', function () {
         Connection = helper.injector.get('Connection');
         amqp = helper.injector.get('amqp');
     });
-   
+
     beforeEach(function() {
         this.subject = new Connection({url: ''}, {}, 'test');
     });
@@ -288,7 +288,7 @@ describe('Connection', function () {
                             'disconnect':function(){done();},
                         });
                     });
-                    return this.subject.start().then(function () {
+                    this.subject.start().then(function () {
                         return expect(self.subject.stop()).to.be.fulfilled;
                     });
                 });

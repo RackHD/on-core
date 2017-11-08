@@ -187,7 +187,7 @@ describe("ChildProcess", function () {
 
             // Use done() because if the promise is fulfilled that is a failure
             // case for this test. Assert that we hit this catch block.
-            return child.run()
+            child.run()
             .catch(function(e) {
                 expect(e).to.deep.equal(new Error('test failure'));
                 expect(_runSpy).to.have.been.calledOnce;
@@ -253,7 +253,7 @@ describe("ChildProcess", function () {
             execFileStub.returns(mockSpawnedProcess)
                 .callsArgWith(3, {code: -1}, undefined, "stderr result");
 
-            return child.run().then(function() {
+            child.run().then(function() {
                 done(new Error('Expect job to fail'));
             })
             .catch(function(e) {

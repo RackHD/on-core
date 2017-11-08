@@ -342,7 +342,7 @@ describe('JsonSchemaValidator', function () {
             nodeFs.readFileAsync.onCall(0).resolves(JSON.stringify(testSchema1));
             nodeFs.readFileAsync.onCall(1).resolves(JSON.stringify(testRefSchema1));
 
-            return validator.addSchemasByDir('/testdir', 'noMetaSchema.json')
+            validator.addSchemasByDir('/testdir', 'noMetaSchema.json')
             .then(function () {
                 done(new Error("Expect addSchemasByDir to fail"));
             })
@@ -359,7 +359,7 @@ describe('JsonSchemaValidator', function () {
         });
 
         it('should throw assertion error when incorrect schemaDir passed', function (done) {
-            return validator.addSchemasByDir(123)
+            validator.addSchemasByDir(123)
             .then(function () {
                 done(new Error("Expect addSchemasByDir to fail"));
             })
@@ -376,7 +376,7 @@ describe('JsonSchemaValidator', function () {
         });
 
         it('should throw assertion error when incorrect metaSchemaName passed', function (done) {
-            return validator.addSchemasByDir('testdir3', 456)
+            validator.addSchemasByDir('testdir3', 456)
             .then(function () {
                 done(new Error("Expect addSchemasByDir to fail"));
             })

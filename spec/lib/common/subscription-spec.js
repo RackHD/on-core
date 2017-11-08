@@ -88,7 +88,7 @@ describe('Subscription', function () {
             self.subject.MAX_DISPOSE_RETRIES = 1;
             self.queue.unsubscribe.rejects(new Error('test error'));
 
-            return expect(self.subject.dispose()).to.be.rejectedWith(/test error/)
+            expect(self.subject.dispose()).to.be.rejectedWith(/test error/)
             .then(function() {
                 setTimeout(function() {
                     try {
@@ -105,7 +105,7 @@ describe('Subscription', function () {
         });
 
         it('should reject with an error if the queue is already unsubscribed', function () {
-             
+
             this.subject.queue.state = 'closing';
 
             return this.subject.dispose().should.be.rejectedWith(
