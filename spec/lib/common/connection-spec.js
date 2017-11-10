@@ -290,7 +290,8 @@ describe('Connection', function () {
                     });
                     this.subject.start().then(function () {
                         return expect(self.subject.stop()).to.be.fulfilled;
-                    });
+                    })
+                    .then(done());
                 });
 
                 it('should reject if not connected', function () {

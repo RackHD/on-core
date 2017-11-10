@@ -22,11 +22,14 @@ describe("Task protocol functions", function() {
         testSubscription = new Subscription({},{});
         testMessage = new Message({},{},{});
         sinon.stub(testMessage);
-        sinon.stub(messenger);
         sinon.stub(testSubscription);
         sinon.stub(events);
     });
 
+    beforeEach(function() {
+        this.sandbox.stub(messenger, 'request');
+        this.sandbox.stub(messenger, 'publish');
+    });
     helper.after();
 
     describe("Run", function() {

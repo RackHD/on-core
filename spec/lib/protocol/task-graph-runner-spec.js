@@ -25,7 +25,12 @@ describe("TaskGraph Runner protocol functions", function () {
         testSubscription = new Subscription({},{});
         testMessage = new Message({},{},{});
         sinon.stub(testMessage);
-        sinon.stub(messenger);
+    });
+
+    beforeEach(function() {
+        this.sandbox.stub(messenger, 'request');
+        this.sandbox.stub(messenger, 'publish');
+        this.sandbox.stub(messenger, 'subscribe');
     });
 
     helper.after();
@@ -88,6 +93,7 @@ describe("TaskGraph Runner protocol functions", function () {
 
         it("should subscribe and receive cancelTaskGraph failures", function() {
             var graphId = uuid.v4();
+            messenger.subscribe.restore();
             messenger.request.rejects(sampleError);
             return taskgraphrunner.subscribeCancelTaskGraph(function(_graphId) {
                 expect(_graphId).to.deep.equal(graphId);
