@@ -1,5 +1,7 @@
 // Copyright 2015, EMC, Inc.
 
+// sample change
+
 'use strict';
 module.exports = prepareGrunt;
 
