@@ -44,7 +44,7 @@ module.exports = function (di, directory) {
             helper.requireWrapper('jsonschema', 'jsonschema'),
             helper.simpleWrapper(console, 'console'),
             helper.simpleWrapper(require('eventemitter2').EventEmitter2, 'EventEmitter'),
-            helper.requireWrapper('shortid', 'shortid'),
+            helper.requireWrapper('nanoid', 'nanoid'),
             helper.requireWrapper('crypto', 'crypto'),
             helper.requireWrapper('crypt3/sync', 'crypt'),
             helper.requireWrapper('util', 'util'),
