@@ -1,8 +1,10 @@
-# Copyright 2016, EMC, Inc. 
-ARG repo=nodesource
-ARG tag=4.4.6
+# Copyright 2016-2018, Dell EMC, Inc.
+ARG repo=node
+ARG tag=4.8.7-wheezy
 
-FROM ${repo}/wheezy:${tag}
+FROM ${repo}:${tag}
+
+RUN npm install -g npm@5.7.1
 
 COPY . /RackHD/on-core/
 
