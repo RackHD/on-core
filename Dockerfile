@@ -1,13 +1,12 @@
-# Copyright 2016, EMC, Inc. 
-ARG repo=nodesource
-ARG tag=4.4.6
+# Copyright 2016, EMC, Inc.
+ARG repo=node
+ARG tag=8.11.1
 
-FROM ${repo}/wheezy:${tag}
+FROM ${repo}:${tag}
 
 COPY . /RackHD/on-core/
 
 RUN cd /RackHD/on-core \
-  && npm install \
-  && npm prune --production
+  && npm install --production
 
 VOLUME /opt/monorail
