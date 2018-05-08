@@ -38,18 +38,19 @@ describe('LogEvent', function () {
 
         describe('redact', function() {
             var testRedactKeys = ['password', 'PASSWORD', 'serverPassword', 'plainPassword',
-                'Password123', 'pppassword', 'encryptedPasswords', 'community'];
+                'Password123', 'pppassword', 'encryptedPasswords', 'community',
+                'productkey', 'Productkey'];
             var testNotRedactKeys = ['pass_word', 'foobar', 'Community', 'community123',
-                'acommunity', 'p.assword'];
+                'acommunity', 'p.assword', 'aproductkey', 'produckey123', 'product.key'];
 
             before('redact', function() {
                 //intentionally add some non-supported redactions to verify they are ignored
-                LogEvent.initRedact([/password/i, 'community', 123, ['a', 'b']]);
+                LogEvent.initRedact([/password/i, 'community', /^productkey$/i, 123, ['a', 'b']]);
             });
 
             it('should have initialized the RegExp redaction pattern in advance', function() {
                 LogEvent._redactPatterns.should.be.an.array;
-                LogEvent._redactPatterns.should.have.length(2);
+                LogEvent._redactPatterns.should.have.length(3);
                 _.isRegExp(LogEvent._redactPatterns[0]).should.be.true;
                 LogEvent._redactPatterns[0].toString().should.equal('/password/i');
             });
