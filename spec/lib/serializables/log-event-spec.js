@@ -67,6 +67,11 @@ describe('LogEvent', function () {
                 });
             });
 
+            it('should succeed if the field is a string array', function() {
+                var srcObj = { array: [ {'bar': ['foo']} ] };
+                LogEvent.redact(srcObj).should.deep.equal(srcObj);
+            });
+
             it('should redact fields which are marked for redaction', function() {
                 _.forEach(testRedactKeys, function(key) {
                     var srcObj = {}, dstObj = {};
