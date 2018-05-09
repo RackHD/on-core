@@ -186,7 +186,7 @@ describe('Models.Lookup', function () {
                     'macAddress'
                 ).then(function () {
                     expect(waterline.lookups.findAndModifyMongo).to.have.been.calledOnce;
-                    var query = { macAddress: 'macAddress' };
+                    var query = { macAddress: 'macaddress' };
                     var update = { $set: { node:  waterline.lookups.mongo.objectId('node') }};
                     expect(waterline.lookups.findAndModifyMongo.firstCall.args[0])
                         .to.deep.equal(query);
@@ -212,7 +212,7 @@ describe('Models.Lookup', function () {
                     'proxy',
                     'macAddress'
                 ).then(function () {
-                    expect(findOne).to.have.been.calledWith({ macAddress: 'macAddress' });
+                    expect(findOne).to.have.been.calledWith({ macAddress: 'macaddress' });
                     expect(update).to.have.been.calledWith({ id: 'id' }, { proxy: 'proxy' });
                 });
             });
@@ -224,7 +224,7 @@ describe('Models.Lookup', function () {
                     'proxy',
                     'macAddress'
                 )).to.be.rejectedWith(Errors.NotFoundError).then(function () {
-                    expect(findOne).to.have.been.calledWith({ macAddress: 'macAddress' });
+                    expect(findOne).to.have.been.calledWith({ macAddress: 'macaddress' });
                 });
             });
         });
